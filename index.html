@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Колесо Баланса / Balance Wheel</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    /* Общие стили */
+    body {
+      transition: background-color 0.3s, color 0.3s;
+    }
+    /* Тёмная тема */
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+    body.dark-mode .navbar,
+    body.dark-mode .nav-tabs {
+      background-color: #1f1f1f;
+    }
+    body.dark-mode .nav-tabs .nav-link.active {
+      background-color: #2c2c2c;
+      color: #fff;
+    }
+    /* Пастельные цвета для сфер можно задать в JS, но общий стиль для примера: */
+    .sphere-header {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    /* Стили для canvas */
+    #balanceWheel {
+      border: 1px solid #ccc;
+      background-color: white;
+    }
+    body.dark-mode #balanceWheel {
+      background-color: #333;
+    }
+  </style>
+</head>
+<body>
+  <!-- Навигационная панель -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Колесо Баланса / Balance Wheel</a>
+      <div class="d-flex">
+        <button id="themeToggle" class="btn btn-secondary me-2">Светлая тема</button>
+        <button id="langToggle" class="btn btn-secondary">EN</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Основной контент -->
+  <div class="container mt-4">
+    <div class="row">
+      <!-- Левая колонка: вкладки сфер -->
+      <div class="col-md-6">
+        <ul class="nav nav-tabs" id="sphereTabs" role="tablist">
+          <!-- Вкладки будут сгенерированы динамически -->
+        </ul>
+        <div class="tab-content" id="sphereTabContent">
+          <!-- Содержимое вкладок -->
+        </div>
+      </div>
+      <!-- Правая колонка: колесо баланса и общее среднее -->
+      <div class="col-md-6">
+        <h4 id="wheelTitle">Колесо Баланса</h4>
+        <canvas id="balanceWheel" width="400" height="400"></canvas>
+        <div id="overallAverage" class="mt-2"></div>
+      </div>
+    </div>
+    <button id="saveResults" class="btn btn-primary mt-3">Сохранить результаты</button>
+  </div>
+
+  <!-- Скрипты -->
+  <script>
+    /***********************
+     * ДАННЫЕ И КОНФИГУРАЦИЯ
+     ***********************/
+    // Пример структуры сфер с вопросами.
+    // Для каждой сферы указан заголовок, пастельный цвет и список вопросов.
+    // Для каждого вопроса заданы заголовок и описания для значений 1–10 (на RU и EN).
+    const spheres = [
+      {
+        id: "health",
+        title: { ru: "Здоровье", en: "Health" },
+        color: "#AEDFF7", // пастельный голубой
+        questions: [
+          {
+            id: "appearance",
+            title: { ru: "Внешний вид", en: "Appearance" },
+            descriptions: {
+              1: { ru: "Крайне неопрятный, лишний вес и явные проблемы со здоровьем", en: "Extremely unkempt, overweight and clearly unhealthy" },
+              2: { ru: "Очень неопрятный, с заметными недостатками", en: "Very unkempt with visible flaws" },
+              3: { ru: "Непривлекательный, избыток веса заметен", en: "Unattractive, with noticeable excess weight" },
+              4: { ru: "Слабая забота о внешности, проблемы на поверхности", en: "Poor self-care, minor visible issues" },
+              5: { ru: "Средний внешний вид, без ярких недостатков", en: "Average appearance, no major flaws" },
+              6: { ru: "Немного ухоженный, видны положительные моменты", en: "Somewhat well-groomed, with positive aspects" },
+              7: { ru: "Хороший внешний вид, забота о здоровье видна", en: "Good appearance, health care is evident" },
+              8: { ru: "Очень ухоженный, спортивный вид почти идеален", en: "Very well-groomed, nearly athletic" },
+              9: { ru: "Отличный внешний вид, почти спортивный", en: "Excellent appearance, almost athletic" },
+              10: { ru: "Идеальный спортивный внешний вид, излучает здоровье", en: "Perfect athletic appearance radiating health" }
+            }
+          },
+          {
+            id: "nutrition",
+            title: { ru: "Питание", en: "Nutrition" },
+            descriptions: {
+              1: { ru: "Очень плохое питание, хаотичное и вредное", en: "Very poor nutrition, chaotic and unhealthy" },
+              2: { ru: "Плохое питание, нерегулярное и в основном вредное", en: "Poor nutrition, irregular and mostly unhealthy" },
+              3: { ru: "Низкое качество питания, редко выбираю полезное", en: "Low-quality nutrition, rarely choosing healthy food" },
+              4: { ru: "Питание оставляет желать лучшего, заметны отклонения", en: "Subpar nutrition with noticeable shortcomings" },
+              5: { ru: "Умеренное питание, рацион смешанный", en: "Moderate nutrition with a mixed diet" },
+              6: { ru: "Неплохое питание, базовые принципы соблюдаются", en: "Decent nutrition with basic principles followed" },
+              7: { ru: "Хорошее питание, можно улучшить баланс", en: "Good nutrition, though balance can be improved" },
+              8: { ru: "Очень хорошее питание, следую режиму", en: "Very good nutrition, following a schedule" },
+              9: { ru: "Отличное питание, почти всегда здоровая пища", en: "Excellent nutrition, almost always healthy" },
+              10: { ru: "Идеальное питание, строго по графику и полностью здоровое", en: "Perfect nutrition, strictly scheduled and completely healthy" }
+            }
+          },
+          {
+            id: "physical_activity",
+            title: { ru: "Физическая культура", en: "Physical Activity" },
+            descriptions: {
+              1: { ru: "Почти не двигаюсь – жизнь между диваном и креслом", en: "Almost no movement – life on the couch" },
+              2: { ru: "Очень малая активность, редкие попытки спорта", en: "Very little activity, rare exercise attempts" },
+              3: { ru: "Низкая активность, занятия нерегулярны", en: "Low activity, exercise is irregular" },
+              4: { ru: "Небольшая активность, спорт встречается редко", en: "Somewhat low activity, sport is occasional" },
+              5: { ru: "Средняя активность, иногда занимаюсь спортом", en: "Moderate activity, occasional exercise" },
+              6: { ru: "Неплохая активность, стараюсь быть в движении", en: "Decent activity, I try to keep moving" },
+              7: { ru: "Хорошая активность, занятия регулярны", en: "Good activity, exercise is regular" },
+              8: { ru: "Очень хорошая активность, почти каждый день", en: "Very good activity, nearly daily exercise" },
+              9: { ru: "Отличная активность, спорт – важная часть жизни", en: "Excellent activity, sport is a key part of life" },
+              10: { ru: "Идеальная активность, занимаюсь спортом каждый день", en: "Perfect activity, exercising daily" }
+            }
+          }
+          // Можно добавить остальные вопросы для сферы "Здоровье"
+        ]
+      },
+      {
+        id: "relationships",
+        title: { ru: "Отношения", en: "Relationships" },
+        color: "#F7D6AE", // пастельный оранжевый
+        questions: [
+          {
+            id: "communication",
+            title: { ru: "Общение", en: "Communication" },
+            descriptions: {
+              1: { ru: "Крайне затруднительно – общаюсь только по необходимости", en: "Extremely difficult – only communicate when forced" },
+              2: { ru: "Очень затруднительно, избегаю общения", en: "Very challenging, tend to avoid interactions" },
+              3: { ru: "Ограниченное общение, испытываю трудности", en: "Limited communication with noticeable difficulties" },
+              4: { ru: "Немного стеснительный, общение даётся с усилием", en: "Somewhat shy, communication takes effort" },
+              5: { ru: "Удовлетворительное общение, нормальное взаимодействие", en: "Satisfactory communication, normal interaction" },
+              6: { ru: "Хорошее общение, легко нахожу общий язык", en: "Good communication, easily connect with others" },
+              7: { ru: "Очень хорошее общение, вступаю в беседы с лёгкостью", en: "Very good communication, easily engage in conversation" },
+              8: { ru: "Отличное общение, свободно и уверенно общаюсь", en: "Excellent communication, speak freely and confidently" },
+              9: { ru: "Исключительное общение, нахожу общий язык с почти всеми", en: "Exceptional communication, connect with nearly everyone" },
+              10: { ru: "Мастер общения – легко, с удовольствием и открыто общаюсь", en: "Masterful communication – effortless and engaging" }
+            }
+          },
+          {
+            id: "friends",
+            title: { ru: "Друзья", en: "Friends" },
+            descriptions: {
+              1: { ru: "Друзей почти нет, или они только используют", en: "Almost no friends or only people who use you" },
+              2: { ru: "Очень мало друзей, тяжело найти поддержку", en: "Very few friends, hard to find support" },
+              3: { ru: "Небольшой круг, не всегда можно положиться", en: "Small circle, not always reliable" },
+              4: { ru: "Ограниченное количество друзей, поддержки порой не хватает", en: "Limited friends, support sometimes lacking" },
+              5: { ru: "Средний круг друзей, поддержку можно получить", en: "Average circle, support is available" },
+              6: { ru: "Хороший круг друзей, на кого можно положиться", en: "Good circle, dependable support" },
+              7: { ru: "Большой круг друзей, всегда готовы поддержать", en: "Large circle, always supportive" },
+              8: { ru: "Отличный круг, близкие и надёжные друзья", en: "Excellent circle, close and reliable" },
+              9: { ru: "Исключительный круг, всегда рядом в трудную минуту", en: "Exceptional circle, always there in tough times" },
+              10: { ru: "Друзья на всю жизнь, всегда поддерживают и вдохновляют", en: "Friends for life, always supportive and inspiring" }
+            }
+          }
+          // Можно добавить остальные вопросы для сферы "Отношения"
+        ]
+      },
+      {
+        id: "environment",
+        title: { ru: "Окружение", en: "Environment" },
+        color: "#D1F7C4", // пастельный зелёный
+        questions: [
+          {
+            id: "relatives",
+            title: { ru: "Родственники", en: "Relatives" },
+            descriptions: {
+              1: { ru: "Отношения крайне напряжены, почти ненавижу", en: "Extremely tense relationships, almost hateful" },
+              2: { ru: "Очень сложные отношения, редко общаюсь", en: "Very difficult, rarely in touch" },
+              3: { ru: "Частые конфликты, отношения далеки от теплых", en: "Frequent conflicts, far from warm" },
+              4: { ru: "Прохладные отношения, мало теплоты", en: "Cool relationships, little warmth" },
+              5: { ru: "Нейтральные отношения, без ярких эмоций", en: "Neutral relationships, no strong emotions" },
+              6: { ru: "Хорошие отношения, поддерживаю связь", en: "Good relationships, maintain contact" },
+              7: { ru: "Очень хорошие отношения, почти всегда поддерживаем", en: "Very good relationships, almost always supportive" },
+              8: { ru: "Отличные отношения, часто общаемся и помогаем", en: "Excellent relationships, frequently in touch" },
+              9: { ru: "Исключительные отношения, близость и поддержка на высшем уровне", en: "Exceptional relationships, high-level closeness" },
+              10: { ru: "Идеальные отношения – полное взаимопонимание и поддержка", en: "Ideal relationships with complete understanding" }
+            }
+          }
+          // Можно добавить остальные вопросы для сферы "Окружение"
+        ]
+      }
+      // Дополнительно можно добавить остальные сферы (Призвание, Обеспеченность, Самосовершенствование, Яркость жизни, Духовность)
+    ];
+
+    // Текущий язык (по умолчанию "ru") и тема (по умолчанию светлая)
+    let currentLanguage = "ru";
+    let darkMode = false;
+
+    // Статические переводы для элементов интерфейса
+    const translations = {
+      themeToggle: { ru: "Светлая тема", en: "Light Theme" },
+      langToggle: { ru: "EN", en: "RU" },
+      saveResults: { ru: "Сохранить результаты", en: "Save Results" },
+      balanceWheel: { ru: "Колесо Баланса", en: "Balance Wheel" },
+      overallAverage: { ru: "Общее среднее: ", en: "Overall Average: " },
+      average: { ru: "Среднее: ", en: "Average: " }
+    };
+
+    /***********************
+     * ФУНКЦИИ РЕНДЕРИНГА
+     ***********************/
+    // Генерация вкладок и содержимого на основе данных сфер
+    function renderTabs() {
+      const tabList = document.getElementById("sphereTabs");
+      const tabContent = document.getElementById("sphereTabContent");
+      tabList.innerHTML = "";
+      tabContent.innerHTML = "";
+      spheres.forEach((sphere, index) => {
+        // Создаём элемент вкладки
+        const li = document.createElement("li");
+        li.className = "nav-item";
+        const a = document.createElement("button");
+        a.className = "nav-link" + (index === 0 ? " active" : "");
+        a.id = "tab-" + sphere.id;
+        a.setAttribute("data-bs-toggle", "tab");
+        a.setAttribute("data-bs-target", "#pane-" + sphere.id);
+        a.type = "button";
+        a.role = "tab";
+        // Отображаем название сферы и среднее (будет обновлено)
+        a.innerText = `${sphere.title[currentLanguage]} (${translations.average[currentLanguage]}0.0)`;
+        li.appendChild(a);
+        tabList.appendChild(li);
+
+        // Создаём содержимое вкладки для сферы
+        const pane = document.createElement("div");
+        pane.className = "tab-pane fade" + (index === 0 ? " show active" : "");
+        pane.id = "pane-" + sphere.id;
+        pane.role = "tabpanel";
+        // Заголовок сферы с текущим средним
+        const header = document.createElement("h5");
+        header.innerText = `${sphere.title[currentLanguage]} - ${translations.average[currentLanguage]}0.0`;
+        header.className = "mb-3";
+        pane.appendChild(header);
+
+        // Для каждого вопроса создаём блок с ползунком
+        sphere.questions.forEach((question) => {
+          const formGroup = document.createElement("div");
+          formGroup.className = "mb-3";
+          const label = document.createElement("label");
+          label.className = "form-label sphere-header";
+          label.setAttribute("for", `slider_${sphere.id}_${question.id}`);
+          label.innerText = question.title[currentLanguage];
+          formGroup.appendChild(label);
+
+          const slider = document.createElement("input");
+          slider.type = "range";
+          slider.className = "form-range";
+          slider.id = `slider_${sphere.id}_${question.id}`;
+          slider.min = "1";
+          slider.max = "10";
+          slider.value = "5";
+          // При изменении обновляем описание и пересчитываем среднее
+          slider.addEventListener("input", () => {
+            updateSliderDisplay(sphere.id, question.id, slider.value);
+            updateSphereAverage(sphere.id);
+            drawWheel();
+          });
+          formGroup.appendChild(slider);
+
+          const desc = document.createElement("div");
+          desc.id = `desc_${sphere.id}_${question.id}`;
+          desc.className = "form-text";
+          // Начальное описание для значения 5
+          desc.innerText = question.descriptions[5][currentLanguage];
+          formGroup.appendChild(desc);
+
+          pane.appendChild(formGroup);
+        });
+        tabContent.appendChild(pane);
+      });
+      // Обновляем статичные элементы (например, заголовок колеса и кнопку сохранения)
+      document.getElementById("wheelTitle").innerText = translations.balanceWheel[currentLanguage];
+      document.getElementById("saveResults").innerText = translations.saveResults[currentLanguage];
+      updateOverallAverage();
+    }
+
+    // Обновление описания для конкретного слайдера
+    function updateSliderDisplay(sphereId, questionId, value) {
+      const sphere = spheres.find(s => s.id === sphereId);
+      if (!sphere) return;
+      const question = sphere.questions.find(q => q.id === questionId);
+      if (!question) return;
+      const descElem = document.getElementById(`desc_${sphereId}_${questionId}`);
+      descElem.innerText = question.descriptions[value][currentLanguage];
+    }
+
+    // Расчёт среднего балла для сферы и обновление заголовка вкладки и содержимого
+    function updateSphereAverage(sphereId) {
+      const sphere = spheres.find(s => s.id === sphereId);
+      if (!sphere) return;
+      let sum = 0, count = 0;
+      sphere.questions.forEach((question) => {
+        const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
+        const val = parseInt(slider.value);
+        sum += val;
+        count++;
+      });
+      const avg = (sum / count).toFixed(1);
+      // Обновляем заголовок вкладки и заголовок содержимого
+      const tabButton = document.getElementById("tab-" + sphere.id);
+      tabButton.innerText = `${sphere.title[currentLanguage]} (${translations.average[currentLanguage]}${avg})`;
+      const paneHeader = document.querySelector(`#pane-${sphere.id} h5`);
+      paneHeader.innerText = `${sphere.title[currentLanguage]} - ${translations.average[currentLanguage]}${avg}`;
+      updateOverallAverage();
+    }
+
+    // Расчёт общего среднего по всем сферам
+    function updateOverallAverage() {
+      let total = 0, count = 0;
+      spheres.forEach((sphere) => {
+        sphere.questions.forEach((question) => {
+          const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
+          total += parseInt(slider.value);
+          count++;
+        });
+      });
+      const overall = (total / count).toFixed(1);
+      document.getElementById("overallAverage").innerText = `${translations.overallAverage[currentLanguage]}${overall}`;
+    }
+
+    /***********************
+     * РИСОВАНИЕ "КОЛЕСА БАЛАНСА"
+     ***********************/
+    function drawWheel() {
+      const canvas = document.getElementById("balanceWheel");
+      const ctx = canvas.getContext("2d");
+      const width = canvas.width;
+      const height = canvas.height;
+      ctx.clearRect(0, 0, width, height);
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const maxRadius = Math.min(width, height) / 2 - 20;
+      const numSpheres = spheres.length;
+      let points = [];
+
+      // Вычисляем точку для каждой сферы (среднее значение задаёт длину радиуса)
+      spheres.forEach((sphere, index) => {
+        let sum = 0, cnt = 0;
+        sphere.questions.forEach((question) => {
+          const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
+          sum += parseInt(slider.value);
+          cnt++;
+        });
+        const avg = sum / cnt;
+        const angle = (2 * Math.PI * index) / numSpheres - Math.PI / 2;
+        const radius = (avg / 10) * maxRadius;
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        points.push({ x, y, avg, sphere });
+      });
+
+      // Рисуем полигон
+      ctx.beginPath();
+      points.forEach((point, i) => {
+        if (i === 0) {
+          ctx.moveTo(point.x, point.y);
+        } else {
+          ctx.lineTo(point.x, point.y);
+        }
+      });
+      ctx.closePath();
+      // Задаём заливку с прозрачностью для каждой сферы (будем использовать линейный градиент)
+      ctx.fillStyle = "rgba(100,150,255,0.3)";
+      ctx.fill();
+      ctx.strokeStyle = "#666";
+      ctx.stroke();
+
+      // Рисуем линии от центра и подписываем название сферы и среднее
+      points.forEach((point, index) => {
+        // Линия от центра
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.lineTo(point.x, point.y);
+        ctx.stroke();
+        // Подпись (смещаем чуть дальше от кончика)
+        const labelX = centerX + (point.x - centerX) * 1.15;
+        const labelY = centerY + (point.y - centerY) * 1.15;
+        ctx.fillStyle = "#000";
+        if(darkMode) ctx.fillStyle = "#fff";
+        ctx.font = "12px sans-serif";
+        const text = `${point.sphere.title[currentLanguage]} (${point.avg.toFixed(1)})`;
+        ctx.fillText(text, labelX - 20, labelY);
+      });
+    }
+
+    /***********************
+     * ПЕРЕКЛЮЧАТЕЛИ ТЕМЫ И ЯЗЫКА
+     ***********************/
+    document.getElementById("themeToggle").addEventListener("click", () => {
+      darkMode = !darkMode;
+      document.body.classList.toggle("dark-mode", darkMode);
+      document.getElementById("themeToggle").innerText = darkMode ? "Тёмная тема" : translations.themeToggle[currentLanguage];
+      drawWheel();
+    });
+
+    document.getElementById("langToggle").addEventListener("click", () => {
+      currentLanguage = currentLanguage === "ru" ? "en" : "ru";
+      // Обновляем текст переключателей и перерисовываем вкладки
+      document.getElementById("langToggle").innerText = translations.langToggle[currentLanguage];
+      document.getElementById("themeToggle").innerText = darkMode ? "Тёмная тема" : translations.themeToggle[currentLanguage];
+      renderTabs();
+      drawWheel();
+    });
+
+    /***********************
+     * СОХРАНЕНИЕ РЕЗУЛЬТАТОВ
+     ***********************/
+    document.getElementById("saveResults").addEventListener("click", () => {
+      let results = {};
+      spheres.forEach((sphere) => {
+        results[sphere.id] = {};
+        sphere.questions.forEach((question) => {
+          const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
+          results[sphere.id][question.id] = parseInt(slider.value);
+        });
+      });
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(results, null, 2));
+      const downloadAnchor = document.createElement("a");
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "results.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    });
+
+    // Инициализация интерфейса при загрузке страницы
+    document.addEventListener("DOMContentLoaded", () => {
+      renderTabs();
+      drawWheel();
+    });
+  </script>
+  <!-- Bootstrap 5 JS (для работы вкладок) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
