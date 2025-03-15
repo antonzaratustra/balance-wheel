@@ -1347,7 +1347,7 @@ function setupButtons() {
     currentLanguage = (currentLanguage === "ru") ? "en" : "ru";
   
     // 3. Обновляем текст кнопок
-    langBtn.innerText = (currentLanguage === "ru") ? "🌐 EN" : "🌐 RU";
+    langBtn.innerText = (currentLanguage === "ru") ? "🌐 RU" : "🌐 EN";
     themeBtn.innerText = darkMode
       ? (currentLanguage === "ru" ? "🌙 Тёмная" : "🌙 Dark")
       : (currentLanguage === "ru" ? "🌞 Светлая" : "🌞 Light");

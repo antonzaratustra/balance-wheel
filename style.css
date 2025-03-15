@@ -162,13 +162,14 @@ input[type=range]::-moz-range-thumb {
 ---- */
 @media (max-width: 576px) {
   input[type=range]::-webkit-slider-runnable-track {
-    /* 100% ширина минус 24px + слева 12px */
-    width: calc(100% - 24px);
-    margin-left: 12px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 12px; /* отступы по краям для компенсации thumb */
   }
   input[type=range]::-moz-range-track {
-    width: calc(100% - 24px);
-    margin-left: 12px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 12px;
   }
 }
 
