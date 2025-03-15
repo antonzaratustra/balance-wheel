@@ -921,11 +921,11 @@ function renderTabs() {
   const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
   tabLinks.forEach(tab => {
     tab.addEventListener("shown.bs.tab", () => {
-      document.getElementById("sphereTabContent").scrollIntoView({ behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
       updateTabStyles();
     });
     tab.addEventListener("hidden.bs.tab", () => {
-      document.getElementById("sphereTabContent").scrollIntoView({ behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
       updateTabStyles();
     });
   });
@@ -1326,6 +1326,19 @@ function setupButtons() {
   };
   
   
+
+  function handleFaqClick() {
+    const faqContent = document.getElementById("faqContent");
+    faqContent.innerHTML = faqInstructions[currentLanguage];
+    document.getElementById("sphereTabContent").style.display = "none";
+    faqContent.style.display = "block";
+  }
+  
+  // Прикрепляем обработчик к обеим кнопкам FAQ:
+  document.getElementById("faqBtnDesktop").addEventListener("click", handleFaqClick);
+  document.getElementById("faqBtnMobile").addEventListener("click", handleFaqClick);
+
+  
   langBtn.addEventListener("click", () => {
     // Сохраняем текущее состояние FAQ (открыт или закрыт)
     const faqContent = document.getElementById("faqContent");
@@ -1343,6 +1356,8 @@ function setupButtons() {
       });
     });
   
+
+    
     // 2. Переключаем язык
     currentLanguage = (currentLanguage === "ru") ? "en" : "ru";
   

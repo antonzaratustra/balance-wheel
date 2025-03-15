@@ -205,7 +205,8 @@ input[type=range]::-moz-range-thumb {
 
 .slider-desc {
   padding: 0 15px;
-
+  min-height: 2.5em; /* или другой подходящий размер для двух строк */
+  line-height: 1.2em; /* регулирует межстрочный интервал */
 
 }
 
@@ -528,6 +529,15 @@ input[type=range]::-moz-range-thumb {
   @media (max-width: 576px) {
     #faqBtn .faq-text {
       display: none;
+    }
+  }
+  
+
+
+  @media (min-width: 992px) {
+    #langToggle {
+      border-top-left-radius: 10px;
+      border-bottom-left-radius: 10px;
     }
   }
   

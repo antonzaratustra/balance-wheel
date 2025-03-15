@@ -15,8 +15,7 @@
     }
     /* Фон navbar такой же, как фон страницы */
     body.dark-mode .navbar {
-      background-color: #161616; /* или #202020, #2c2c2c и т.п. */
-  
+      background-color: #161616;
       border: none;
     }
     body:not(.dark-mode) .navbar {
@@ -33,12 +32,12 @@
     @media (min-width: 992px) {
       .position-relative {
         position: relative;
-        height: 800px; /* Подберите оптимальное значение */
+        height: 800px;
       }
       #canvas-wrapper {
         position: absolute;
         top: 0;
-        left: 60%; /* настройте значение для нужного отступа от левого блока */
+        left: 60%;
         transform: translateY(0);
       }
     }
@@ -48,17 +47,25 @@
   <!-- Фиксированная навигационная панель -->
   <nav class="navbar fixed-top navbar-expand-lg">
     <div class="container-fluid">
-      <!-- Вместо d-flex ... можно сделать btn-group -->
-      <div class="btn-group ms-auto" role="group">
-
-        <button id="faqBtn" class="btn btn-secondary">
+      <!-- Кнопка FAQ для десктопа (видна на lg и выше) -->
+      <div class="d-none d-lg-block">
+        <button id="faqBtnDesktop" class="btn btn-secondary">
           <span class="faq-emoji">💡</span>
           <span class="faq-text"> FAQ</span>
         </button>
-
-        <button id="langToggle" class="btn btn-secondary">🌐 EN</button>
-        <button id="themeToggle" class="btn btn-secondary">🌙 Dark</button>
-        <button id="savePDF" class="btn btn-primary">📄 Save</button>
+      </div>
+      <!-- Правый блок с остальными кнопками -->
+      <div class="ms-auto">
+        <div class="btn-group" role="group">
+          <!-- Кнопка FAQ для мобильных (видна на md и ниже) -->
+          <button id="faqBtnMobile" class="btn btn-secondary d-lg-none">
+            <span class="faq-emoji">💡</span>
+            <span class="faq-text"></span>
+          </button>
+          <button id="langToggle" class="btn btn-secondary">🌐 EN</button>
+          <button id="themeToggle" class="btn btn-secondary">🌙 Dark</button>
+          <button id="savePDF" class="btn btn-primary">📄 Save</button>
+        </div>
       </div>
     </div>
   </nav>
@@ -66,16 +73,16 @@
   <!-- Основной контент -->
   <div class="container mt-4 position-relative">
     <div class="row">
-      <!-- Левая колонка: вкладки сфер + вопросы -->
+      <!-- Левая колонка: вкладки сфер + контент -->
       <div class="col-md-7">
         <ul class="nav nav-tabs" id="sphereTabs" role="tablist"></ul>
         <div class="tab-content" id="sphereTabContent"></div>
-        <div id="faqContent" style="display: none; padding: 20px; margin-top: 80px"></div>
+        <!-- Контейнер для FAQ, по умолчанию скрыт -->
+        <div id="faqContent" style="display: none; padding: 20px; margin-top: 80px;"></div>
       </div>
     </div>
     <!-- Абсолютно позиционированный блок для канваса -->
     <div id="canvas-wrapper">
-      
       <div class="canvas-container">
         <canvas id="balanceWheel" width="800" height="800"></canvas>
       </div>
