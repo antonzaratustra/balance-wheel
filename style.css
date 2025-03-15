@@ -110,11 +110,11 @@ body:not(.dark-mode) button {
 }
 
 /* === СТИЛИЗАЦИЯ ПОЛЗУНКОВ === */
-input[type=range] {
+/* input[type=range] {
   -webkit-appearance: none;
   width: 100%;
   background: transparent;
-}
+} */
 input[type=range]::-webkit-slider-runnable-track {
   height: 6px;
   background: #ddd;
@@ -319,12 +319,12 @@ input[type=range]::-moz-range-thumb {
    Основные стили для ползунка 
    (ниже уже были, вынесено для наглядности)
 */
-input[type=range] {
+/* input[type=range] {
   -webkit-appearance: none;
   width: 100%;
   background: transparent;
   position: relative;
-}
+} */
 
 /* Стили для дорожки (webkit) */
 input[type=range]::-webkit-slider-runnable-track {
