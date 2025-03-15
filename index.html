@@ -50,9 +50,15 @@
     <div class="container-fluid">
       <!-- Вместо d-flex ... можно сделать btn-group -->
       <div class="btn-group ms-auto" role="group">
+
+        <button id="faqBtn" class="btn btn-secondary">
+          <span class="faq-emoji">💡</span>
+          <span class="faq-text"> FAQ</span>
+        </button>
+
         <button id="langToggle" class="btn btn-secondary">🌐 RU</button>
         <button id="themeToggle" class="btn btn-secondary">🌙 Dark</button>
-        <button id="savePDF" class="btn btn-primary">📄 Save (PDF)</button>
+        <button id="savePDF" class="btn btn-primary">📄 Save</button>
       </div>
     </div>
   </nav>
@@ -64,6 +70,7 @@
       <div class="col-md-7">
         <ul class="nav nav-tabs" id="sphereTabs" role="tablist"></ul>
         <div class="tab-content" id="sphereTabContent"></div>
+        <div id="faqContent" style="display: none; padding: 20px; margin-top: 80px"></div>
       </div>
     </div>
     <!-- Абсолютно позиционированный блок для канваса -->
