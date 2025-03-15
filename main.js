@@ -6,6 +6,8 @@ window.addEventListener("resize", () => {
 
 
 
+
+
 function fillCanvasBackground(canvas, color) {
   const ctx = canvas.getContext("2d");
   ctx.save();
@@ -234,7 +236,7 @@ const spheres = [
     id: "environment",
     emoji: "🏠",
     title: { ru: "Окружение", en: "Environment" },
-    color: "B2DFDB",
+    color: "#B2DFDB",
     questions: [
       {
         id: "relatives",
@@ -879,7 +881,7 @@ function renderTabs() {
       const initVal = slider.value;
       desc.innerText = question.descriptions[initVal] ? question.descriptions[initVal][currentLanguage] : "";
       let val = parseInt(initVal, 10);
-      let fraction = (val - 1) / 9;
+      let fraction = val / 10;
       let r = Math.round(255 * (1 - fraction));
       let g = Math.round(255 * fraction);
       desc.style.color = `rgb(${r}, ${g}, 0)`;
@@ -919,9 +921,11 @@ function renderTabs() {
   const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
   tabLinks.forEach(tab => {
     tab.addEventListener("shown.bs.tab", () => {
+      document.getElementById("sphereTabContent").scrollIntoView({ behavior: "smooth" });
       updateTabStyles();
     });
     tab.addEventListener("hidden.bs.tab", () => {
+      document.getElementById("sphereTabContent").scrollIntoView({ behavior: "smooth" });
       updateTabStyles();
     });
   });
@@ -999,7 +1003,7 @@ function updateSliderDisplay(sphereId, questionId, value) {
   descElem.innerText = dict ? dict[currentLanguage] : "";
 
   let val = parseInt(value, 10);
-  let fraction = (val - 1) / 9;
+  let fraction = val / 10; // <-- вместо (val - 1)/9
   let r = Math.round(255 * (1 - fraction));
   let g = Math.round(255 * fraction);
   descElem.style.color = `rgb(${r}, ${g}, 0)`;
@@ -1046,7 +1050,7 @@ function updateSliderDisplay(sphereId, questionId, value) {
   const dict = question.descriptions[value];
   descElem.innerText = dict ? dict[currentLanguage] : "";
   let val = parseInt(value, 10);
-  let fraction = (val - 1) / 9;
+  let fraction = val / 10; // <-- вместо (val - 1)/9
   let r = Math.round(255 * (1 - fraction));
   let g = Math.round(255 * fraction);
   descElem.style.color = `rgb(${r}, ${g}, 0)`;
@@ -1107,7 +1111,7 @@ function updateSliderDisplay(sphereId, questionId, value) {
   const dict = question.descriptions[value];
   descElem.innerText = dict ? dict[currentLanguage] : "";
   let val = parseInt(value, 10);
-  let fraction = (val - 1) / 9;
+  let fraction = val / 10;
   let r = Math.round(255 * (1 - fraction));
   let g = Math.round(255 * fraction);
   descElem.style.color = `rgb(${r}, ${g}, 0)`;
@@ -1163,6 +1167,8 @@ function updateOverallAverage() {
 /****************************************
  * 4. РИСОВАНИЕ «КОЛЕСА» (СЕКТОРОВ)
  ****************************************/
+// 1) ВНЕ функции — никакой prevSide не нужен, если вы фиксируете именно "Health".
+
 function drawWheel() {
   const canvas = document.getElementById("balanceWheel");
   const ctx = canvas.getContext("2d");
@@ -1173,20 +1179,22 @@ function drawWheel() {
   const centerX = width / 2;
   const centerY = height / 2;
   const maxRadius = Math.min(width, height) / 2 - 30;
-  const numSpheres = spheres.length;
-  const anglePerSphere = (2 * Math.PI) / numSpheres;
+  const anglePerSphere = (2 * Math.PI) / spheres.length;
   let startAngle = -Math.PI / 2;
 
-  // Сдвиги текста (отдельные смещения, если сектор попадает почти сверху/снизу/слева/справа)
   const shifts = {
-    topShift: { x: 0, y: -10 },
-    bottomShift: { x: 0, y: 10 },
-    leftShift: { x: 40, y: 0 },
-    rightShift: { x: -40, y: 0 }
+    leftShift:   { x: 40,  y: 0 },
+    rightShift:  { x: -40, y: 0 },
+    topShift:    { x: 0,   y: -10 },
+    bottomShift: { x: 0,   y: 10 }
   };
 
+  // Если хотите flipping для других сфер, оставьте threshold.
+  // Но Health будет игнорировать flipping.
+  const threshold = 0.2;
+
   spheres.forEach((sphere) => {
-    // Считаем среднее значение по вопросам сферы
+    // Подсчёт среднего
     let sum = 0, count = 0;
     sphere.questions.forEach((question) => {
       const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
@@ -1194,15 +1202,12 @@ function drawWheel() {
       count++;
     });
     const avg = sum / (count || 1);
-    
-    // Пропорция радиуса (avg от 1 до 10 => секторRadius от 1/10 до полного maxRadius)
+    // Радиус
     const fraction = avg / 10;
     const sectorRadius = fraction * maxRadius;
 
-    // Угол конца сектора
+    // Рисуем сектор
     const endAngle = startAngle + anglePerSphere;
-
-    // Рисуем «круговой» сектор
     ctx.beginPath();
     ctx.moveTo(centerX, centerY);
     ctx.arc(centerX, centerY, sectorRadius, startAngle, endAngle);
@@ -1212,58 +1217,69 @@ function drawWheel() {
     ctx.strokeStyle = darkMode ? "#ccc" : "#666";
     ctx.stroke();
 
-    // Середина сектора (для текста)
+    // Точка, где рисовать текст
     const midAngle = startAngle + anglePerSphere / 2;
-
-    // Радиус, на котором будет надпись (чуть за пределами сектора)
-    const labelRadius = maxRadius + 20;
-    let labelX = centerX + labelRadius * Math.cos(midAngle);
-    let labelY = centerY + labelRadius * Math.sin(midAngle);
-
-    // Текст для сферы
-    const sphereTitle = sphere.title[currentLanguage] || sphere.title["en"];
-    // По умолчанию эмодзи в начале
-    let text = `${sphere.emoji || ""} ${sphereTitle} ${avg.toFixed(1)}`;
-
-    // Определяем, куда сдвигать текст
-    let shift = { x: 0, y: 0 };
-    const sinMid = Math.sin(midAngle);
     const cosMid = Math.cos(midAngle);
+    const sinMid = Math.sin(midAngle);
 
-    // Если почти вертикально сверху/снизу — меняем на topShift/bottomShift
-    if (Math.abs(sinMid) > 0.99) {
-      // Почти ровно сверху (sinMid ~ 1 или ~ -1)
-      shift = shifts.topShift;  
-      // Если нужно различать верх/низ, 
-      // можно проверить sinMid > 0 ? topShift : bottomShift
-    } else if (Math.abs(sinMid) < 0.01) {
-      // Почти ровно горизонтально (sinMid ~ 0)
-      // Значит проверим cosMid > 0, cosMid < 0, если нужно...
-      shift = shifts.bottomShift;
-    } else if (cosMid < 0) {
-      // Левая половина
+    const labelRadius = maxRadius + 10;
+    let labelX = centerX + labelRadius * cosMid;
+    let labelY = centerY + labelRadius * sinMid;
+
+    // Формируем текст
+    const sphereTitle = sphere.title[currentLanguage] || sphere.title["en"];
+    let text;
+    let shift = { x: 0, y: 0 };
+
+    // ==============  ОСОБЫЙ СЛУЧАЙ "health"  ==================
+    if (sphere.id === "health") {
+      // Ни при каких условиях не flip'аем текст
+      // Всегда "❤️ Health 5.0"
+      // И shift, допустим, leftShift (чуть отодвинем)
+      text = `${sphere.emoji || ""} ${sphereTitle} ${avg.toFixed(1)}`;
       shift = shifts.leftShift;
-    } else {
-      // Правая половина
-      shift = shifts.rightShift;
-      // Если хотите ставить эмодзи справа – можно поменять текст:
-      text = `${sphereTitle} ${avg.toFixed(1)} ${sphere.emoji || ""}`;
+    } 
+    // ==============  ДЛЯ ОСТАЛЬНЫХ СФЕР  =======================
+    else {
+      // Сюда вставляете вашу обычную логику flipping:
+      // threshold-check, cosMid>0.2 => right, < -0.2 => left, и т.д.
+
+      if (cosMid > threshold) {
+        shift = shifts.rightShift;
+        text = `${sphereTitle} ${avg.toFixed(1)} ${sphere.emoji || ""}`;
+      } else if (cosMid < -threshold) {
+        shift = shifts.leftShift;
+        text = `${sphere.emoji || ""} ${sphereTitle} ${avg.toFixed(1)}`;
+      } else {
+        // Вертикальная зона
+        if (sinMid > 0) {
+          shift = shifts.topShift;
+          text = `${sphere.emoji || ""} ${sphereTitle} ${avg.toFixed(1)}`;
+        } else {
+          shift = shifts.bottomShift;
+          text = `${sphere.emoji || ""} ${sphereTitle} ${avg.toFixed(1)}`;
+        }
+      }
     }
 
-    // Применяем выбранный сдвиг
+    // Применяем shift
     labelX += shift.x;
     labelY += shift.y;
 
-    // Чтобы текст был по центру относительно точки labelX, labelY
+    // Выравнивание по центру
     const textWidth = ctx.measureText(text).width;
     labelX -= textWidth / 2;
 
-    // Цвет текста в зависимости от тёмной/светлой темы
+    // Рисуем текст
     ctx.fillStyle = darkMode ? "#fff" : "#000";
-    ctx.font = "16px sans-serif";
+    ctx.font = "18px sans-serif";
+    // тень / обводка
+    ctx.shadowColor = darkMode ? "#000" : "#fff";
+    ctx.shadowBlur = 2;
     ctx.fillText(text, labelX, labelY);
+    ctx.shadowBlur = 0;
 
-    // Разделительная линия от центра до края
+    // Линия (разделитель)
     ctx.beginPath();
     ctx.moveTo(centerX, centerY);
     ctx.lineTo(
@@ -1272,11 +1288,10 @@ function drawWheel() {
     );
     ctx.stroke();
 
-    // Готовимся к следующему сектору
     startAngle = endAngle;
   });
 
-  // Чертим финальную разграничивающую линию (между последним сектором и первым)
+  // Финальный разделитель
   ctx.beginPath();
   ctx.moveTo(centerX, centerY);
   ctx.lineTo(
@@ -1298,11 +1313,12 @@ function setupButtons() {
   themeBtn.addEventListener("click", () => {
     darkMode = !darkMode;
     document.body.classList.toggle("dark-mode", darkMode);
-   themeBtn.innerText = darkMode
-     ? (currentLanguage === "ru" ? "🌙 Тёмная" : "🌙 Dark")
-     : (currentLanguage === "ru" ? "🌞 Светлая" : "🌞 Light");
   
-    // Обновляем стили вкладок сразу после смены темы
+    // Меняем текст кнопки в зависимости от языка
+    themeBtn.innerText = darkMode
+      ? (currentLanguage === "ru" ? "🌙 Тёмная" : "🌙 Dark")
+      : (currentLanguage === "ru" ? "🌞 Светлая" : "🌞 Light");
+  
     updateTabStyles();
     drawWheel();
   });
@@ -1570,3 +1586,17 @@ document.getElementById("savePDF")?.addEventListener("click", async () => {
     drawWheel();
   }, 600);
 });
+
+
+let lastScrollTop = 0;
+window.addEventListener("scroll", function() {
+  let st = window.pageYOffset || document.documentElement.scrollTop;
+  if (st > lastScrollTop) {
+    // скроллим вниз, прячем sphereTabs
+    document.getElementById("sphereTabs").style.transform = "translateY(-200%)";
+  } else {
+    // скроллим вверх
+    document.getElementById("sphereTabs").style.transform = "translateY(0)";
+  }
+  lastScrollTop = st <= 0 ? 0 : st;
+}, false);

@@ -28,7 +28,7 @@ body {
 
 /* === ТЁМНАЯ ТЕМА === */
 body.dark-mode {
-  background-color: #121212;
+  background-color: #161616; /* или #202020, #2c2c2c и т.п. */
   color: #e0e0e0;
 }
 
@@ -83,9 +83,18 @@ body:not(.dark-mode) button {
   color: #000;
 }
 
+/* В тёмной теме (dark-mode) ползунки – темнее треки */
+body.dark-mode input[type=range]::-webkit-slider-runnable-track {
+  background: #444; /* или #3a3a3a */
+}
+body.dark-mode input[type=range]::-moz-range-track {
+  background: #444;
+}
+
+
 /* === КОНТЕЙНЕР ДЛЯ КАНВАСА (колеса) === */
 .canvas-container {
-  border: 1px solid #555;
+  border: 1px solid #b5b5b5;
   border-radius: 20px;
   padding: 10px;
   overflow: hidden;
@@ -115,6 +124,7 @@ body:not(.dark-mode) button {
   width: 100%;
   background: transparent;
 } */
+/* Базовые стили для бегунка (трек + сам "thumb") */
 input[type=range]::-webkit-slider-runnable-track {
   height: 6px;
   background: #ddd;
@@ -146,19 +156,56 @@ input[type=range]::-moz-range-thumb {
   transform: translateX(-50%);
 }
 
+/* ---- 
+   Мобильная верстка: сохраняем отступ слева (12px), 
+   чтобы трек не выходил за пределы "thumb".
+---- */
+@media (max-width: 576px) {
+  input[type=range]::-webkit-slider-runnable-track {
+    /* 100% ширина минус 24px + слева 12px */
+    width: calc(100% - 24px);
+    margin-left: 12px;
+  }
+  input[type=range]::-moz-range-track {
+    width: calc(100% - 24px);
+    margin-left: 12px;
+  }
+}
+
+/* ---- 
+   Десктоп: убираем отступ, чтобы трек начинался с самого левого края.
+---- */
+@media (min-width: 577px) {
+  input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    margin-left: 0;
+  }
+  input[type=range]::-moz-range-track {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
 /* Обёртка для ползунка и подписи */
 .slider-wrapper {
   display: flex;
   flex-direction: column;
-  padding: 0 15px;
 }
 @media (max-width: 576px) {
   .slider-wrapper {
+    padding: 0 15px;
+
     flex-direction: column-reverse;
   }
   .slider-wrapper .slider-desc {
     margin-bottom: 15px;
   }
+}
+
+.slider-desc {
+  padding: 0 15px;
+
+
 }
 
 /* === БЛОК КНОПОК ВВЕРХУ === */
@@ -278,7 +325,10 @@ input[type=range]::-moz-range-thumb {
 
 /* === ВЫРАВНИВАНИЕ КНОПОК (NAVBAR) === */
 /* На мобильном кнопки центрированы, а на десктопе – справа */
+/* --- Мобильная верстка (до 576px) --- */
 @media (max-width: 576px) {
+
+  /* Панель (navbar) с кнопками */
   .navbar .container-fluid {
     width: 90% !important;
     margin: 0 auto;
@@ -292,12 +342,31 @@ input[type=range]::-moz-range-thumb {
     margin: 0 auto;
     display: flex;
     justify-content: space-evenly;
+    
+  }
+
+  .navbar .container-fluid .ms-auto {
+    margin-left: 0 !important; /* убиваем auto */
+  }
+
+  /* Панель вкладок (#sphereTabs) */
+  #sphereTabs {
+    position: fixed;
+    top: 90px; /* как и было, чтобы не налезать на кнопки */
+    width: 90% !important;  /* то же самое, что у navbar */
+    margin: 0 auto;
+    z-index: 1000;
+    overflow: hidden;
+    border: none;
+    border-radius: 10px !important;
   }
 }
+
+/* --- Десктопная верстка (от 577px и шире) --- */
 @media (min-width: 577px) {
   .navbar .container-fluid {
     width: 100%;
-    padding: 0 10px;
+    padding: 0 30px;
     margin-top: 20px;
   }
   .navbar .container-fluid > .d-flex {
@@ -305,6 +374,7 @@ input[type=range]::-moz-range-thumb {
     justify-content: flex-end;
   }
 }
+
 
 /* === ОТСТУПЫ У ЗАГОЛОВКОВ ВОПРОСОВ (Spheres) === */
 .sphere-header {
@@ -319,6 +389,8 @@ input[type=range]::-moz-range-thumb {
    Основные стили для ползунка 
    (ниже уже были, вынесено для наглядности)
 */
+
+
 /* input[type=range] {
   -webkit-appearance: none;
   width: 100%;
@@ -434,3 +506,21 @@ input[type=range]::-moz-range-thumb {
 
 
 
+.nav-tabs .nav-link:hover {
+  filter: brightness(110%); /* или background-color: lighten(...) */
+  cursor: pointer;
+}
+
+
+
+
+
+@media (max-width: 576px) {
+  #sphereTabs {
+    position: fixed;
+    transition: transform 0.5s ease; /* Добавляем плавный переход */
+  }
+  }
+
+
+  

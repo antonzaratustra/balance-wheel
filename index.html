@@ -15,7 +15,8 @@
     }
     /* Фон navbar такой же, как фон страницы */
     body.dark-mode .navbar {
-      background-color: #121212 !important;
+      background-color: #161616; /* или #202020, #2c2c2c и т.п. */
+  
       border: none;
     }
     body:not(.dark-mode) .navbar {
@@ -45,12 +46,12 @@
 </head>
 <body class="dark-mode">
   <!-- Фиксированная навигационная панель -->
-  <nav class="navbar fixed-top navbar-expand-lg navbar-dark">
+  <nav class="navbar fixed-top navbar-expand-lg">
     <div class="container-fluid">
-      <!-- Изменённый класс: на мобильном по центру, на десктопе справа -->
-      <div class="d-flex justify-content-center justify-content-lg-end w-100">
-        <button id="langToggle" class="btn btn-secondary me-2">🌐 RU</button>
-        <button id="themeToggle" class="btn btn-secondary me-2">🌙 Dark</button>
+      <!-- Вместо d-flex ... можно сделать btn-group -->
+      <div class="btn-group ms-auto" role="group">
+        <button id="langToggle" class="btn btn-secondary">🌐 RU</button>
+        <button id="themeToggle" class="btn btn-secondary">🌙 Dark</button>
         <button id="savePDF" class="btn btn-primary">📄 Save (PDF)</button>
       </div>
     </div>
