@@ -1421,35 +1421,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupButtons();
 
 
-  const faqBtn = document.getElementById("faqBtn");
-faqBtn.addEventListener("click", () => {
-  const faqInstructions = {
-    ru: `<strong>Добро пожаловать в Mentorist Balance Wheel!</strong><br><br>
-  <strong>Обзор:</strong> Инструмент для оценки баланса жизни по 8 сферам: Здоровье, Отношения, Окружение, Призвание, Финансы, Саморазвитие, Яркость жизни, Духовность.<br><br>
-  <strong>1. Оценка:</strong> Используйте ползунки (0–10) для оценки; среднее значение показывается на вкладке и колесе.<br><br>
-  <strong>2. Визуализация:</strong> Колесо отображает сектора, размеры которых соответствуют оценкам, а текст (эмодзи и название) позиционируется автоматически.<br><br>
-  <strong>3. Переключение:</strong> Вкладки вверху позволяют выбрать нужную сферу.<br><br>
-  <strong>4. FAQ:</strong> Нажмите <strong>💡 FAQ</strong> для этой инструкции; для возврата – нажмите вкладку сферы.<br><br>
-  <strong>5. Тема и язык:</strong> Используйте кнопки для смены темы и языка (RU/EN).<br><br>
-  <strong>6. Сохранение:</strong> Кнопка <strong>📄 Save (PDF)</strong> сохраняет состояние колеса в PDF или JSON.`,
-    en: `<strong>Welcome to Mentorist Balance Wheel!</strong><br><br>
-  <strong>Overview:</strong> A tool to assess your life balance across 8 areas: Health, Relationships, Environment, Calling, Financial Security, Self-Improvement, Life Brightness, Spirituality.<br><br>
-  <strong>1. Assessment:</strong> Use sliders (0–10) to rate each aspect; the average is shown on the tab and wheel.<br><br>
-  <strong>2. Visualization:</strong> The wheel displays sectors sized by their scores, with auto-positioned labels.<br><br>
-  <strong>3. Switching:</strong> Use the top tabs to select an area.<br><br>
-  <strong>4. FAQ Mode:</strong> Click <strong>💡 FAQ</strong> to view this guide; click an area tab to return.<br><br>
-  <strong>5. Theme & Language:</strong> Use the buttons to toggle theme and language (RU/EN).<br><br>
-  <strong>6. Saving:</strong> The <strong>📄 Save (PDF)</strong> button saves your wheel state as a PDF or JSON.`
-  };
 
-  // Записываем инструкцию в контейнер FAQ
-  const faqContent = document.getElementById("faqContent");
-  faqContent.innerHTML = faqInstructions[currentLanguage];
-
-  // Скрываем контент сфер и показываем FAQ
-  document.getElementById("sphereTabContent").style.display = "none";
-  faqContent.style.display = "block";
-});
 
 const sphereTabs = document.querySelectorAll("#sphereTabs .nav-link");
 sphereTabs.forEach(tab => {

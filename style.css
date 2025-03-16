@@ -401,15 +401,30 @@ input[type=range]::-moz-range-thumb {
 } */
 
 /* Стили для дорожки (webkit) */
+/* Общие стили для ползунка */
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  background: transparent;
+}
+
+/* Стили для дорожки (трек) для всех устройств */
 input[type=range]::-webkit-slider-runnable-track {
-  width: calc(100% - 24px); /* Корректируем ширину трека, чтобы thumb не выходил за границы */
   height: 6px;
   background: #ddd;
   border-radius: 3px;
-  position: relative;
-  margin-left: 12px; /* Смещаем трек, чтобы он корректно выровнялся */
+  box-sizing: border-box;
+  padding: 0 12px; /* отступы для компенсации ширины thumb */
 }
-/* Стили для thumb (ползунка) (webkit) */
+input[type=range]::-moz-range-track {
+  height: 6px;
+  background: #ddd;
+  border-radius: 3px;
+  box-sizing: border-box;
+  padding: 0 12px;
+}
+
+/* Стили для thumb (ползунка) для всех устройств */
 input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 24px;
@@ -419,19 +434,8 @@ input[type=range]::-webkit-slider-thumb {
   border: none;
   cursor: pointer;
   position: relative;
-  transform: translateX(-12px); /* Смещаем его влево на половину ширины */
+  transform: translateX(-50%);
 }
-
-/* Firefox track */
-input[type=range]::-moz-range-track {
-  width: calc(100% - 24px);
-  height: 6px;
-  background: #ddd;
-  border-radius: 3px;
-  position: relative;
-  margin-left: 12px;
-}
-/* Firefox thumb */
 input[type=range]::-moz-range-thumb {
   width: 24px;
   height: 24px;
@@ -439,8 +443,10 @@ input[type=range]::-moz-range-thumb {
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  transform: translateX(-12px);
+  position: relative;
+  transform: translateX(-50%);
 }
+
 
 
 
