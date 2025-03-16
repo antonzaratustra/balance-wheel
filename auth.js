@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Закрываем модальное окно
       loginModal.hide();
       // Обновляем текст кнопки "Login" на имя пользователя (или email)
-      loginBtn.innerText = user.displayName || user.email || "Profile";
+    //   loginBtn.innerText = user.displayName || user.email || "Profile";
       // Сохраняем UID пользователя (если необходимо)
       localStorage.setItem("uid", user.uid);
     } catch (error) {
