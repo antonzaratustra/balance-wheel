@@ -88,6 +88,13 @@
           <span class="faq-text"> FAQ</span>
         </button>
       </div>
+
+
+
+      <div id="userInfo" class="ms-2" style="display: inline-block; color: #ccc;"></div>
+
+
+
       <!-- Правый блок с остальными кнопками -->
       <div class="ms-auto">
         <div class="btn-group" role="group">
@@ -96,9 +103,10 @@
             <span class="faq-emoji">💡</span>
             <span class="faq-text"></span>
           </button>
-          <button id="loginBtn" class="btn btn-secondary">Login</button>
           <button id="langToggle" class="btn btn-secondary">🌐 EN</button>
           <button id="themeToggle" class="btn btn-secondary">🌙 Dark</button>
+          <button id="loginBtn" class="btn btn-secondary">👤Login</button>
+
           <button id="savePDF" class="btn btn-primary">📄 Save</button>
         </div>
       </div>
@@ -180,8 +188,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <!-- Подключаем основной скрипт -->
 
-  <script src="main.js"></script>
+  
   <script type="module" src="firebase-init.js"></script>
   <script type="module" src="auth.js"></script>
+  <script type="module" src="main.js"></script>
 </body>
 </html>

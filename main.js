@@ -1,13 +1,20 @@
+// Импорт auth из firebase-init.js
+import { auth } from "./firebase-init.js";
+
+// Импорт нужных методов из firebase/auth
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
 
 
 
 
 
-
-
-
-
+document.addEventListener("DOMContentLoaded", () => {
 
 
 // Глобальная переменная для определения мобильного устройства
@@ -1480,7 +1487,6 @@ function setupButtons() {
   
 }
 
-document.addEventListener("DOMContentLoaded", () => {
   renderTabs();
   updateDateDisplay();
   drawWheel();
@@ -1497,7 +1503,7 @@ sphereTabs.forEach(tab => {
   });
 });
 
-});
+
 
 
 
@@ -1745,3 +1751,85 @@ window.addEventListener("scroll", function() {
   }
   lastScrollTop = st <= 0 ? 0 : st;
 }, false);
+
+
+
+
+
+
+
+
+
+
+
+
+const loginBtn = document.getElementById("loginBtn");
+const userInfo = document.getElementById("userInfo"); // div, где показываем имя
+
+// Слушаем изменения состояния аутентификации
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // Пользователь залогинен
+    loginBtn.innerText = "Logout";
+    // Показываем имя пользователя (или email), если есть
+    userInfo.textContent = user.displayName || user.email || "No Name";
+  } else {
+    // Пользователь вышел или ещё не залогинен
+    loginBtn.innerText = "Login";
+    userInfo.textContent = "";
+  }
+});
+
+loginBtn.addEventListener("click", () => {
+  if (auth.currentUser) {
+    // Уже залогинен => выходим
+    signOut(auth)
+      .then(() => {
+        console.log("Пользователь вышел");
+        // onAuthStateChanged сам обновит UI
+      })
+      .catch((err) => {
+        console.error("Ошибка при выходе:", err);
+      });
+  } else {
+    // Не залогинен => открываем модалку входа
+    const loginModalEl = document.getElementById("loginModal");
+    const loginModal = new bootstrap.Modal(loginModalEl, {
+      backdrop: "static",
+      keyboard: true
+    });
+    loginModal.show();
+  }
+});
+
+
+
+onAuthStateChanged(auth, (user) => {
+  // const mainContent = document.getElementById("mainContent"); // например, div, где всё колесо
+  if (user) {
+    loginBtn.innerText = "Logout";
+    userInfo.textContent = user.displayName || user.email;
+    // mainContent.style.display = "block"; // показываем колесо
+  } else {
+    loginBtn.innerText = "Login";
+    userInfo.textContent = "";
+    // mainContent.style.display = "none"; // скрываем колесо
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+});
