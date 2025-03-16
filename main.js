@@ -1359,6 +1359,7 @@ function setupButtons() {
       ? (currentLanguage === "ru" ? "🌙 Тёмная" : "🌙 Dark")
       : (currentLanguage === "ru" ? "🌞 Светлая" : "🌞 Light");
   
+      updateUILanguage();
     updateTabStyles();
     drawWheel();
   });
@@ -1444,6 +1445,7 @@ function setupButtons() {
   
     // 4. Обновляем дату
     updateDateDisplay();
+    updateUILanguage();
   
     // 5. Перерисовываем вкладки (контент сфер) – эта функция создаёт новые элементы,
     // поэтому после неё нужно снова прикрепить обработчики вкладок.
@@ -1778,6 +1780,7 @@ onAuthStateChanged(auth, (user) => {
     loginBtn.innerText = currentLanguage === "ru" ? "👤 Войти" : "👤 Login";
     userInfo.textContent = "";
   }
+  updateUILanguage();
 });
 
 
@@ -1823,6 +1826,66 @@ loginBtn.addEventListener("click", () => {
     });
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function updateUILanguage() {
+  // Обновляем текст кнопки логина/выхода
+  if (auth.currentUser) {
+    loginBtn.innerText = currentLanguage === "ru" ? "👤 Выйти" : "👤 Logout";
+  } else {
+    loginBtn.innerText = currentLanguage === "ru" ? "👤 Войти" : "👤 Login";
+  }
+  
+  // Обновляем текст в модальном окне
+  const loginModalLabel = document.getElementById("loginModalLabel");
+  const modalBodyText = document.querySelector("#loginModal .modal-body p");
+  const googleSignInBtn = document.getElementById("googleSignInBtn");
+  
+  if (currentLanguage === "ru") {
+    loginModalLabel.innerText = "Вход";
+    modalBodyText.innerText = "Войдите с помощью:";
+    googleSignInBtn.innerText = "Войти через Google";
+  } else {
+    loginModalLabel.innerText = "Login";
+    modalBodyText.innerText = "Sign in with:";
+    googleSignInBtn.innerText = "Sign in with Google";
+  }
+  
+  // Если у вас есть другие элементы с переводом – обновите и их
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
