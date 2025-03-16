@@ -1,3 +1,15 @@
+
+
+
+
+
+
+
+
+
+
+
+
 // Глобальная переменная для определения мобильного устройства
 let isMobile = window.innerWidth < 576;
 window.addEventListener("resize", () => {
@@ -17,6 +29,8 @@ function fillCanvasBackground(canvas, color) {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.restore();
 }
+
+
 
 
 /***************************************************
@@ -784,6 +798,16 @@ const spheres = [
 ];
 
 
+
+
+
+
+
+
+
+
+
+
   
 /****************************************
  * 3. РЕНДЕР ВКЛАДОК И ЭЛЕМЕНТОВ UI
@@ -1353,6 +1377,19 @@ function setupButtons() {
   };
   
   
+
+
+
+
+
+
+
+
+
+
+
+
+
   
   
 
@@ -1461,6 +1498,72 @@ sphereTabs.forEach(tab => {
 });
 
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+// -------------------------------
+  // Добавляем обработку модального окна авторизации
+  // -------------------------------
+  const loginBtn = document.getElementById("loginBtn");
+  const loginModalEl = document.getElementById("loginModal");
+  const loginModal = new bootstrap.Modal(loginModalEl, {
+    backdrop: "static",
+    keyboard: true
+  });
+
+  // Открываем модальное окно по клику на кнопку Login
+  loginBtn.addEventListener("click", () => {
+    loginModal.show();
+  });
+
+  // Обработчик для кнопки "Войти через Google"
+  const googleSignInBtn = document.getElementById("googleSignInBtn");
+  googleSignInBtn.addEventListener("click", async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      // Используем модульный API signInWithPopup
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      console.log("Пользователь вошёл:", user);
+      // Закрываем модальное окно
+      loginModal.hide();
+      // Обновляем текст кнопки "Login" на имя пользователя (или email)
+      loginBtn.innerText = user.displayName || user.email || "Profile";
+      // При необходимости сохраняем UID в localStorage
+      localStorage.setItem("uid", user.uid);
+    } catch (error) {
+      console.error("Ошибка авторизации:", error);
+      alert("Ошибка входа: " + error.message);
+    }
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /****************************************
  * 6. ТЕКУЩАЯ ДАТА И СОХРАНЕНИЕ В JSON/PDF

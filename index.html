@@ -44,6 +44,72 @@
   </style>
 </head>
 <body class="dark-mode">
+
+
+
+
+
+
+  <script type="module">
+    // Импорт необходимых модулей Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+  
+    // Конфигурация вашего проекта Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDyzigwSvdr8neaujmOqL3arcuXLe83UVo",
+      authDomain: "mentorist-1111.firebaseapp.com",
+      projectId: "mentorist-1111",
+      storageBucket: "mentorist-1111.firebasestorage.app",
+      messagingSenderId: "73083879430",
+      appId: "1:73083879430:web:25b64c11f3cd75d80dc387",
+      measurementId: "G-RWCL6CQ31K"
+    };
+  
+    // Инициализация Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+  
+    // Логирование для проверки корректной инициализации
+    console.log("Firebase App:", app);
+    console.log("Firebase Analytics:", analytics);
+    console.log("Firebase Auth:", auth);
+    console.log("Firestore DB:", db);
+    
+    // Теперь можно использовать Firebase Authentication, Firestore и т.д.
+  </script>
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   <!-- Фиксированная навигационная панель -->
   <nav class="navbar fixed-top navbar-expand-lg">
     <div class="container-fluid">
@@ -62,6 +128,7 @@
             <span class="faq-emoji">💡</span>
             <span class="faq-text"></span>
           </button>
+          <button id="loginBtn" class="btn btn-secondary">Login</button>
           <button id="langToggle" class="btn btn-secondary">🌐 EN</button>
           <button id="themeToggle" class="btn btn-secondary">🌙 Dark</button>
           <button id="savePDF" class="btn btn-primary">📄 Save</button>
@@ -69,6 +136,52 @@
       </div>
     </div>
   </nav>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Модальное окно для входа -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-dark">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">Login</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Sign in with:</p>
+        <!-- Кнопка "Войти через Google" -->
+        <button id="googleSignInBtn" class="btn btn-danger mb-2 w-100">Google</button>
+        <!-- Для Apple, если нужно, аналогично -->
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   <!-- Основной контент -->
   <div class="container mt-4 position-relative">
