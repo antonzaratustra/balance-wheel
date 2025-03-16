@@ -585,7 +585,7 @@ input[type=range]::-moz-range-thumb {
 
 
 .slider-desc {
-  padding: 0 15px;
+  /* padding: 0 15px; */
   min-height: 2.5em; /* или другой подходящий размер для двух строк */
   line-height: 1.2em; /* регулирует межстрочный интервал */
 
