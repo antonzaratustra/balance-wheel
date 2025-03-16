@@ -486,14 +486,7 @@ input[type=range]::-moz-range-thumb {
   box-sizing: border-box;
 }
 
-/* Сбрасываем дефолтные стили у range и растягиваем на всю ширину обёртки */
-.range-container input[type=range] {
-  width: 100%;
-  margin: 0;
-  background: transparent;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
+
 
 /* Трек (WebKit) */
 .range-container input[type=range]::-webkit-slider-runnable-track {
@@ -589,16 +582,7 @@ input[type=range]::-moz-range-thumb {
   display: flex;
   flex-direction: column;
 }
-@media (max-width: 576px) {
-  .slider-wrapper {
-    padding: 0 15px;
 
-    flex-direction: column-reverse;
-  }
-  .slider-wrapper .slider-desc {
-    margin-bottom: 15px;
-  }
-}
 
 .slider-desc {
   padding: 0 15px;
