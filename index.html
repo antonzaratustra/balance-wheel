@@ -127,17 +127,17 @@
 
 
 
-<!-- Модальное окно для входа -->
+<!-- Модальное окно для входа (Bootstrap 5) -->
 <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content text-dark">
       <div class="modal-header">
-        <h5 class="modal-title" id="loginModalLabel">Login</h5>
+        <h5 class="modal-title" id="loginModalLabel">Вход</h5>
+        <!-- Обратите внимание, чтобы кнопка закрытия имела data-bs-dismiss="modal" -->
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p>Sign in with:</p>
-        <!-- Кнопка "Войти через Google" -->
+        <p>Войдите с помощью:</p>
         <button id="googleSignInBtn" class="btn btn-danger mb-2 w-100">Google</button>
       </div>
     </div>

@@ -1766,56 +1766,65 @@ window.addEventListener("scroll", function() {
 const loginBtn = document.getElementById("loginBtn");
 const userInfo = document.getElementById("userInfo"); // div, где показываем имя
 
-// Слушаем изменения состояния аутентификации
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    // Пользователь залогинен
-    loginBtn.innerText = "Logout";
-    // Показываем имя пользователя (или email), если есть
-    userInfo.textContent = user.displayName || user.email || "No Name";
+    // Если пользователь вошёл:
+    // Если выбран русский язык, меняем на "Выйти", иначе "Logout"
+    loginBtn.innerText = currentLanguage === "ru" ? "👤 Выйти" : "👤 Logout";
+    // Выводим имя пользователя или email
+    userInfo.textContent = user.displayName || user.email || "";
   } else {
-    // Пользователь вышел или ещё не залогинен
-    loginBtn.innerText = "Login";
+    // Пользователь не вошёл
+    loginBtn.innerText = currentLanguage === "ru" ? "👤 Войти" : "👤 Login";
     userInfo.textContent = "";
   }
 });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Обработчик клика по кнопке Login/Logout
 loginBtn.addEventListener("click", () => {
   if (auth.currentUser) {
-    // Уже залогинен => выходим
+    // Пользователь залогинен – выполняем выход
     signOut(auth)
       .then(() => {
         console.log("Пользователь вышел");
-        // onAuthStateChanged сам обновит UI
+        // onAuthStateChanged обновит UI автоматически
       })
       .catch((err) => {
         console.error("Ошибка при выходе:", err);
       });
   } else {
-    // Не залогинен => открываем модалку входа
-    const loginModalEl = document.getElementById("loginModal");
+    // Пользователь не залогинен – открываем модальное окно для входа
     const loginModal = new bootstrap.Modal(loginModalEl, {
-      backdrop: "static",
+      backdrop: "static", // можно использовать "static", если не хотите закрывать при клике вне модалки
       keyboard: true
     });
     loginModal.show();
+
+    // Также можно добавить обработчик события скрытия модалки,
+    // чтобы при закрытии (например, нажатием на крестик) backdrop точно удалялся:
+    loginModalEl.addEventListener("hidden.bs.modal", () => {
+      // Удаляем модалку (или делаем какие-то действия)
+      // Если backdrop остается, можно попробовать вызвать loginModal.dispose();
+      loginModal.dispose();
+    });
   }
 });
 
 
-
-onAuthStateChanged(auth, (user) => {
-  // const mainContent = document.getElementById("mainContent"); // например, div, где всё колесо
-  if (user) {
-    loginBtn.innerText = "Logout";
-    userInfo.textContent = user.displayName || user.email;
-    // mainContent.style.display = "block"; // показываем колесо
-  } else {
-    loginBtn.innerText = "Login";
-    userInfo.textContent = "";
-    // mainContent.style.display = "none"; // скрываем колесо
-  }
-});
 
 
 
