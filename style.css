@@ -591,7 +591,7 @@ input[type=range]::-moz-range-thumb {
 
 }
 
-@media (max-width: 577px) {
+@media (max-width: 576px) {
 .btn {
   font-size: 0.7rem !important;
 }
@@ -600,8 +600,19 @@ input[type=range]::-moz-range-thumb {
 
 
 
+ @media (min-width: 577px) {
+  #userInfo {
+    padding-left: 20px;
+  }
+  }
 
 
 
+
+  @media (max-width: 576px) {
+    #userInfo {
+      display: none !important;
+    }
+    }
 
 
