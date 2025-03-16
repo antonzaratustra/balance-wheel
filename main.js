@@ -10,7 +10,12 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
 
-
+import {
+  saveResultToFirestore,
+  loadResultsList,
+  loadSavedResult,
+  deleteSavedResult
+} from "./firestore-utils.js";
 
 
 
@@ -803,6 +808,126 @@ const spheres = [
     ]
   }
 ];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const saveToCloudBtn = document.getElementById("saveToCloudBtn");
+saveToCloudBtn.addEventListener("click", () => {
+  if (!auth.currentUser) {
+    alert("Сначала войдите в систему!");
+    return;
+  }
+  const title = prompt("Введите название результата:", "Мой результат");
+  if (title) {
+    // spheres — это ваш массив сфер
+    saveResultToFirestore(title, spheres);
+  }
+});
+
+
+
+
+const showResultsBtn = document.getElementById("showResultsBtn");
+const resultsModalEl = document.getElementById("resultsModal");
+const resultsListEl = document.getElementById("resultsList");
+
+showResultsBtn.addEventListener("click", async () => {
+
+
+
+  if (!auth.currentUser) {
+    alert("Сначала войдите в систему!");
+    return;
+  }
+
+  // Загружаем список
+  const entries = await loadResultsList();
+  // Очищаем содержимое
+  resultsListEl.innerHTML = "";
+
+  entries.forEach((entry) => {
+    // entry.id, entry.title, entry.createdAt, entry.data
+    const row = document.createElement("div");
+    row.classList.add("d-flex", "justify-content-between", "align-items-center", "mb-2");
+
+    // Название и дата
+    const titleSpan = document.createElement("span");
+    const dateStr = entry.createdAt?.seconds
+      ? new Date(entry.createdAt.seconds * 1000).toLocaleString()
+      : "(no date)";
+    titleSpan.textContent = `${entry.title || "Без названия"} — ${dateStr}`;
+
+    // Кнопки «Загрузить» и «Удалить»
+    const loadBtn = document.createElement("button");
+    loadBtn.className = "btn btn-sm btn-primary me-2";
+    loadBtn.textContent = "Загрузить";
+    loadBtn.addEventListener("click", () => {
+      loadSavedResult(entry.id); // применит ползунки
+    });
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "btn btn-sm btn-danger";
+    delBtn.textContent = "Удалить";
+    delBtn.addEventListener("click", async () => {
+      if (confirm("Точно удалить результат?")) {
+        await deleteSavedResult(entry.id);
+        // Обновим список заново
+        showResultsBtn.click(); // повторно вызываем клик, чтобы обновить
+      }
+    });
+
+    row.appendChild(titleSpan);
+    row.appendChild(loadBtn);
+    row.appendChild(delBtn);
+    resultsListEl.appendChild(row);
+  });
+
+  // Открываем модалку
+  const modal = new bootstrap.Modal(resultsModalEl);
+  modal.show();
+  
+});
+
+
+
+
+
+
+
 
 
 
@@ -1812,7 +1937,7 @@ loginBtn.addEventListener("click", () => {
   } else {
     // Пользователь не залогинен – открываем модальное окно для входа
     const loginModal = new bootstrap.Modal(loginModalEl, {
-      backdrop: "static", // можно использовать "static", если не хотите закрывать при клике вне модалки
+      backdrop: true, // можно использовать "static", если не хотите закрывать при клике вне модалки
       keyboard: true
     });
     loginModal.show();

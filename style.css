@@ -615,4 +615,18 @@ input[type=range]::-moz-range-thumb {
     }
     }
 
+  
 
+    .modal-backdrop {
+      --bs-backdrop-zindex: 1029 !important;
+    }
+    
+    
+
+
+    @media (min-width: 577px) {
+      #btn-group-padding {
+        padding-left: 20px;
+      }
+      }
+    

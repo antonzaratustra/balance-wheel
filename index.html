@@ -82,6 +82,8 @@
   <nav class="navbar fixed-top navbar-expand-lg">
     <div class="container-fluid">
       <!-- Кнопка FAQ для десктопа (видна на lg и выше) -->
+
+
       <div class="d-none d-lg-block">
         <button id="faqBtnDesktop" class="btn btn-secondary">
           <span class="faq-emoji">💡</span>
@@ -90,8 +92,57 @@
       </div>
 
 
+      <div class="btn-group" id="btn-group-padding" role="group">
+
+      <button id="saveToCloudBtn" class="btn btn-secondary">💾</button>
+
+
+
+
+
+      <button id="showResultsBtn" class="btn btn-secondary">☁️</button>
+    </div>
+
+
 
       <div id="userInfo" style="display: inline-block; color: #ccc;"></div>
+
+
+
+
+
+      <div class="modal fade" id="resultsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content text-dark">
+            <div class="modal-header">
+              <h5 class="modal-title">Мои результаты</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <div id="resultsList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
