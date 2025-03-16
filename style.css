@@ -144,7 +144,6 @@ input[type=range]::-webkit-slider-thumb {
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  transform: translateX(-50%);
 }
 input[type=range]::-moz-range-thumb {
   width: 24px;
@@ -153,62 +152,8 @@ input[type=range]::-moz-range-thumb {
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  transform: translateX(-50%);
 }
 
-/* ---- 
-   Мобильная верстка: сохраняем отступ слева (12px), 
-   чтобы трек не выходил за пределы "thumb".
----- */
-@media (max-width: 576px) {
-  input[type=range]::-webkit-slider-runnable-track {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 0 12px; /* отступы по краям для компенсации thumb */
-  }
-  input[type=range]::-moz-range-track {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 0 12px;
-  }
-}
-
-/* ---- 
-   Десктоп: убираем отступ, чтобы трек начинался с самого левого края.
----- */
-@media (min-width: 577px) {
-  input[type=range]::-webkit-slider-runnable-track {
-    width: 100%;
-    margin-left: 0;
-  }
-  input[type=range]::-moz-range-track {
-    width: 100%;
-    margin-left: 0;
-  }
-}
-
-/* Обёртка для ползунка и подписи */
-.slider-wrapper {
-  display: flex;
-  flex-direction: column;
-}
-@media (max-width: 576px) {
-  .slider-wrapper {
-    padding: 0 15px;
-
-    flex-direction: column-reverse;
-  }
-  .slider-wrapper .slider-desc {
-    margin-bottom: 15px;
-  }
-}
-
-.slider-desc {
-  padding: 0 15px;
-  min-height: 2.5em; /* или другой подходящий размер для двух строк */
-  line-height: 1.2em; /* регулирует межстрочный интервал */
-
-}
 
 /* === БЛОК КНОПОК ВВЕРХУ === */
 .top-buttons {
@@ -387,65 +332,8 @@ input[type=range]::-moz-range-thumb {
 
 
 
-/* 
-   Основные стили для ползунка 
-   (ниже уже были, вынесено для наглядности)
-*/
 
 
-/* input[type=range] {
-  -webkit-appearance: none;
-  width: 100%;
-  background: transparent;
-  position: relative;
-} */
-
-/* Стили для дорожки (webkit) */
-/* Общие стили для ползунка */
-input[type=range] {
-  -webkit-appearance: none;
-  width: 100%;
-  background: transparent;
-}
-
-/* Стили для дорожки (трек) для всех устройств */
-input[type=range]::-webkit-slider-runnable-track {
-  height: 6px;
-  background: #ddd;
-  border-radius: 3px;
-  box-sizing: border-box;
-  padding: 0 12px; /* отступы для компенсации ширины thumb */
-}
-input[type=range]::-moz-range-track {
-  height: 6px;
-  background: #ddd;
-  border-radius: 3px;
-  box-sizing: border-box;
-  padding: 0 12px;
-}
-
-/* Стили для thumb (ползунка) для всех устройств */
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 24px;
-  height: 24px;
-  background-color: var(--slider-thumb-color, #007bff);
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  position: relative;
-  transform: translateX(-50%);
-}
-input[type=range]::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
-  background-color: var(--slider-thumb-color, #007bff);
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  position: relative;
-  transform: translateX(-50%);
-}
 
 
 
@@ -547,3 +435,186 @@ input[type=range]::-moz-range-thumb {
     }
   }
   
+
+
+  .btn-like {
+    display: inline-block;
+    padding: 1px 8px;
+    
+    margin: 0 2px;
+    border-radius: 4px;
+    background-color: var(--btn-bg, #f0f0f0);
+    color: var(--btn-color, #333);
+    font-weight: bold;
+    font-size: 0.9em;
+  }
+  body.dark-mode .btn-like {
+    background-color: var(--btn-bg-dark, #444);
+    color: var(--btn-color-dark, #fff);
+  }
+  
+
+  
+ 
+
+
+ 
+  @media (max-width: 576px) {
+    #faqContent {
+      margin-top: 80px !important;
+    }
+  }
+
+
+  .faq-content {
+    line-height: 1.6 !important; /* или любое другое значение */
+  }
+  
+
+
+
+
+
+
+
+
+  /* Обёртка, создающая отступы слева и справа, равные половине ширины thumb */
+.range-container {
+  position: relative;
+  width: 100%;
+  padding: 0 12px; /* Если thumb = 24px, то половина = 12px */
+  box-sizing: border-box;
+}
+
+/* Сбрасываем дефолтные стили у range и растягиваем на всю ширину обёртки */
+.range-container input[type=range] {
+  width: 100%;
+  margin: 0;
+  background: transparent;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* Трек (WebKit) */
+.range-container input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 6px;
+  background: #ddd;
+  border-radius: 3px;
+}
+
+/* Трек (Firefox) */
+.range-container input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 6px;
+  background: #ddd;
+  border-radius: 3px;
+}
+
+/* Thumb (WebKit) */
+.range-container input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  background-color: var(--slider-thumb-color, #007bff);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  /* (24 - 6)/2 = 9 => чтобы центрировать thumb по вертикали над треком */
+  margin-top: -9px;
+}
+
+/* Thumb (Firefox) */
+.range-container input[type=range]::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  background-color: var(--slider-thumb-color, #007bff);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ---- 
+   Мобильная верстка: сохраняем отступ слева (12px), 
+   чтобы трек не выходил за пределы "thumb".
+---- */
+@media (max-width: 576px) {
+  input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 12px; /* отступы по краям для компенсации thumb */
+  }
+  input[type=range]::-moz-range-track {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 12px;
+  }
+}
+
+/* ---- 
+   Десктоп: убираем отступ, чтобы трек начинался с самого левого края.
+---- */
+@media (min-width: 577px) {
+  input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    margin-left: 0;
+  }
+  input[type=range]::-moz-range-track {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+/* Обёртка для ползунка и подписи */
+.slider-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+@media (max-width: 576px) {
+  .slider-wrapper {
+    padding: 0 15px;
+
+    flex-direction: column-reverse;
+  }
+  .slider-wrapper .slider-desc {
+    margin-bottom: 15px;
+  }
+}
+
+.slider-desc {
+  padding: 0 15px;
+  min-height: 2.5em; /* или другой подходящий размер для двух строк */
+  line-height: 1.2em; /* регулирует межстрочный интервал */
+
+}
+
+
+
+
+
+
+
+
+
+
+
+

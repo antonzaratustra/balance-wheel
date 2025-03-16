@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Range Test</title>
+
+  <!-- (Не обязательно) Bootstrap 5 для демонстрации конфликта -->
+  <!-- Закомментируйте эту строку, если хотите проверить без Bootstrap -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+  <style>
+    /* === ШАГ 1: создаём обёртку, где учитываем половину ширины thumb === */
+    .range-container {
+      position: relative;
+      width: 100%;
+      max-width: 300px;    /* Пример фиксированной ширины, чтобы наглядно увидеть края */
+      padding: 0 12px;     /* Если thumb=24px, половина = 12px */
+      box-sizing: border-box;
+      margin: 40px auto;   /* Отцентрируем для примера */
+      border: 1px dashed #666;
+    }
+
+    /* === ШАГ 2: сбрасываем дефолтные стили и растягиваем input[type=range] на 100% внутри обёртки === */
+    .range-container input[type=range] {
+      width: 100% !important;      /* !important, чтобы переплюнуть стили Bootstrap */
+      margin: 0;
+      background: transparent;
+      -webkit-appearance: none; /* отключаем дефолтный вид в WebKit */
+      -moz-appearance: none;    /* и в Firefox */
+      appearance: none;
+    }
+
+    /* Если вы используете класс .form-range из Bootstrap, переопределите его тоже */
+    .range-container input[type=range].form-range {
+      padding: 0 !important;
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      appearance: none !important;
+    }
+
+    /* === ШАГ 3: трек (track) === */
+    .range-container input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      background: #ddd;
+      border-radius: 3px;
+    }
+    .range-container input[type=range]::-moz-range-track {
+      width: 100%;
+      height: 6px;
+      background: #ddd;
+      border-radius: 3px;
+    }
+
+    /* === ШАГ 4: сам кружок (thumb) === */
+    .range-container input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      background-color: #007bff;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      margin-top: -9px;  /* (24 - 6)/2 = 9, чтобы центрировать thumb над треком */
+    }
+    .range-container input[type=range]::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      background-color: #007bff;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ДЛЯ ТЕСТА: ТРИ СЛАЙДЕРА С РАЗНЫМИ НАЧАЛЬНЫМИ ЗНАЧЕНИЯМИ -->
+  <div class="range-container">
+    <!-- Крайнее левое значение (0) -->
+    <input type="range" min="0" max="10" value="0" />
+  </div>
+
+  <div class="range-container">
+    <!-- Среднее значение (5) -->
+    <input type="range" min="0" max="10" value="5" />
+  </div>
+
+  <div class="range-container">
+    <!-- Крайнее правое значение (10) -->
+    <input type="range" min="0" max="10" value="10" />
+  </div>
+
+</body>
+</html>

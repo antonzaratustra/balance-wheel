@@ -794,16 +794,17 @@ function renderTabs() {
   const tabList = document.getElementById("sphereTabs");
   const tabContent = document.getElementById("sphereTabContent");
 
-  // === Сохраняем ID активной вкладки ===
+  // Сохраняем ID активной вкладки
   const activeTabId = document.querySelector("#sphereTabs .nav-link.active")?.id;
 
   tabList.innerHTML = "";
   tabContent.innerHTML = "";
 
-  spheres.forEach((sphere, index) => {
+  spheres.forEach((sphere) => {
     // Создаём вкладку
     const li = document.createElement("li");
     li.className = "nav-item";
+
     const btn = document.createElement("button");
     btn.className = "nav-link";
     btn.id = "tab-" + sphere.id;
@@ -813,7 +814,7 @@ function renderTabs() {
     btn.setAttribute("data-bs-target", "#pane-" + sphere.id);
     btn.role = "tab";
 
-    let avg = (5.0).toFixed(1); // Сразу делаем строку "5.0"
+    let avg = (5.0).toFixed(1);
     if (savedValues[sphere.id]) {
       let sum = 0, count = 0;
       for (const key in savedValues[sphere.id]) {
@@ -821,13 +822,12 @@ function renderTabs() {
         count++;
       }
       if (count) {
-        avg = (sum / count).toFixed(1); // Гарантируем один знак после запятой
+        avg = (sum / count).toFixed(1);
       }
     }
 
     let isMobileView = window.innerWidth < 576;
-
-    // Формируем innerHTML в зависимости от устройства
+    // Текст на вкладке (мобильная/десктопная версия)
     if (isMobileView) {
       btn.innerHTML = `<span class="tab-emoji">${sphere.emoji || ""}</span> <span class="tab-average">${avg}</span>`;
     } else {
@@ -858,9 +858,16 @@ function renderTabs() {
       label.innerText = question.title[currentLanguage];
       formGroup.appendChild(label);
 
+      // Обёртка для слайдера + описание
       const sliderWrapper = document.createElement("div");
       sliderWrapper.className = "slider-wrapper";
 
+      // -- ВАЖНО: range-container --
+      // Здесь создаём div с классом "range-container", внутрь которого кладём сам <input type="range">
+      const rangeContainer = document.createElement("div");
+      rangeContainer.className = "range-container";
+
+      // Создаём сам слайдер
       const slider = document.createElement("input");
       slider.type = "range";
       slider.className = "form-range slider-control";
@@ -868,35 +875,46 @@ function renderTabs() {
       slider.min = "0";
       slider.max = "10";
       slider.value = (savedValues[sphere.id] && savedValues[sphere.id][question.id]) || "5";
+      // Цвет thumb берём из sphere.color
       slider.style.setProperty('--slider-thumb-color', sphere.color);
+
       slider.addEventListener("input", () => {
         updateSliderDisplay(sphere.id, question.id, slider.value);
         updateSphereAverage(sphere.id);
         drawWheel();
       });
 
+      // Описание
       const desc = document.createElement("div");
       desc.id = `desc_${sphere.id}_${question.id}`;
       desc.className = "form-text slider-desc";
       const initVal = slider.value;
-      desc.innerText = question.descriptions[initVal] ? question.descriptions[initVal][currentLanguage] : "";
+      desc.innerText = question.descriptions[initVal]
+        ? question.descriptions[initVal][currentLanguage]
+        : "";
       let val = parseInt(initVal, 10);
       let fraction = val / 10;
       let r = Math.round(255 * (1 - fraction));
       let g = Math.round(255 * fraction);
       desc.style.color = `rgb(${r}, ${g}, 0)`;
 
-      sliderWrapper.appendChild(slider);
+      // Вкладываем слайдер в rangeContainer
+      rangeContainer.appendChild(slider);
+      // Затем добавляем rangeContainer и описание в sliderWrapper
+      sliderWrapper.appendChild(rangeContainer);
       sliderWrapper.appendChild(desc);
+
+      // Вкладываем sliderWrapper в formGroup
       formGroup.appendChild(sliderWrapper);
       pane.appendChild(formGroup);
     });
+
     tabContent.appendChild(pane);
   });
 
   updateOverallAverage();
 
-  // === Восстанавливаем активную вкладку ===
+  // Восстанавливаем активную вкладку
   if (activeTabId) {
     const newActiveTab = document.getElementById(activeTabId);
     if (newActiveTab) {
@@ -908,7 +926,7 @@ function renderTabs() {
       }
     }
   } else {
-    // Если активной вкладки нет, делаем первую активной (на случай багов)
+    // Если активной вкладки нет, делаем первую активной
     const firstTab = document.querySelector("#sphereTabs .nav-link");
     const firstPane = document.querySelector("#sphereTabContent .tab-pane");
     if (firstTab && firstPane) {
@@ -1184,8 +1202,8 @@ function drawWheel() {
 
   // Определяем базовые смещения для остальных сфер
   const shifts = {
-    leftShift:   { x: 40,  y: 0 },
-    rightShift:  { x: -40, y: 0 },
+    leftShift:   { x: 45,  y: 0 },
+    rightShift:  { x: -60, y: 0 },
     topShift:    { x: 0,   y: -10 },
     bottomShift: { x: 0,   y: 10 }
   };
@@ -1235,7 +1253,7 @@ function drawWheel() {
 
     if (sphere.id === "health") {
       // Для health используем фиксированный порядок, но не смещаем текст вручную
-      text = `${sphere.emoji || ""} ${sphereTitle} ${avg.toFixed(1)}`;
+      text = `${sphereTitle} ${avg.toFixed(1)} ${sphere.emoji || ""}`;
       shift = { x: 0, y: 0 };
     } else {
       if (cosMid > threshold) {
@@ -1308,22 +1326,24 @@ function setupButtons() {
   // Глобальный объект с инструкциями FAQ (не внутри обработчика FAQ)
   const faqInstructions = {
     ru: `<strong>Добро пожаловать в Mentorist Balance Wheel!</strong><br><br>
-  <strong>Обзор:</strong> Инструмент для оценки баланса жизни по 8 сферам: Здоровье, Отношения, Окружение, Призвание, Финансы, Саморазвитие, Яркость жизни, Духовность.<br><br>
-  <strong>1. Оценка:</strong> Используйте ползунки (0–10) для оценки; среднее значение показывается на вкладке и колесе.<br><br>
-  <strong>2. Визуализация:</strong> Колесо отображает сектора, размеры которых соответствуют оценкам, а текст (эмодзи и название) позиционируется автоматически.<br><br>
-  <strong>3. Переключение:</strong> Вкладки вверху позволяют выбрать нужную сферу.<br><br>
-  <strong>4. FAQ:</strong> Нажмите <strong>💡 FAQ</strong> для этой инструкции; для возврата – нажмите вкладку сферы.<br><br>
-  <strong>5. Тема и язык:</strong> Используйте кнопки для смены темы и языка (RU/EN).<br><br>
-  <strong>6. Сохранение:</strong> Кнопка <strong>📄 Save (PDF)</strong> сохраняет состояние колеса в PDF или JSON.`,
+  Это инструмент для оценки баланса жизни по 8 ключевым сферам: Здоровье, Отношения, Окружение, Призвание, Финансы, Саморазвитие, Яркость жизни и Духовность.<br><br>
+  <strong>1. Тема и язык:</strong> Используйте кнопки для смены темы и языка <span class="btn-like">🌐 RU</span> and <span class="btn-like">🌙 Тёмная</span> / <span class="btn-like">🌞 Светлая</span>.<br><br>
+  <strong>2. FAQ:</strong> Нажмите <span class="btn-like">💡 FAQ</span> для этой инструкции; для возврата к сферам – нажмите вкладку сферы, например <span class="btn-like">❤️ Здоровье (5.0)</span>.<br><br>
+  <strong>3. Переключение:</strong> Вкладки вверху позволяют выбрать нужную сферу, например <span class="btn-like">❤️ Здоровье (5.0)</span>.<br><br>
+  <strong>4. Оценка:</strong> Используйте ползунки (0–10) для оценки сфер: ответьте на 5 экспресс вопросов в каждой. Среднее значение по сфере показывается на вкладке и на колесе баланса, а общее среднее – под ним.<br><br>
+  <strong>5. Визуализация:</strong> Колесо в реальном времени отображает сектора, размеры которых соответствуют оценкам и изменяются в зависимости от положения ползунков.<br><br>
+  <strong>6. Сохранение результатов:</strong> Кнопка <span class="btn-like">📄 Сохранить</span> сохраняет состояние колеса с вашими ответами в PDF.`,
     en: `<strong>Welcome to Mentorist Balance Wheel!</strong><br><br>
-  <strong>Overview:</strong> A tool to assess your life balance across 8 areas: Health, Relationships, Environment, Calling, Financial Security, Self-Improvement, Life Brightness, Spirituality.<br><br>
-  <strong>1. Assessment:</strong> Use sliders (0–10) to rate each aspect; the average is shown on the tab and wheel.<br><br>
-  <strong>2. Visualization:</strong> The wheel displays sectors sized by their scores, with auto-positioned labels.<br><br>
-  <strong>3. Switching:</strong> Use the top tabs to select an area.<br><br>
-  <strong>4. FAQ Mode:</strong> Click <strong>💡 FAQ</strong> to view this guide; click an area tab to return.<br><br>
-  <strong>5. Theme & Language:</strong> Use the buttons to toggle theme and language (RU/EN).<br><br>
-  <strong>6. Saving:</strong> The <strong>📄 Save (PDF)</strong> button saves your wheel state as a PDF or JSON.`
+  This tool helps you assess your life balance across 8 key areas: Health, Relationships, Environment, Calling, Financial Security, Self-Improvement, Life Brightness, and Spirituality.<br><br>
+  <strong>1. Theme & Language:</strong> Use the buttons <span class="btn-like">🌐 EN</span> and <span class="btn-like">🌙 Dark</span> / <span class="btn-like">🌞 Light</span> to toggle the theme and language.<br><br>
+  <strong>2. FAQ:</strong> Click <span class="btn-like">💡 FAQ</span> to view this guide; to return to the areas, click an area tab, e.g. <span class="btn-like">❤️ Health (5.0)</span>.<br><br>
+  <strong>3. Switching:</strong> The top tabs allow you to select an area, for example <span class="btn-like">❤️ Health (5.0)</span>.<br><br>
+  <strong>4. Assessment:</strong> Use sliders (0–10) to rate each area by answering 5 express questions per area. The average for each area is displayed on its tab and on the balance wheel, while the overall average appears below it.<br><br>
+  <strong>5. Visualization:</strong> The wheel displays sectors in real time, with sizes corresponding to the scores and updating as you move the sliders.<br><br>
+  <strong>6. Saving Results:</strong> The <span class="btn-like">📄 Save (PDF)</span> button saves the current state of your wheel with your responses as a PDF.`
   };
+  
+  
   
   
 
@@ -1634,14 +1654,17 @@ const DejaVuSansTTF = `
 
 
   let lastScrollTop = 0;
-  window.addEventListener("scroll", function() {
-    let st = window.pageYOffset || document.documentElement.scrollTop;
-    if (st > lastScrollTop) {
-      // скроллим вниз, прячем sphereTabs
-      document.getElementById("sphereTabs").style.transform = "translateY(-200%)";
-    } else {
-      // скроллим вверх
-      document.getElementById("sphereTabs").style.transform = "translateY(0)";
-    }
-    lastScrollTop = st <= 0 ? 0 : st;
-  }, false);
+window.addEventListener("scroll", function() {
+  // Если экран десктопный, выходим и не скрываем вкладки
+  if (window.innerWidth >= 576) return;
+
+  let st = window.pageYOffset || document.documentElement.scrollTop;
+  if (st > lastScrollTop) {
+    // Скроллим вниз – скрываем вкладки
+    document.getElementById("sphereTabs").style.transform = "translateY(-200%)";
+  } else {
+    // Скроллим вверх – показываем вкладки
+    document.getElementById("sphereTabs").style.transform = "translateY(0)";
+  }
+  lastScrollTop = st <= 0 ? 0 : st;
+}, false);
