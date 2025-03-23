@@ -652,6 +652,79 @@ input[type=range]::-moz-range-thumb {
       }
       }
     
+/* === СТИЛИ ДЛЯ МОДАЛЬНЫХ ОКОН === */
+.modal-content {
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--bs-border-color);
+  padding: 1.5rem 1.5rem 1rem;
+}
+
+.modal-title {
+  font-weight: 600;
+  color: var(--bs-primary);
+}
+
+.modal-body {
+  padding: 1.5rem;
+  color: var(--bs-body-color);
+}
+
+.modal-footer {
+  border-top: 1px solid var(--bs-border-color);
+  padding: 1rem 1.5rem 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.btn-close {
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.btn-close:hover {
+  opacity: 1;
+}
+
+/* Стили для кнопок в модальных окнах */
+.btn-primary {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+  padding: 0.5rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.btn-primary:hover {
+  background-color: var(--bs-primary-rgb);
+  border-color: var(--bs-primary-rgb);
+}
+
+.btn-secondary {
+  background-color: var(--bs-secondary);
+  border-color: var(--bs-secondary);
+  padding: 0.5rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.btn-danger {
+  background-color: var(--bs-danger);
+  border-color: var(--bs-danger);
+  padding: 0.5rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.btn-danger:hover {
+  background-color: var(--bs-danger-rgb);
+  border-color: var(--bs-danger-rgb);
+}
+
 /* === СТИЛИ ДЛЯ КОНТЕЙНЕРА СЛАЙДЕРА ИСТОРИИ === */
 #historySliderContainer {
   width: 100%;

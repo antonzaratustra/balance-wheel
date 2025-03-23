@@ -96,7 +96,7 @@ let darkMode = true;        // по умолчанию тёмная тема
 const saveToCloudBtn = document.getElementById("saveToCloudBtn");
 saveToCloudBtn.addEventListener("click", () => {
   if (!auth.currentUser) {
-    alert("Сначала войдите в систему!");
+    showModal("authModal");
     return;
   }
   // Сохраняем с текущей датой/временем как названием
@@ -112,7 +112,7 @@ const resultsListEl = document.getElementById("resultsList");
 
 showResultsBtn.addEventListener("click", async () => {
   if (!auth.currentUser) {
-    alert("Сначала войдите в систему!");
+    showModal("authModal");
     return;
   }
 
@@ -180,7 +180,7 @@ showResultsBtn.addEventListener("click", async () => {
     loadBtn.addEventListener("click", async () => {
       const data = await loadSavedResult(entry.id);
       if (!data) {
-        alert("Не удалось загрузить результат");
+        showModal("loadErrorModal");
         return;
       }
       
@@ -205,18 +205,24 @@ showResultsBtn.addEventListener("click", async () => {
       const modal = bootstrap.Modal.getInstance(resultsModalEl);
       modal.hide();
       
-      alert(`Загружен результат от ${dateStr}`);
+      showModal("loadSuccessModal");
     });
 
     delBtn.addEventListener("click", async () => {
-      if (confirm("Точно удалить результат?")) {
-        await deleteSavedResult(entry.id);
-        // Закрываем модальное окно
-        const modal = bootstrap.Modal.getInstance(resultsModalEl);
-        modal.hide();
-        // Обновляем список результатов
-        showResultsBtn.click();
-      }
+      showConfirmDeleteModal(async () => {
+        try {
+          await deleteSavedResult(entry.id);
+          // Закрываем модальное окно
+          const modal = bootstrap.Modal.getInstance(resultsModalEl);
+          modal.hide();
+          // Обновляем список результатов
+          showResultsBtn.click();
+          showModal("deleteSuccessModal");
+        } catch (error) {
+          console.error("Ошибка при удалении:", error);
+          showModal("deleteErrorModal");
+        }
+      });
     });
 
     // Собираем структуру
@@ -569,6 +575,7 @@ function initializeHistorySlider() {
     });
   }).catch(error => {
     console.error("Ошибка при загрузке результатов:", error);
+    showModal("loadErrorModal");
   });
 }
 
@@ -718,7 +725,7 @@ function updateSliderDisplay(sphereId, questionId, value) {
   if (!sphere) return;
   const question = sphere.questions.find(q => q.id === questionId);
   if (!question) return;
-  const descElem = document.getElementById(`desc_${sphereId}_${question.id}`);
+  const descElem = document.getElementById(`desc_${sphere.id}_${question.id}`);
   const dict = question.descriptions[value];
   descElem.innerText = dict ? dict[currentLanguage] : "";
   let val = parseInt(value, 10);
@@ -1361,6 +1368,7 @@ loginBtn.addEventListener("click", () => {
       })
       .catch((err) => {
         console.error("Ошибка при выходе:", err);
+        showModal("logoutErrorModal");
       });
   } else {
     // Пользователь не залогинен – открываем модальное окно для входа
@@ -1430,31 +1438,25 @@ function updateUILanguage() {
   // Если у вас есть другие элементы с переводом – обновите и их
 }
 
+function showModal(modalId) {
+  const modal = new bootstrap.Modal(document.getElementById(modalId));
+  modal.show();
+}
 
+function showConfirmDeleteModal(onConfirm) {
+  const modal = new bootstrap.Modal(document.getElementById("confirmDeleteModal"));
+  modal.show();
+  
+  // Добавляем обработчик для кнопки подтверждения
+  const confirmBtn = document.getElementById("deleteConfirmBtn");
+  confirmBtn.onclick = () => {
+    modal.hide();
+    onConfirm();
+  };
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function showLoadResultModal(date) {
+  document.getElementById("loadResultDate").textContent = date.toLocaleString();
+  showModal("loadResultModal");
+}
 });

@@ -168,7 +168,7 @@ export async function deleteSavedResult(entryId) {
   try {
     await deleteDoc(entryRef);
     console.log("Результат удалён:", entryId);
-    alert("Результат удалён!");
+    // alert("Результат удалён!");
   } catch (error) {
     console.error("Ошибка при удалении:", error);
   }
