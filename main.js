@@ -1,3 +1,26 @@
+// Глобальный объект с инструкциями FAQ
+const faqInstructions = {
+  ru: `<strong>Добро пожаловать в Mentorist Life Balance Wheel!</strong><br><br>
+  Это инструмент для оценки баланса жизни по 8 ключевым сферам: Здоровье, Отношения, Окружение, Призвание, Финансы, Саморазвитие, Яркость жизни и Духовность.<br><br>
+  <strong>1. Тема и язык:</strong> Используйте кнопки для смены темы и языка <span class="btn-like">🌐 RU</span> и <span class="btn-like">🌙 Тёмная</span> / <span class="btn-like">🌞 Светлая</span>.<br><br>
+  <strong>2. FAQ:</strong> Нажмите <span class="btn-like">💡 FAQ</span> для этой инструкции; для возврата к сферам – нажмите вкладку сферы, например <span class="btn-like">❤️ Здоровье (5.0)</span>.<br><br>
+  <strong>3. Переключение:</strong> Вкладки вверху позволяют переключаться между сферами жизни.<br><br>
+  <strong>4. Оценка:</strong> В каждой сфере есть 5 вопросов. Используйте слайдеры для оценки от 0 до 10.<br><br>
+  <strong>5. Визуализация:</strong> Колесо баланса наглядно показывает ваши оценки.<br><br>
+  <strong>6. Среднее:</strong> Для каждой сферы и общее среднее значение рассчитываются автоматически.<br><br>
+  <strong>7. Сохранение:</strong> Для сохранения результатов нажмите <span class="btn-like">👤 Login</span>, чтобы войти. После этого используйте кнопку <span class="btn-like">💾</span> для сохранения в облако или <span class="btn-like">☁️</span> для просмотра сохранённых результатов. Кнопка <span class="btn-like">🔽 PDF</span> позволяет скачать результаты в формате PDF.`,
+    
+    en: `<strong>Welcome to Mentorist Life Balance Wheel!</strong><br><br>
+  This is a tool for assessing life balance across 8 key areas: Health, Relationships, Environment, Calling, Finance, Self-Improvement, Life Brightness, and Spirituality.<br><br>
+  <strong>1. Theme & Language:</strong> Use buttons to change theme and language <span class="btn-like">🌐 EN</span> and <span class="btn-like">🌙 Dark</span> / <span class="btn-like">🌞 Light</span>.<br><br>
+  <strong>2. FAQ:</strong> Click <span class="btn-like">💡 FAQ</span> to view this guide; to return to the areas, click an area tab, e.g. <span class="btn-like">❤️ Health (5.0)</span>.<br><br>
+  <strong>3. Navigation:</strong> Use the tabs above to switch between life areas.<br><br>
+  <strong>4. Assessment:</strong> Each area has 5 questions. Use sliders to rate from 0 to 10.<br><br>
+  <strong>5. Visualization:</strong> The balance wheel visually represents your ratings.<br><br>
+  <strong>6. Average:</strong> For each area and overall, averages are calculated automatically.<br><br>
+  <strong>7. Saving:</strong> To save your results, click <span class="btn-like">👤 Login</span> to sign in. Then use the <span class="btn-like">💾</span> button to save to the cloud or <span class="btn-like">☁️</span> to view saved results. The <span class="btn-like">🔽 PDF</span> button allows you to download results as PDF.`
+};
+
 // Импорт auth из firebase-init.js
 import { auth } from "./firebase-init.js";
 import { DejaVuSansTTF } from './fonts.js';
@@ -505,12 +528,10 @@ function renderTabs() {
       }
     }
   } else {
-    // Если активной вкладки нет, делаем первую активной
-    const firstTab = document.querySelector("#sphereTabs .nav-link");
-    const firstPane = document.querySelector("#sphereTabContent .tab-pane");
-    if (firstTab && firstPane) {
-      firstTab.classList.add("active");
-      firstPane.classList.add("show", "active");
+    // Если активной вкладки нет, показываем FAQ
+    const faqTab = document.getElementById("faqBtnDesktop") || document.getElementById("faqBtnMobile");
+    if (faqTab) {
+      faqTab.click();
     }
   }
 
@@ -615,6 +636,18 @@ function updateCanvasFromHistory(entries, index) {
 // Инициализируем слайдер истории после загрузки страницы
 document.addEventListener("DOMContentLoaded", () => {
   initializeHistorySlider();
+  renderTabs();
+  updateDateDisplay();
+  drawWheel();
+  setupButtons();
+
+  // Добавляем задержку перед показом FAQ
+  setTimeout(() => {
+    const faqBtn = document.getElementById("faqBtnDesktop") || document.getElementById("faqBtnMobile");
+    if (faqBtn) {
+      faqBtn.click();
+    }
+  }, 2000); // Задержка в 2 секунды
 });
 
 function updateTabStyles() {
@@ -888,6 +921,26 @@ function drawWheel() {
  * 5. ПЕРЕКЛЮЧАТЕЛИ ТЕМЫ И ЯЗЫКА
  ****************************************/
 function setupButtons() {
+  console.log("setupButtons started");
+  
+  // Скрываем контент FAQ по умолчанию
+  const faqContent = document.getElementById("faqContent");
+  const sphereTabContent = document.getElementById("sphereTabContent");
+  
+  console.log("FAQ elements initialization:");
+  console.log("faqContent:", faqContent);
+  console.log("sphereTabContent:", sphereTabContent);
+  
+  if (faqContent) {
+    faqContent.style.display = "block";
+    faqContent.innerHTML = faqInstructions[currentLanguage];
+    console.log("faqContent initialized");
+  }
+  if (sphereTabContent) {
+    sphereTabContent.style.display = "block";
+    console.log("sphereTabContent initialized");
+  }
+
   // Обработчики для кнопок, которые находятся как в фиксированном хедере (на десктопе), так и внизу (на мобильном)
   const themeBtn = document.getElementById("themeToggle");
   const langBtn = document.getElementById("langToggle");
@@ -907,66 +960,54 @@ function setupButtons() {
   });
   
   // Глобальный объект с инструкциями FAQ (не внутри обработчика FAQ)
-  const faqInstructions = {
-    ru: `<strong>Добро пожаловать в Mentorist Life Balance Wheel!</strong><br><br>
-  Это инструмент для оценки баланса жизни по 8 ключевым сферам: Здоровье, Отношения, Окружение, Призвание, Финансы, Саморазвитие, Яркость жизни и Духовность.<br><br>
-  <strong>1. Тема и язык:</strong> Используйте кнопки для смены темы и языка <span class="btn-like">🌐 RU</span> и <span class="btn-like">🌙 Тёмная</span> / <span class="btn-like">🌞 Светлая</span>.<br><br>
-  <strong>2. FAQ:</strong> Нажмите <span class="btn-like">💡 FAQ</span> для этой инструкции; для возврата к сферам – нажмите вкладку сферы, например <span class="btn-like">❤️ Здоровье (5.0)</span>.<br><br>
-  <strong>3. Переключение:</strong> Вкладки вверху позволяют переключаться между сферами жизни.<br><br>
-  <strong>4. Оценка:</strong> В каждой сфере есть 5 вопросов. Используйте слайдеры для оценки от 0 до 10.<br><br>
-  <strong>5. Визуализация:</strong> Колесо баланса наглядно показывает ваши оценки.<br><br>
-  <strong>6. Среднее:</strong> Для каждой сферы и общее среднее значение рассчитываются автоматически.<br><br>
-  <strong>7. Сохранение:</strong> Для сохранения результатов нажмите <span class="btn-like">👤 Login</span>, чтобы войти. После этого используйте кнопку <span class="btn-like">💾</span> для сохранения в облако или <span class="btn-like">☁️</span> для просмотра сохранённых результатов. Кнопка <span class="btn-like">🔽 PDF</span> позволяет скачать результаты в формате PDF.`,
-    
-    en: `<strong>Welcome to Mentorist Life Balance Wheel!</strong><br><br>
-  This is a tool for assessing life balance across 8 key areas: Health, Relationships, Environment, Calling, Finance, Self-Improvement, Life Brightness, and Spirituality.<br><br>
-  <strong>1. Theme & Language:</strong> Use buttons to change theme and language <span class="btn-like">🌐 EN</span> and <span class="btn-like">🌙 Dark</span> / <span class="btn-like">🌞 Light</span>.<br><br>
-  <strong>2. FAQ:</strong> Click <span class="btn-like">💡 FAQ</span> to view this guide; to return to the areas, click an area tab, e.g. <span class="btn-like">❤️ Health (5.0)</span>.<br><br>
-  <strong>3. Navigation:</strong> Use the tabs above to switch between life areas.<br><br>
-  <strong>4. Assessment:</strong> Each area has 5 questions. Use sliders to rate from 0 to 10.<br><br>
-  <strong>5. Visualization:</strong> The balance wheel visually represents your ratings.<br><br>
-  <strong>6. Average:</strong> For each area and overall, averages are calculated automatically.<br><br>
-  <strong>7. Saving:</strong> To save your results, click <span class="btn-like">👤 Login</span> to sign in. Then use the <span class="btn-like">💾</span> button to save to the cloud or <span class="btn-like">☁️</span> to view saved results. The <span class="btn-like">🔽 PDF</span> button allows you to download results as PDF.`
-  };
   
-  
-
-
-
-
-
-
-
-
-
-
-
-
 
   
   
 
   function handleFaqClick() {
+    console.log("handleFaqClick called");
+    console.log("faqContent:", document.getElementById("faqContent"));
+    console.log("sphereTabContent:", document.getElementById("sphereTabContent"));
+    
     const faqContent = document.getElementById("faqContent");
     const sphereTabContent = document.getElementById("sphereTabContent");
     
-    // Обновляем содержимое FAQ
-    faqContent.innerHTML = faqInstructions[currentLanguage];
-    
-    // Показываем FAQ, скрываем контент сфер
-    sphereTabContent.style.display = "none";
-    faqContent.style.display = "block";
+    if (faqContent && sphereTabContent) {
+      // Обновляем содержимое FAQ
+      faqContent.innerHTML = faqInstructions[currentLanguage];
+      
+      // Показываем FAQ, скрываем контент сфер
+      sphereTabContent.style.display = "none";
+      faqContent.style.display = "block";
 
-    // Прокручиваем к верху страницы только на мобильных устройствах
-    if (window.innerWidth <= 576) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      console.log("FAQ content updated and shown");
+      console.log("faqContent display:", faqContent.style.display);
+      console.log("sphereTabContent display:", sphereTabContent.style.display);
+
+      // Прокручиваем к верху страницы только на мобильных устройствах
+      if (window.innerWidth <= 576) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    } else {
+      console.log("FAQ elements not found!");
     }
   }
 
   // Прикрепляем обработчик к обеим кнопкам FAQ:
-  document.getElementById("faqBtnDesktop").addEventListener("click", handleFaqClick);
-  document.getElementById("faqBtnMobile").addEventListener("click", handleFaqClick);
-
+  const faqBtnDesktop = document.getElementById("faqBtnDesktop");
+  const faqBtnMobile = document.getElementById("faqBtnMobile");
+  
+  console.log("FAQ buttons initialization:");
+  console.log("faqBtnDesktop:", faqBtnDesktop);
+  console.log("faqBtnMobile:", faqBtnMobile);
+  
+  if (faqBtnDesktop) {
+    faqBtnDesktop.addEventListener("click", handleFaqClick);
+  }
+  if (faqBtnMobile) {
+    faqBtnMobile.addEventListener("click", handleFaqClick);
+  }
   
   langBtn.addEventListener("click", () => {
     // Сохраняем текущее состояние FAQ (открыт или закрыт)
