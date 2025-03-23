@@ -334,7 +334,7 @@ input[type=range]::-moz-range-thumb {
 }
 
 /* 
-  ===========
+   ===========
    ДОПОЛНИТЕЛЬНО: Стили для НЕактивных вкладок
    чтобы в тёмной теме они были чуть светлее контейнера,
    а в светлой – чуть темнее. 
@@ -920,4 +920,35 @@ body.dark-mode #historySlider::-moz-range-thumb {
 
 body.dark-mode #historyDateDisplay {
   color: #f0f1f3 !important;
+}
+
+
+/* Темная тема */
+.dark-mode .sphere-tab-btn {
+  box-shadow: none;
+}
+
+/* Эффект сияния для активной кнопки */
+.sphere-tab-btn.active {
+  box-shadow: 0 0 5px 2.5px var(--sphere-color);
+}
+
+/* Эффект сияния для кнопок в темной теме */
+.dark-mode .sphere-tab-btn.active {
+  box-shadow: 0 0 5px 2.5px var(--sphere-color);
+}
+
+/* Убираем эффект сияния на мобильных устройствах */
+@media (max-width: 768px) {
+  .sphere-tab-btn {
+    box-shadow: none !important;
+  }
+  
+  .sphere-tab-btn.active {
+    box-shadow: none !important;
+  }
+  
+  .dark-mode .sphere-tab-btn.active {
+    box-shadow: none !important;
+  }
 }

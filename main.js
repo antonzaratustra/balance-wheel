@@ -408,7 +408,7 @@ function renderTabs() {
     li.className = "nav-item";
 
     const btn = document.createElement("button");
-    btn.className = "nav-link";
+    btn.className = "nav-link sphere-tab-btn"; 
     btn.id = "tab-" + sphere.id;
     btn.type = "button";
     btn.setAttribute("data-color", sphere.color);
@@ -546,91 +546,20 @@ function renderTabs() {
       window.scrollTo({ top: 0, behavior: "smooth" });
       updateTabStyles();
     });
+    tab.addEventListener('mouseenter', () => {
+      tab.style.boxShadow = `0 0 7px 2.5px ${tab.getAttribute("data-color")}`;
+    });
+
+    tab.addEventListener('mouseleave', () => {
+      tab.style.boxShadow = 'none';
+    });
+
+    tab.addEventListener('click', () => {
+      // При клике оставляем тень
+      tab.style.boxShadow = `0 0 10px 5px ${tab.getAttribute("data-color")}`;
+    });
   });
   updateTabStyles();
-}
-
-// Функция для инициализации слайдера истории изменений
-function initializeHistorySlider() {
-  console.log("Инициализация слайдера истории");
-  
-  // Загружаем все результаты
-  loadResultsList().then(entries => {
-    console.log("Загружены результаты:", entries);
-    
-    if (entries.length < 2) {
-      console.log("Менее двух записей, скрываем слайдер");
-      // Скрываем слайдер, если записей меньше двух
-      document.getElementById("historySliderContainer").classList.add("d-none");
-      return;
-    }
-
-    console.log("Показываем слайдер, записей:", entries.length);
-    
-    // Показываем слайдер
-    const historySliderContainer = document.getElementById("historySliderContainer");
-    historySliderContainer.classList.remove("d-none");
-
-    // Сортируем записи по дате
-    entries.sort((a, b) => a.createdAt.seconds - b.createdAt.seconds);
-    console.log("Записи отсортированы, первая запись:", new Date(entries[0].createdAt.seconds * 1000));
-
-    // Инициализируем слайдер
-    const historySlider = document.getElementById("historySlider");
-    historySlider.min = "0";
-    historySlider.max = entries.length - 1;
-    historySlider.value = entries.length - 1;
-
-    // Обновляем отображение даты
-    updateHistoryDateDisplay(historySlider.value, entries);
-
-    // Обновляем канвас для текущей позиции
-    updateCanvasFromHistory(entries, historySlider.value);
-
-    // Добавляем обработчик для слайдера
-    historySlider.addEventListener("input", (e) => {
-      console.log("Слайдер перемещен, новое значение:", e.target.value);
-      const value = e.target.value;
-      updateHistoryDateDisplay(value, entries);
-      updateCanvasFromHistory(entries, value);
-    });
-  }).catch(error => {
-    console.error("Ошибка при загрузке результатов:", error);
-    showModal("loadErrorModal");
-  });
-}
-
-// Функция для обновления отображаемой даты
-function updateHistoryDateDisplay(value, entries) {
-  const entry = entries[value];
-  const date = new Date(entry.createdAt.seconds * 1000);
-  document.getElementById("historyDateDisplay").textContent = date.toLocaleString();
-}
-
-// Функция для обновления канваса из истории
-function updateCanvasFromHistory(entries, index) {
-  const data = entries[index].data;
-  Object.keys(data).forEach(sphereId => {
-    const sphereData = data[sphereId];
-    Object.keys(sphereData).forEach(questionId => {
-      const slider = document.getElementById(`slider_${sphereId}_${questionId}`);
-      if (slider) {
-        const value = sphereData[questionId];
-        slider.value = value;
-        updateSliderDisplay(sphereId, questionId, value);
-      }
-    });
-    updateSphereAverage(sphereId);
-  });
-  
-  updateOverallAverage();
-  
-  const balanceWheelCanvas = document.getElementById("balanceWheel");
-  if (balanceWheelCanvas) {
-    const ctx = balanceWheelCanvas.getContext("2d");
-    ctx.clearRect(0, 0, balanceWheelCanvas.width, balanceWheelCanvas.height);
-    drawWheel(ctx, balanceWheelCanvas.width, balanceWheelCanvas.height);
-  }
 }
 
 // Инициализируем слайдер истории после загрузки страницы
@@ -1101,38 +1030,80 @@ sphereTabs.forEach(tab => {
   });
 });
 
+// Функция для инициализации слайдера истории изменений
+function initializeHistorySlider() {
+  console.log("Инициализация слайдера истории");
+  
+  // Загружаем все результаты
+  loadResultsList().then(entries => {
+    console.log("Загружены результаты:", entries);
+    
+    if (entries.length < 2) {
+      console.log("Менее двух записей, скрываем слайдер");
+      // Скрываем слайдер, если записей меньше двух
+      document.getElementById("historySliderContainer").classList.add("d-none");
+      return;
+    }
 
+    console.log("Показываем слайдер, записей:", entries.length);
+    
+    // Показываем слайдер
+    const historySliderContainer = document.getElementById("historySliderContainer");
+    historySliderContainer.classList.remove("d-none");
 
+    // Сортируем записи по дате
+    entries.sort((a, b) => a.createdAt.seconds - b.createdAt.seconds);
+    console.log("Записи отсортированы, первая запись:", new Date(entries[0].createdAt.seconds * 1000));
 
+    // Инициализируем слайдер
+    const historySlider = document.getElementById("historySlider");
+    historySlider.min = "0";
+    historySlider.max = entries.length - 1;
+    historySlider.value = entries.length - 1;
 
+    // Обновляем отображение даты
+    updateHistoryDateDisplay(historySlider.value, entries);
 
+    // Обновляем канвас для текущей позиции
+    updateCanvasFromHistory(entries, historySlider.value);
 
+    // Добавляем обработчик для слайдера
+    historySlider.addEventListener("input", (e) => {
+      console.log("Слайдер перемещен, новое значение:", e.target.value);
+      const value = e.target.value;
+      updateHistoryDateDisplay(value, entries);
+      updateCanvasFromHistory(entries, value);
+    });
+  }).catch(error => {
+    console.error("Ошибка при загрузке результатов:", error);
+    showModal("loadErrorModal");
+  });
+}
 
+// Функция для обновления отображаемой даты
+function updateHistoryDateDisplay(value, entries) {
+  const entry = entries[value];
+  const date = new Date(entry.createdAt.seconds * 1000);
+  document.getElementById("historyDateDisplay").textContent = date.toLocaleString();
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Функция для обновления канваса из истории
+function updateCanvasFromHistory(entries, index) {
+  const data = entries[index].data;
+  Object.keys(data).forEach(sphereId => {
+    const sphereData = data[sphereId];
+    Object.keys(sphereData).forEach(questionId => {
+      const slider = document.getElementById(`slider_${sphereId}_${questionId}`);
+      if (slider) {
+        const value = sphereData[questionId];
+        slider.value = value;
+        updateSliderDisplay(sphereId, questionId, value);
+      }
+    });
+    updateSphereAverage(sphereId);
+  });
+  drawWheel();
+}
 
 /****************************************
  * 6. ТЕКУЩАЯ ДАТА И СОХРАНЕНИЕ В JSON/PDF
