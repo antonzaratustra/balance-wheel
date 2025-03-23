@@ -143,8 +143,35 @@ showResultsBtn.addEventListener("click", async () => {
     const loadBtn = document.createElement("button");
     loadBtn.className = "btn btn-sm btn-primary me-2";
     loadBtn.textContent = "Загрузить";
-    loadBtn.addEventListener("click", () => {
-      loadSavedResult(entry.id); // применит ползунки
+    loadBtn.addEventListener("click", async () => {
+      const data = await loadSavedResult(entry.id);
+      if (!data) {
+        alert("Не удалось загрузить результат");
+        return;
+      }
+      
+      // Применяем данные к слайдерам
+      Object.keys(data).forEach(sphereId => {
+        const sphereData = data[sphereId];
+        Object.keys(sphereData).forEach(questionId => {
+          const slider = document.getElementById(`slider_${sphereId}_${questionId}`);
+          if (slider) {
+            slider.value = sphereData[questionId];
+            updateSliderDisplay(sphereId, questionId, sphereData[questionId]);
+          }
+        });
+        updateSphereAverage(sphereId);
+      });
+      
+      // Обновляем общее среднее и колесо
+      updateOverallAverage();
+      drawWheel();
+      
+      // Закрываем модальное окно
+      const modal = bootstrap.Modal.getInstance(resultsModalEl);
+      modal.hide();
+      
+      alert(`Результат "${entry.title || 'Без названия'}" успешно загружен`);
     });
 
     const delBtn = document.createElement("button");
