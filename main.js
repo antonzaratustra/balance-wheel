@@ -558,7 +558,7 @@ function initializeHistorySlider() {
     const historySlider = document.getElementById("historySlider");
     historySlider.min = "0";
     historySlider.max = entries.length - 1;
-    historySlider.value = "0";
+    historySlider.value = entries.length - 1;
 
     // Обновляем отображение даты
     updateHistoryDateDisplay(historySlider.value, entries);
@@ -725,7 +725,7 @@ function updateSliderDisplay(sphereId, questionId, value) {
   if (!sphere) return;
   const question = sphere.questions.find(q => q.id === questionId);
   if (!question) return;
-  const descElem = document.getElementById(`desc_${sphere.id}_${question.id}`);
+  const descElem = document.getElementById(`desc_${sphereId}_${question.id}`);
   const dict = question.descriptions[value];
   descElem.innerText = dict ? dict[currentLanguage] : "";
   let val = parseInt(value, 10);
@@ -755,7 +755,7 @@ function updateSphereAverage(sphereId) {
     tabButton.innerHTML = `<span class="tab-emoji">${sphere.emoji || ""}</span> <span class="tab-title">${sphere.title[currentLanguage]}</span> <span class="tab-average">(${avg})</span>`;
   }
 
-  const paneHeader = document.querySelector(`#pane-${sphere.id} h5`);
+  const paneHeader = document.querySelector(`#pane-${sphereId} h5`);
   if (paneHeader) {
     paneHeader.innerText = `${sphere.emoji || ""} ${sphere.title[currentLanguage]} - ${avg}`;
   }
@@ -1105,6 +1105,7 @@ sphereTabs.forEach(tab => {
     doc.setFont("DejaVuSans", "normal");
   }
 
+  // Функция для форматирования даты в зависимости от языка
   function updateDateDisplay() {
     const now = new Date();
     const monthsEn = [
@@ -1118,9 +1119,18 @@ sphereTabs.forEach(tab => {
     const day = now.getDate();
     const monthIndex = now.getMonth();
     const year = now.getFullYear();
-    const monthName = currentLanguage === "ru" ? monthsRu[monthIndex] : monthsEn[monthIndex];
-    const dateString = `${monthName} ${day}, ${year}`;
-    document.getElementById("currentDate").innerText = `(${dateString})`;
+    
+    if (currentLanguage === "ru") {
+      // Для русского: "24 марта 2025"
+      const monthName = monthsRu[monthIndex];
+      const dateString = `${day} ${monthName} ${year}`;
+      document.getElementById("currentDate").innerText = `(${dateString})`;
+    } else {
+      // Для английского: "March 24, 2025"
+      const monthName = monthsEn[monthIndex];
+      const dateString = `${monthName} ${day}, ${year}`;
+      document.getElementById("currentDate").innerText = `(${dateString})`;
+    }
   }
 
   // Сохранение в JSON

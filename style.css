@@ -850,3 +850,53 @@ input[type=range]::-moz-range-thumb {
     padding: 0 15px;
   }
 }
+
+/* === СТИЛИ ДЛЯ userInfo === */
+#userInfo {
+  color: #333 !important; /* Темный цвет текста для светлой темы */
+}
+
+/* В тёмной теме оставляем цвет по умолчанию */
+body.dark-mode #userInfo {
+  color: #e0e0e0 !important;
+}
+
+/* === СТИЛИ ДЛЯ СЛАЙДЕРА ИСТОРИИ === */
+#historySlider {
+  /* Основной цвет слайдера */
+  --bs-slider-thumb-bg: #333;
+  --bs-slider-thumb-color: #fff;
+  --bs-slider-thumb-size: 25px;
+  --bs-slider-thumb-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#historySlider::-webkit-slider-thumb {
+  background: #333;
+  border: 2px solid #fff;
+}
+
+#historySlider::-moz-range-thumb {
+  background: #333;
+  border: 2px solid #fff;
+}
+
+/* Текст даты */
+#historyDateDisplay {
+  color: #333 !important;
+}
+
+/* В тёмной теме оставляем цвета по умолчанию */
+body.dark-mode #historySlider {
+  --bs-slider-thumb-bg: #f0f1f3;
+  --bs-slider-thumb-color: #333;
+}
+
+body.dark-mode #historySlider::-webkit-slider-thumb,
+body.dark-mode #historySlider::-moz-range-thumb {
+  background: #f0f1f3;
+  border: 2px solid #333;
+}
+
+body.dark-mode #historyDateDisplay {
+  color: #f0f1f3 !important;
+}
