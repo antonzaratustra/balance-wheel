@@ -513,25 +513,10 @@ function updateSphereAverage(sphereId) {
 }
 
 
-function updateOverallAverage() {
-  let total = 0, count = 0;
-  spheres.forEach(sphere => {
-    sphere.questions.forEach(question => {
-      const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
-      total += parseInt(slider.value);
-      count++;
-    });
-  });
-  const overall = (total / (count || 1)).toFixed(1);
-  document.getElementById("overallAverage").innerText =
-    (currentLanguage === "ru" ? "Общее среднее: " : "Overall Average: ") + overall;
-}
-
-
 /****************************************
  * 4. РИСОВАНИЕ «КОЛЕСА» (СЕКТОРОВ)
  ****************************************/
-// 1) ВНЕ функции — никакой prevSide не нужен, если вы фиксируйте именно "Health".
+// 1) ВНЕ функции — никакой prevSide не нужен, если вы фиксируете именно "Health".
 
 function drawWheel() {
   const canvas = document.getElementById("balanceWheel");
@@ -674,13 +659,13 @@ function setupButtons() {
   const faqInstructions = {
     ru: `<strong>Добро пожаловать в Mentorist Balance Wheel!</strong><br><br>
   Это инструмент для оценки баланса жизни по 8 ключевым сферам: Здоровье, Отношения, Окружение, Призвание, Финансы, Саморазвитие, Яркость жизни и Духовность.<br><br>
-  <strong>1. Тема и язык:</strong> Используйте кнопки для смены темы и языка <span class="btn-like">🌐 RU</span> and <span class="btn-like">🌙 Тёмная</span> / <span class="btn-like">🌞 Светлая</span>.<br><br>
+  <strong>1. Тема и язык:</strong> Используйте кнопки для смены темы и языка <span class="btn-like">🌐 RU</span> и <span class="btn-like">🌙 Тёмная</span> / <span class="btn-like">🌞 Светлая</span>.<br><br>
   <strong>2. FAQ:</strong> Нажмите <span class="btn-like">💡 FAQ</span> для этой инструкции; для возврата к сферам – нажмите вкладку сферы, например <span class="btn-like">❤️ Здоровье (5.0)</span>.<br><br>
   <strong>3. Переключение:</strong> Вкладки вверху позволяют переключаться между сферами жизни.<br><br>
   <strong>4. Оценка:</strong> В каждой сфере есть 3 вопроса. Используйте слайдеры для оценки от 0 до 10.<br><br>
   <strong>5. Визуализация:</strong> Справа отображается колесо баланса, наглядно показывающее ваши оценки.<br><br>
   <strong>6. Среднее:</strong> Для каждой сферы и общее среднее значение рассчитываются автоматически.<br><br>
-  <strong>7. Сохранение:</strong> Для сохранения результатов нажмите <span class="btn-like">👤 Login</span>, чтобы войти. После этого используйте кнопку <span class="btn-like">💾</span> для сохранения в облако или <span class="btn-like">☁️</span> для просмотра сохранённых результатов. Кнопка <span class="btn-like">📄 Save</span> позволяет скачать результаты в формате PDF.`,
+  <strong>7. Сохранение:</strong> Для сохранения результатов нажмите <span class="btn-like">👤 Login</span>, чтобы войти. После этого используйте кнопку <span class="btn-like">💾</span> для сохранения в облако или <span class="btn-like">☁️</span> для просмотра сохранённых результатов. Кнопка <span class="btn-like">🔽 PDF</span> позволяет скачать результаты в формате PDF.`,
     
     en: `<strong>Welcome to Mentorist Balance Wheel!</strong><br><br>
   This is a tool for assessing life balance across 8 key areas: Health, Relationships, Environment, Calling, Finance, Self-Improvement, Life Brightness, and Spirituality.<br><br>
@@ -690,7 +675,7 @@ function setupButtons() {
   <strong>4. Assessment:</strong> Each area has 3 questions. Use sliders to rate from 0 to 10.<br><br>
   <strong>5. Visualization:</strong> The balance wheel on the right visually represents your ratings.<br><br>
   <strong>6. Average:</strong> For each area and overall, averages are calculated automatically.<br><br>
-  <strong>7. Saving:</strong> To save your results, click <span class="btn-like">👤 Login</span> to sign in. Then use the <span class="btn-like">💾</span> button to save to the cloud or <span class="btn-like">☁️</span> to view saved results. The <span class="btn-like">📄 Save</span> button allows you to download results as PDF.`
+  <strong>7. Saving:</strong> To save your results, click <span class="btn-like">👤 Login</span> to sign in. Then use the <span class="btn-like">💾</span> button to save to the cloud or <span class="btn-like">☁️</span> to view saved results. The <span class="btn-like">🔽 PDF</span> button allows you to download results as PDF.`
   };
   
   
@@ -712,11 +697,21 @@ function setupButtons() {
 
   function handleFaqClick() {
     const faqContent = document.getElementById("faqContent");
+    const sphereTabContent = document.getElementById("sphereTabContent");
+    
+    // Обновляем содержимое FAQ
     faqContent.innerHTML = faqInstructions[currentLanguage];
-    document.getElementById("sphereTabContent").style.display = "none";
+    
+    // Показываем FAQ, скрываем контент сфер
+    sphereTabContent.style.display = "none";
     faqContent.style.display = "block";
+
+    // Прокручиваем к верху страницы только на мобильных устройствах
+    if (window.innerWidth <= 576) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }
-  
+
   // Прикрепляем обработчик к обеим кнопкам FAQ:
   document.getElementById("faqBtnDesktop").addEventListener("click", handleFaqClick);
   document.getElementById("faqBtnMobile").addEventListener("click", handleFaqClick);
@@ -750,7 +745,7 @@ function setupButtons() {
       ? (currentLanguage === "ru" ? "🌙 Тёмная" : "🌙 Dark")
       : (currentLanguage === "ru" ? "🌞 Светлая" : "🌞 Light");
     const savePdfBtn = document.getElementById("savePDF");
-    savePdfBtn.innerText = (currentLanguage === "ru") ? "📄 Скачать" : "📄 Save (PDF)";
+    savePdfBtn.innerText = (currentLanguage === "ru") ? "🔽 PDF" : "🔽 PDF";
   
     // 4. Обновляем дату
     updateDateDisplay();
