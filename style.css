@@ -330,14 +330,6 @@ input[type=range]::-moz-range-thumb {
   margin-bottom: 0.5rem;
 }
 
-
-
-
-
-
-
-
-
 /* 
   ===========
    ДОПОЛНИТЕЛЬНО: Стили для НЕактивных вкладок
@@ -378,8 +370,19 @@ input[type=range]::-moz-range-thumb {
   }
 }
 
+/* Стили для мобильных кнопок */
+@media (max-width: 576px) {
+  #btn-group-padding {
+    display: none;
+  }
+}
 
-
+/* На десктопе показываем кнопки в навбаре */
+@media (min-width: 577px) {
+  #btn-group-padding {
+    display: inline-flex;
+  }
+}
 
 @media (max-width: 576px) {
   #canvas-wrapper {

@@ -397,9 +397,6 @@ function updateTabStyles() {
   });
 }
 
-
-
-
 function updateSphereAverage(sphereId) {
   const sphere = spheres.find(s => s.id === sphereId);
   if (!sphere) return;
@@ -477,7 +474,7 @@ function updateSliderDisplay(sphereId, questionId, value) {
   if (!sphere) return;
   const question = sphere.questions.find(q => q.id === questionId);
   if (!question) return;
-  const descElem = document.getElementById(`desc_${sphereId}_${questionId}`);
+  const descElem = document.getElementById(`desc_${sphereId}_${question.id}`);
   const dict = question.descriptions[value];
   descElem.innerText = dict ? dict[currentLanguage] : "";
   let val = parseInt(value, 10);
@@ -525,70 +522,6 @@ function updateOverallAverage() {
       count++;
     });
   });
-
-  const overall = (total / (count || 1)).toFixed(1); // Округляем до 1 знака после запятой
-  document.getElementById("overallAverage").innerText =
-    (currentLanguage === "ru" ? "Общее среднее: " : "Overall Average: ") + overall;
-}
-
-
-
-function updateSliderDisplay(sphereId, questionId, value) {
-  const sphere = spheres.find(s => s.id === sphereId);
-  if (!sphere) return;
-  const question = sphere.questions.find(q => q.id === questionId);
-  if (!question) return;
-  const descElem = document.getElementById(`desc_${sphereId}_${questionId}`);
-  const dict = question.descriptions[value];
-  descElem.innerText = dict ? dict[currentLanguage] : "";
-  let val = parseInt(value, 10);
-  let fraction = val / 10;
-  let r = Math.round(255 * (1 - fraction));
-  let g = Math.round(255 * fraction);
-  descElem.style.color = `rgb(${r}, ${g}, 0)`;
-}
-
-function updateSphereAverage(sphereId) {
-  const sphere = spheres.find(s => s.id === sphereId);
-  if (!sphere) return;
-  let sum = 0, count = 0;
-  sphere.questions.forEach(question => {
-    const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
-    sum += parseInt(slider.value);
-    count++;
-  });
-
-  const avg = (sum / (count || 1)).toFixed(1);
-  const tabButton = document.getElementById("tab-" + sphere.id);
-  const isMobile = window.innerWidth < 576;
-
-  if (isMobile) {
-    // На мобильных только эмодзи + число
-    tabButton.innerHTML = `<span class="tab-emoji">${sphere.emoji || ""}</span> <span class="tab-average">${avg}</span>`;
-  } else {
-    // На десктопе эмодзи + текст + число в скобках
-    tabButton.innerHTML = `<span class="tab-emoji">${sphere.emoji || ""}</span> <span class="tab-title">${sphere.title[currentLanguage]}</span> <span class="tab-average">(${avg})</span>`;
-  }
-
-  // Обновляем заголовок в контенте вкладки
-  const paneHeader = document.querySelector(`#pane-${sphere.id} h5`);
-  if (paneHeader) {
-    paneHeader.innerText = `${sphere.emoji || ""} ${sphere.title[currentLanguage]} - ${avg}`;
-  }
-
-  updateOverallAverage();
-}
-
-
-function updateOverallAverage() {
-  let total = 0, count = 0;
-  spheres.forEach((sphere) => {
-    sphere.questions.forEach((question) => {
-      const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
-      total += parseInt(slider.value);
-      count++;
-    });
-  });
   const overall = (total / (count || 1)).toFixed(1);
   document.getElementById("overallAverage").innerText =
     (currentLanguage === "ru" ? "Общее среднее: " : "Overall Average: ") + overall;
@@ -598,7 +531,7 @@ function updateOverallAverage() {
 /****************************************
  * 4. РИСОВАНИЕ «КОЛЕСА» (СЕКТОРОВ)
  ****************************************/
-// 1) ВНЕ функции — никакой prevSide не нужен, если вы фиксируете именно "Health".
+// 1) ВНЕ функции — никакой prevSide не нужен, если вы фиксируйте именно "Health".
 
 function drawWheel() {
   const canvas = document.getElementById("balanceWheel");
@@ -743,18 +676,21 @@ function setupButtons() {
   Это инструмент для оценки баланса жизни по 8 ключевым сферам: Здоровье, Отношения, Окружение, Призвание, Финансы, Саморазвитие, Яркость жизни и Духовность.<br><br>
   <strong>1. Тема и язык:</strong> Используйте кнопки для смены темы и языка <span class="btn-like">🌐 RU</span> and <span class="btn-like">🌙 Тёмная</span> / <span class="btn-like">🌞 Светлая</span>.<br><br>
   <strong>2. FAQ:</strong> Нажмите <span class="btn-like">💡 FAQ</span> для этой инструкции; для возврата к сферам – нажмите вкладку сферы, например <span class="btn-like">❤️ Здоровье (5.0)</span>.<br><br>
-  <strong>3. Переключение:</strong> Вкладки вверху позволяют выбрать нужную сферу, например <span class="btn-like">❤️ Здоровье (5.0)</span>.<br><br>
-  <strong>4. Оценка:</strong> Используйте ползунки (0–10) для оценки сфер: ответьте на 5 экспресс вопросов в каждой. Среднее значение по сфере показывается на вкладке и на колесе баланса, а общее среднее – под ним.<br><br>
-  <strong>5. Визуализация:</strong> Колесо в реальном времени отображает сектора, размеры которых соответствуют оценкам и изменяются в зависимости от положения ползунков.<br><br>
-  <strong>6. Сохранение результатов:</strong> Кнопка <span class="btn-like">📄 Сохранить</span> сохраняет состояние колеса с вашими ответами в PDF.`,
+  <strong>3. Переключение:</strong> Вкладки вверху позволяют переключаться между сферами жизни.<br><br>
+  <strong>4. Оценка:</strong> В каждой сфере есть 3 вопроса. Используйте слайдеры для оценки от 0 до 10.<br><br>
+  <strong>5. Визуализация:</strong> Справа отображается колесо баланса, наглядно показывающее ваши оценки.<br><br>
+  <strong>6. Среднее:</strong> Для каждой сферы и общее среднее значение рассчитываются автоматически.<br><br>
+  <strong>7. Сохранение:</strong> Для сохранения результатов нажмите <span class="btn-like">👤 Login</span>, чтобы войти. После этого используйте кнопку <span class="btn-like">💾</span> для сохранения в облако или <span class="btn-like">☁️</span> для просмотра сохранённых результатов. Кнопка <span class="btn-like">📄 Save</span> позволяет скачать результаты в формате PDF.`,
+    
     en: `<strong>Welcome to Mentorist Balance Wheel!</strong><br><br>
-  This tool helps you assess your life balance across 8 key areas: Health, Relationships, Environment, Calling, Financial Security, Self-Improvement, Life Brightness, and Spirituality.<br><br>
-  <strong>1. Theme & Language:</strong> Use the buttons <span class="btn-like">🌐 EN</span> and <span class="btn-like">🌙 Dark</span> / <span class="btn-like">🌞 Light</span> to toggle the theme and language.<br><br>
+  This is a tool for assessing life balance across 8 key areas: Health, Relationships, Environment, Calling, Finance, Self-Improvement, Life Brightness, and Spirituality.<br><br>
+  <strong>1. Theme & Language:</strong> Use buttons to change theme and language <span class="btn-like">🌐 EN</span> and <span class="btn-like">🌙 Dark</span> / <span class="btn-like">🌞 Light</span>.<br><br>
   <strong>2. FAQ:</strong> Click <span class="btn-like">💡 FAQ</span> to view this guide; to return to the areas, click an area tab, e.g. <span class="btn-like">❤️ Health (5.0)</span>.<br><br>
-  <strong>3. Switching:</strong> The top tabs allow you to select an area, for example <span class="btn-like">❤️ Health (5.0)</span>.<br><br>
-  <strong>4. Assessment:</strong> Use sliders (0–10) to rate each area by answering 5 express questions per area. The average for each area is displayed on its tab and on the balance wheel, while the overall average appears below it.<br><br>
-  <strong>5. Visualization:</strong> The wheel displays sectors in real time, with sizes corresponding to the scores and updating as you move the sliders.<br><br>
-  <strong>6. Saving Results:</strong> The <span class="btn-like">📄 Save (PDF)</span> button saves the current state of your wheel with your responses as a PDF.`
+  <strong>3. Navigation:</strong> Use the tabs above to switch between life areas.<br><br>
+  <strong>4. Assessment:</strong> Each area has 3 questions. Use sliders to rate from 0 to 10.<br><br>
+  <strong>5. Visualization:</strong> The balance wheel on the right visually represents your ratings.<br><br>
+  <strong>6. Average:</strong> For each area and overall, averages are calculated automatically.<br><br>
+  <strong>7. Saving:</strong> To save your results, click <span class="btn-like">👤 Login</span> to sign in. Then use the <span class="btn-like">💾</span> button to save to the cloud or <span class="btn-like">☁️</span> to view saved results. The <span class="btn-like">📄 Save</span> button allows you to download results as PDF.`
   };
   
   

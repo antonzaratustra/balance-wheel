@@ -93,15 +93,9 @@
 
 
       <div class="btn-group" id="btn-group-padding" role="group">
-
-      <button id="saveToCloudBtn" class="btn btn-secondary">💾</button>
-
-
-
-
-
-      <button id="showResultsBtn" class="btn btn-secondary">☁️</button>
-    </div>
+        <button id="saveToCloudBtn" class="btn btn-secondary d-none d-sm-inline-block">💾</button>
+        <button id="showResultsBtn" class="btn btn-secondary d-none d-sm-inline-block">☁️</button>
+      </div>
 
 
 
@@ -157,7 +151,6 @@
           <button id="langToggle" class="btn btn-secondary">🌐 EN</button>
           <button id="themeToggle" class="btn btn-secondary">🌙 Dark</button>
           <button id="loginBtn" class="btn btn-secondary">👤Login</button>
-
           <button id="savePDF" class="btn btn-primary">📄 Save</button>
         </div>
       </div>
@@ -222,6 +215,11 @@
     </div>
     <!-- Абсолютно позиционированный блок для канваса -->
     <div id="canvas-wrapper">
+      <!-- Кнопки для мобильной версии -->
+      <div class="d-flex justify-content-center mb-3 d-sm-none">
+        <button id="mobileCloudBtn" class="btn btn-secondary me-2" onclick="document.getElementById('saveToCloudBtn').click()">💾</button>
+        <button id="mobileResultsBtn" class="btn btn-secondary" onclick="document.getElementById('showResultsBtn').click()">☁️</button>
+      </div>
       <div class="canvas-container">
         <canvas id="balanceWheel" width="800" height="800"></canvas>
       </div>
