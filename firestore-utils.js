@@ -101,23 +101,24 @@ export async function saveResultToFirestore(title, spheres) {
 export async function loadResultsList() {
   const user = auth.currentUser;
   if (!user) {
-    console.error("Пользователь не авторизован!");
+    console.log("Пользователь не авторизован");
     return [];
   }
 
-  const userDocRef = doc(db, "results", user.uid);
-  const subcolRef = collection(userDocRef, "savedEntries");
-
   try {
-    const snapshot = await getDocs(subcolRef);
-    // Преобразуем в массив
-    const entries = snapshot.docs.map(docSnap => ({
-      id: docSnap.id,
-      ...docSnap.data(),
+    console.log("Загрузка результатов для пользователя:", user.uid);
+    const userDocRef = doc(db, "results", user.uid);
+    const subcolRef = collection(userDocRef, "savedEntries");
+    const querySnapshot = await getDocs(subcolRef);
+    
+    console.log("Получены результаты:", querySnapshot.docs.length);
+    
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
     }));
-    return entries;
   } catch (error) {
-    console.error("Ошибка при загрузке списка:", error);
+    console.error("Ошибка при загрузке результатов:", error);
     return [];
   }
 }
@@ -129,7 +130,7 @@ export async function loadSavedResult(entryId) {
   const user = auth.currentUser;
   if (!user) {
     console.error("Пользователь не авторизован!");
-    return;
+    return null;
   }
 
   const userDocRef = doc(db, "results", user.uid);
@@ -140,15 +141,13 @@ export async function loadSavedResult(entryId) {
     const docSnap = await getDoc(entryRef);
     if (!docSnap.exists()) {
       console.error("Документ не найден!");
-      return;
+      return null;
     }
     const entryData = docSnap.data();
-    // entryData.data — объект с ползунками
-    applySlidersFromData(entryData.data);
-    console.log("Загружено:", entryData);
-    alert(`Загружено: ${entryData.title || "без названия"}`);
+    return entryData.data; // Возвращаем данные ползунков
   } catch (error) {
     console.error("Ошибка при загрузке:", error);
+    return null;
   }
 }
 

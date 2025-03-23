@@ -99,11 +99,8 @@ saveToCloudBtn.addEventListener("click", () => {
     alert("Сначала войдите в систему!");
     return;
   }
-  const title = prompt("Введите название результата:", "Мой результат");
-  if (title) {
-    // spheres — это ваш массив сфер
-    saveResultToFirestore(title, spheres);
-  }
+  // Сохраняем с текущей датой/временем как названием
+  saveResultToFirestore(new Date().toLocaleString(), spheres);
 });
 
 
@@ -114,35 +111,72 @@ const resultsModalEl = document.getElementById("resultsModal");
 const resultsListEl = document.getElementById("resultsList");
 
 showResultsBtn.addEventListener("click", async () => {
-
-
-
   if (!auth.currentUser) {
     alert("Сначала войдите в систему!");
     return;
   }
+
+  // Показываем модальное окно сразу
+  const modal = new bootstrap.Modal(resultsModalEl);
+  modal.show();
 
   // Загружаем список
   const entries = await loadResultsList();
   // Очищаем содержимое
   resultsListEl.innerHTML = "";
 
+  if (entries.length === 0) {
+    // Если нет результатов, показываем Траволту
+    const noResultsDiv = document.createElement("div");
+    noResultsDiv.classList.add("text-center", "py-4");
+    
+    const travoltaImg = document.createElement("img");
+    travoltaImg.src = "img/travolta.gif";
+    travoltaImg.alt = "Нет результатов";
+    travoltaImg.style.maxWidth = "200px";
+    
+    const noResultsText = document.createElement("p");
+    noResultsText.classList.add("mt-3", "text-muted");
+    noResultsText.textContent = currentLanguage === "ru" ? 
+      "Пока нет сохранённых результатов" : 
+      "No saved results yet";
+    
+    noResultsDiv.appendChild(travoltaImg);
+    noResultsDiv.appendChild(noResultsText);
+    resultsListEl.appendChild(noResultsDiv);
+    return;
+  }
+
   entries.forEach((entry) => {
     // entry.id, entry.title, entry.createdAt, entry.data
     const row = document.createElement("div");
     row.classList.add("d-flex", "justify-content-between", "align-items-center", "mb-2");
 
-    // Название и дата
+    // Только дата
     const titleSpan = document.createElement("span");
+    titleSpan.style.flexGrow = "1";
+    titleSpan.style.marginRight = "1rem";
     const dateStr = entry.createdAt?.seconds
       ? new Date(entry.createdAt.seconds * 1000).toLocaleString()
-      : "(no date)";
-    titleSpan.textContent = `${entry.title || "Без названия"} — ${dateStr}`;
+      : new Date().toLocaleString();
+    titleSpan.textContent = dateStr;
+
+    // Контейнер для кнопок (с фиксированной позицией справа)
+    const buttonsContainer = document.createElement("div");
+    buttonsContainer.classList.add("d-flex", "align-items-center");
+    buttonsContainer.style.flexShrink = "0";
 
     // Кнопки «Загрузить» и «Удалить»
     const loadBtn = document.createElement("button");
     loadBtn.className = "btn btn-sm btn-primary me-2";
-    loadBtn.textContent = "Загрузить";
+    loadBtn.textContent = "▶️";
+    loadBtn.style.width = "40px"; // Фиксированная ширина для кнопок
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "btn btn-sm btn-danger";
+    delBtn.textContent = "❌";
+    delBtn.style.width = "40px"; // Фиксированная ширина для кнопок
+
     loadBtn.addEventListener("click", async () => {
       const data = await loadSavedResult(entry.id);
       if (!data) {
@@ -171,51 +205,150 @@ showResultsBtn.addEventListener("click", async () => {
       const modal = bootstrap.Modal.getInstance(resultsModalEl);
       modal.hide();
       
-      alert(`Результат "${entry.title || 'Без названия'}" успешно загружен`);
+      alert(`Загружен результат от ${dateStr}`);
     });
 
-    const delBtn = document.createElement("button");
-    delBtn.className = "btn btn-sm btn-danger";
-    delBtn.textContent = "Удалить";
     delBtn.addEventListener("click", async () => {
       if (confirm("Точно удалить результат?")) {
         await deleteSavedResult(entry.id);
-        // Обновим список заново
-        showResultsBtn.click(); // повторно вызываем клик, чтобы обновить
+        // Закрываем модальное окно
+        const modal = bootstrap.Modal.getInstance(resultsModalEl);
+        modal.hide();
+        // Обновляем список результатов
+        showResultsBtn.click();
       }
     });
 
+    // Собираем структуру
+    buttonsContainer.appendChild(loadBtn);
+    buttonsContainer.appendChild(delBtn);
     row.appendChild(titleSpan);
-    row.appendChild(loadBtn);
-    row.appendChild(delBtn);
+    row.appendChild(buttonsContainer);
     resultsListEl.appendChild(row);
   });
 
-  // Открываем модалку
-  const modal = new bootstrap.Modal(resultsModalEl);
-  modal.show();
   
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Модифицируем функцию drawWheel для использования с разными контекстами
+function drawWheel(ctx, width, height) {
+  // Сохраняем текущее состояние контекста
+  ctx.save();
   
+  // Очищаем канвас
+  ctx.clearRect(0, 0, width, height);
+  
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const maxRadius = Math.min(width, height) / 2 - 30;
+  
+  // Рисуем колесо
+  const anglePerSphere = (2 * Math.PI) / spheres.length;
+  let startAngle = -Math.PI / 2;
+
+  // Определяем базовые смещения для остальных сфер
+  const shifts = {
+    leftShift:   { x: 45,  y: 0 },
+    rightShift:  { x: -60, y: 0 },
+    topShift:    { x: 0,   y: -10 },
+    bottomShift: { x: 0,   y: 10 }
+  };
+  const threshold = 0.2;
+
+  // Устанавливаем выравнивание текста по центру
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.font = "18px sans-serif";
+
+  spheres.forEach((sphere) => {
+    // Рассчитываем среднее значение для сферы
+    let sum = 0, count = 0;
+    sphere.questions.forEach((question) => {
+      const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
+      sum += parseInt(slider.value);
+      count++;
+    });
+    const avg = sum / (count || 1);
+    const fraction = avg / 10;
+    const sectorRadius = fraction * maxRadius;
+
+    // Рисуем сектор
+    const endAngle = startAngle + anglePerSphere;
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.arc(centerX, centerY, sectorRadius, startAngle, endAngle);
+    ctx.closePath();
+    ctx.fillStyle = sphere.color || "#CCC";
+    ctx.fill();
+    ctx.strokeStyle = darkMode ? "#ccc" : "#666";
+    ctx.stroke();
+
+    // Вычисляем позицию для текста по середине сектора
+    const midAngle = startAngle + anglePerSphere / 2;
+    const cosMid = Math.cos(midAngle);
+    const sinMid = Math.sin(midAngle);
+    const labelRadius = maxRadius + 10;
+    let labelX = centerX + labelRadius * cosMid;
+    let labelY = centerY + labelRadius * sinMid;
+
+    // Формируем текст. Для сферы health сохраняем нужный порядок,
+    // а для остальных – динамически выбираем сдвиг.
+    const sphereTitle = sphere.title[currentLanguage] || sphere.title["en"];
+    let text = "";
+    let shift = { x: 0, y: 0 };
+
+    if (sphere.id === "health") {
+      // Для health используем фиксированный порядок, но не смещаем текст вручную
+      text = `${sphereTitle} ${avg.toFixed(1)} ${sphere.emoji || ""}`;
+      shift = { x: 0, y: 0 };
+    } else {
+      if (cosMid > threshold) {
+        shift = shifts.rightShift;
+        text = `${sphereTitle} ${avg.toFixed(1)} ${sphere.emoji || ""}`;
+      } else if (cosMid < -threshold) {
+        shift = shifts.leftShift;
+        text = `${sphere.emoji || ""} ${sphereTitle} ${avg.toFixed(1)}`;
+      } else {
+        if (sinMid > 0) {
+          shift = shifts.topShift;
+          text = `${sphere.emoji || ""} ${sphereTitle} ${avg.toFixed(1)}`;
+        } else {
+          shift = shifts.bottomShift;
+          text = `${sphere.emoji || ""} ${sphereTitle} ${avg.toFixed(1)}`;
+        }
+      }
+    }
+    labelX += shift.x;
+    labelY += shift.y;
+
+    // Рисуем текст – благодаря center-выравниванию он всегда будет центрирован относительно (labelX, labelY)
+    ctx.shadowColor = darkMode ? "#000" : "#fff";
+    ctx.shadowBlur = 2;
+    ctx.fillStyle = darkMode ? "#fff" : "#000";
+    ctx.fillText(text, labelX, labelY);
+    ctx.shadowBlur = 0;
+
+    // Рисуем разделительную линию
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(centerX + maxRadius * Math.cos(startAngle),
+               centerY + maxRadius * Math.sin(startAngle));
+    ctx.stroke();
+
+    startAngle = endAngle;
+  });
+
+  // Финальный разделитель
+  ctx.beginPath();
+  ctx.moveTo(centerX, centerY);
+  ctx.lineTo(centerX + maxRadius * Math.cos(startAngle),
+             centerY + maxRadius * Math.sin(startAngle));
+  ctx.stroke();
+  
+  // Восстанавливаем состояние контекста
+  ctx.restore();
+}
+
 /****************************************
  * 3. РЕНДЕР ВКЛАДОК И ЭЛЕМЕНТОВ UI
  ****************************************/
@@ -390,8 +523,92 @@ function renderTabs() {
   updateTabStyles();
 }
 
+// Функция для инициализации слайдера истории изменений
+function initializeHistorySlider() {
+  console.log("Инициализация слайдера истории");
+  
+  // Загружаем все результаты
+  loadResultsList().then(entries => {
+    console.log("Загружены результаты:", entries);
+    
+    if (entries.length < 2) {
+      console.log("Менее двух записей, скрываем слайдер");
+      // Скрываем слайдер, если записей меньше двух
+      document.getElementById("historySliderContainer").classList.add("d-none");
+      return;
+    }
 
+    console.log("Показываем слайдер, записей:", entries.length);
+    
+    // Показываем слайдер
+    const historySliderContainer = document.getElementById("historySliderContainer");
+    historySliderContainer.classList.remove("d-none");
 
+    // Сортируем записи по дате
+    entries.sort((a, b) => a.createdAt.seconds - b.createdAt.seconds);
+    console.log("Записи отсортированы, первая запись:", new Date(entries[0].createdAt.seconds * 1000));
+
+    // Инициализируем слайдер
+    const historySlider = document.getElementById("historySlider");
+    historySlider.min = "0";
+    historySlider.max = entries.length - 1;
+    historySlider.value = "0";
+
+    // Обновляем отображение даты
+    updateHistoryDateDisplay(historySlider.value, entries);
+
+    // Обновляем канвас для текущей позиции
+    updateCanvasFromHistory(entries, historySlider.value);
+
+    // Добавляем обработчик для слайдера
+    historySlider.addEventListener("input", (e) => {
+      console.log("Слайдер перемещен, новое значение:", e.target.value);
+      const value = e.target.value;
+      updateHistoryDateDisplay(value, entries);
+      updateCanvasFromHistory(entries, value);
+    });
+  }).catch(error => {
+    console.error("Ошибка при загрузке результатов:", error);
+  });
+}
+
+// Функция для обновления отображаемой даты
+function updateHistoryDateDisplay(value, entries) {
+  const entry = entries[value];
+  const date = new Date(entry.createdAt.seconds * 1000);
+  document.getElementById("historyDateDisplay").textContent = date.toLocaleString();
+}
+
+// Функция для обновления канваса из истории
+function updateCanvasFromHistory(entries, index) {
+  const data = entries[index].data;
+  Object.keys(data).forEach(sphereId => {
+    const sphereData = data[sphereId];
+    Object.keys(sphereData).forEach(questionId => {
+      const slider = document.getElementById(`slider_${sphereId}_${questionId}`);
+      if (slider) {
+        const value = sphereData[questionId];
+        slider.value = value;
+        updateSliderDisplay(sphereId, questionId, value);
+      }
+    });
+    updateSphereAverage(sphereId);
+  });
+  
+  updateOverallAverage();
+  
+  const balanceWheelCanvas = document.getElementById("balanceWheel");
+  if (balanceWheelCanvas) {
+    const ctx = balanceWheelCanvas.getContext("2d");
+    ctx.clearRect(0, 0, balanceWheelCanvas.width, balanceWheelCanvas.height);
+    drawWheel(ctx, balanceWheelCanvas.width, balanceWheelCanvas.height);
+  }
+}
+
+// Инициализируем слайдер истории после загрузки страницы
+document.addEventListener("DOMContentLoaded", () => {
+  initializeHistorySlider();
+});
 
 function updateTabStyles() {
   const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
@@ -434,14 +651,14 @@ function updateSphereAverage(sphereId) {
     count++;
   });
   const avg = (sum / (count || 1)).toFixed(1);
-  const tabButton = document.getElementById("tab-" + sphere.id);
+  const tabButton = document.getElementById("tab-" + sphereId);
   if (isMobile) {
     // На мобильном – только эмодзи и число (без скобок и без названия)
     tabButton.innerHTML = `<span class="tab-emoji">${sphere.emoji || ""}</span> <span class="tab-average">${avg}</span>`;
   } else {
     tabButton.innerHTML = `<span class="tab-emoji">${sphere.emoji || ""}</span> <span class="tab-title">${sphere.title[currentLanguage]}</span> <span class="tab-average">(${avg})</span>`;
   }
-  const paneHeader = document.querySelector(`#pane-${sphere.id} h5`);
+  const paneHeader = document.querySelector(`#pane-${sphereId} h5`);
   paneHeader.innerText = `${sphere.emoji || ""} ${sphere.title[currentLanguage]} - ${avg}`;
   updateOverallAverage();
 }
@@ -522,7 +739,7 @@ function updateSphereAverage(sphereId) {
   });
 
   const avg = (sum / (count || 1)).toFixed(1); // Округляем до 1 знака после запятой
-  const tabButton = document.getElementById("tab-" + sphere.id);
+  const tabButton = document.getElementById("tab-" + sphereId);
   const isMobile = window.innerWidth < 576;
 
   if (isMobile) {
@@ -577,7 +794,7 @@ function drawWheel() {
     let sum = 0, count = 0;
     sphere.questions.forEach((question) => {
       const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
-      sum += parseInt(slider.value, 10);
+      sum += parseInt(slider.value);
       count++;
     });
     const avg = sum / (count || 1);
@@ -1096,17 +1313,25 @@ window.addEventListener("scroll", function() {
 const loginBtn = document.getElementById("loginBtn");
 const userInfo = document.getElementById("userInfo"); // div, где показываем имя
 
-onAuthStateChanged(auth, (user) => {
+auth.onAuthStateChanged((user) => {
   if (user) {
-    // Если пользователь вошёл:
+    console.log("Пользователь авторизован:", user.uid);
+    // Инициализируем слайдер истории после авторизации
+    initializeHistorySlider();
     // Если выбран русский язык, меняем на "Выйти", иначе "Logout"
     loginBtn.innerText = currentLanguage === "ru" ? "👤 Выйти" : "👤 Logout";
     // Выводим имя пользователя или email
     userInfo.textContent = user.displayName || user.email || "";
   } else {
+    console.log("Пользователь не авторизован");
     // Пользователь не вошёл
     loginBtn.innerText = currentLanguage === "ru" ? "👤 Войти" : "👤 Login";
     userInfo.textContent = "";
+    // Скрываем слайдер если пользователь вышел
+    const historySliderContainer = document.getElementById("historySliderContainer");
+    if (historySliderContainer) {
+      historySliderContainer.classList.add("d-none");
+    }
   }
   updateUILanguage();
 });
@@ -1195,11 +1420,11 @@ function updateUILanguage() {
   if (currentLanguage === "ru") {
     loginModalLabel.innerText = "Вход";
     modalBodyText.innerText = "Войдите с помощью:";
-    googleSignInBtn.innerText = "Войти через Google";
+    googleSignInBtn.innerText = "Google";
   } else {
     loginModalLabel.innerText = "Login";
     modalBodyText.innerText = "Sign in with:";
-    googleSignInBtn.innerText = "Sign in with Google";
+    googleSignInBtn.innerText = "Google";
   }
   
   // Если у вас есть другие элементы с переводом – обновите и их
