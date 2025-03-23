@@ -99,7 +99,15 @@ body.dark-mode input[type=range]::-moz-range-track {
   padding: 10px;
   overflow: hidden;
   margin-bottom: 1rem;
-  background-color: inherit;
+  position: relative;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+#balanceWheelCanvas {
+  transform-style: preserve-3d;
+  transition: transform 0.1s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+  backface-visibility: hidden;
 }
 
 #balanceWheel {
@@ -951,4 +959,17 @@ body.dark-mode #historyDateDisplay {
   .dark-mode .sphere-tab-btn.active {
     box-shadow: none !important;
   }
+}
+
+/* Эффект 3D вращения для канваса */
+#balanceWheelContainer {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  /* cursor: move; */
+}
+
+#balanceWheel {
+  transform-style: preserve-3d;
+  transition: transform 0.1s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+  backface-visibility: hidden;
 }

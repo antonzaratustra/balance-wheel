@@ -495,7 +495,7 @@ function renderTabs() {
         ? question.descriptions[initVal][currentLanguage]
         : "";
       let val = parseInt(initVal, 10);
-      let fraction = val / 10;
+      let fraction = val / 10; // <-- вместо (val - 1)/9
       let r = Math.round(255 * (1 - fraction));
       let g = Math.round(255 * fraction);
       desc.style.color = `rgb(${r}, ${g}, 0)`;
@@ -621,12 +621,14 @@ function updateSphereAverage(sphereId) {
   });
   const avg = (sum / (count || 1)).toFixed(1);
   const tabButton = document.getElementById("tab-" + sphereId);
+  const isMobile = window.innerWidth < 576;
+
   if (isMobile) {
-    // На мобильном – только эмодзи и число (без скобок и без названия)
     tabButton.innerHTML = `<span class="tab-emoji">${sphere.emoji || ""}</span> <span class="tab-average">${avg}</span>`;
   } else {
     tabButton.innerHTML = `<span class="tab-emoji">${sphere.emoji || ""}</span> <span class="tab-title">${sphere.title[currentLanguage]}</span> <span class="tab-average">(${avg})</span>`;
   }
+
   const paneHeader = document.querySelector(`#pane-${sphereId} h5`);
   paneHeader.innerText = `${sphere.emoji || ""} ${sphere.title[currentLanguage]} - ${avg}`;
   updateOverallAverage();
@@ -1328,16 +1330,66 @@ window.addEventListener("scroll", function() {
   lastScrollTop = st <= 0 ? 0 : st;
 }, false);
 
+// Добавляем обработку движения мыши для 3D эффекта
+const canvasContainer = document.getElementById('balanceWheelContainer');
+const canvas = document.getElementById('balanceWheel');
 
+let mouseX = 0;
+let mouseY = 0;
+let targetX = 0;
+let targetY = 0;
+let speed = 0.1;
 
+function handleMouseMove(e) {
+  const rect = canvasContainer.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  
+  mouseX = e.clientX - centerX;
+  mouseY = e.clientY - centerY;
+  
+  // Нормализуем значения в диапазоне -100..100
+  mouseX = Math.min(Math.max(mouseX, -100), 100);
+  mouseY = Math.min(Math.max(mouseY, -100), 100);
+}
 
+function animate3D() {
+  // Вычисляем углы вращения
+  const maxX = 15; // максимальный угол по оси X
+  const maxY = 15; // максимальный угол по оси Y
+  
+  // Применяем нелинейное преобразование для более естественного эффекта
+  const angleX = Math.sin(mouseY / 100 * Math.PI) * maxX;
+  const angleY = Math.sin(mouseX / 100 * Math.PI) * maxY;
+  
+  // Плавно изменяем углы
+  targetX = angleY;
+  targetY = angleX;
+  
+  const currentTransform = canvas.style.transform;
+  const currentRotation = currentTransform ? currentTransform.match(/rotateX\((-?\d+\.?\d*)deg\) rotateY\((-?\d+\.?\d*)deg\)/) : null;
+  
+  const currentX = currentRotation ? parseFloat(currentRotation[1]) : 0;
+  const currentY = currentRotation ? parseFloat(currentRotation[2]) : 0;
+  
+  const newX = currentX + (targetX - currentX) * speed;
+  const newY = currentY + (targetY - currentY) * speed;
+  
+  canvas.style.transform = `rotateX(${newY}deg) rotateY(${newX}deg)`;
+  
+  requestAnimationFrame(animate3D);
+}
 
-
-
-
-
-
-
+// Добавляем обработчики событий
+if (canvasContainer) {
+  canvasContainer.addEventListener('mousemove', handleMouseMove);
+  canvasContainer.addEventListener('mouseenter', () => {
+    requestAnimationFrame(animate3D);
+  });
+  canvasContainer.addEventListener('mouseleave', () => {
+    canvas.style.transform = 'rotateX(0deg) rotateY(0deg)';
+  });
+}
 
 const loginBtn = document.getElementById("loginBtn");
 const userInfo = document.getElementById("userInfo"); // div, где показываем имя
@@ -1364,20 +1416,6 @@ auth.onAuthStateChanged((user) => {
   }
   updateUILanguage();
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Обработчик клика по кнопке Login/Logout
 loginBtn.addEventListener("click", () => {
@@ -1410,29 +1448,28 @@ loginBtn.addEventListener("click", () => {
   }
 });
 
+// Обработчик клика по кнопке Google Sign In
+googleSignInBtn.addEventListener("click", async () => {
+  const provider = new GoogleAuthProvider();
+  try {
+    const result = await signInWithPopup(auth, provider);
+    console.log("Пользователь авторизован:", result.user.uid);
+  } catch (error) {
+    console.error("Ошибка при входе:", error);
+    showModal("loginErrorModal");
+  }
+});
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Обработчик клика по кнопке Google Sign Out
+googleSignOutBtn.addEventListener("click", async () => {
+  try {
+    await signOut(auth);
+    console.log("Пользователь вышел");
+  } catch (error) {
+    console.error("Ошибка при выходе:", error);
+    showModal("logoutErrorModal");
+  }
+});
 
 function updateUILanguage() {
   // Обновляем текст кнопки логина/выхода

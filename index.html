@@ -228,12 +228,8 @@
     </div>
     <!-- Абсолютно позиционированный блок для канваса -->
     <div id="canvas-wrapper">
-      <!-- Кнопки для мобильной версии -->
-      <div class="d-flex justify-content-center mb-3 d-sm-none">
-        <button id="mobileCloudBtn" class="btn btn-secondary me-2" onclick="document.getElementById('saveToCloudBtn').click()">💾</button>
-        <button id="mobileResultsBtn" class="btn btn-secondary" onclick="document.getElementById('showResultsBtn').click()">☁️</button>
-      </div>
-      <div class="canvas-container">
+      <!-- Контейнер для колеса баланса -->
+      <div id="balanceWheelContainer" class="mb-4">
         <canvas id="balanceWheel" width="800" height="800"></canvas>
       </div>
       <h4 id="wheelTitle">
