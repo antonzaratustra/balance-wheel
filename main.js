@@ -28,8 +28,6 @@ import { auth } from "./firebase-init.js";
 import { DejaVuSansTTF } from './fonts.js';
 import { spheres } from './js/spheres.js';
 
-
-
 // Импорт нужных методов из firebase/auth
 import {
   GoogleAuthProvider,
@@ -38,7 +36,6 @@ import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
-
 import {
   saveResultToFirestore,
   loadResultsList,
@@ -46,10 +43,7 @@ import {
   deleteSavedResult
 } from "./firestore-utils.js";
 
-
-
 document.addEventListener("DOMContentLoaded", () => {
-
 
 // Глобальная переменная для определения мобильного устройства
 let isMobile = window.innerWidth < 576;
@@ -1433,27 +1427,27 @@ loginBtn.addEventListener("click", () => {
 });
 
 // Обработчик клика по кнопке Google Sign In
-googleSignInBtn.addEventListener("click", async () => {
-  const provider = new GoogleAuthProvider();
-  try {
-    const result = await signInWithPopup(auth, provider);
-    console.log("Пользователь авторизован:", result.user.uid);
-  } catch (error) {
-    console.error("Ошибка при входе:", error);
-    showModal("loginErrorModal");
-  }
-});
+// googleSignInBtn.addEventListener("click", async () => {
+//   const provider = new GoogleAuthProvider();
+//   try {
+//     const result = await signInWithPopup(auth, provider);
+//     console.log("Пользователь авторизован:", result.user.uid);
+//   } catch (error) {
+//     console.error("Ошибка при входе:", error);
+//     showModal("loginErrorModal");
+//   }
+// });
 
 // Обработчик клика по кнопке Google Sign Out
-googleSignOutBtn.addEventListener("click", async () => {
-  try {
-    await signOut(auth);
-    console.log("Пользователь вышел");
-  } catch (error) {
-    console.error("Ошибка при выходе:", error);
-    showModal("logoutErrorModal");
-  }
-});
+// googleSignOutBtn.addEventListener("click", async () => {
+//   try {
+//     await signOut(auth);
+//     console.log("Пользователь вышел");
+//   } catch (error) {
+//     console.error("Ошибка при выходе:", error);
+//     showModal("logoutErrorModal");
+//   }
+// });
 
 function updateUILanguage() {
   // Обновляем текст кнопки логина/выхода
@@ -1466,16 +1460,16 @@ function updateUILanguage() {
   // Обновляем текст в модальном окне
   const loginModalLabel = document.getElementById("loginModalLabel");
   const modalBodyText = document.querySelector("#loginModal .modal-body p");
-  const googleSignInBtn = document.getElementById("googleSignInBtn");
+  // const googleSignInBtn = document.getElementById("googleSignInBtn");
   
   if (currentLanguage === "ru") {
     loginModalLabel.innerText = "Вход";
     modalBodyText.innerText = "Войдите с помощью:";
-    googleSignInBtn.innerText = "Google";
+    // googleSignInBtn.innerText = "Google";
   } else {
     loginModalLabel.innerText = "Login";
     modalBodyText.innerText = "Sign in with:";
-    googleSignInBtn.innerText = "Google";
+    // googleSignInBtn.innerText = "Google";
   }
   
   // Если у вас есть другие элементы с переводом – обновите и их
