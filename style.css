@@ -680,6 +680,8 @@ input[type=range]::-moz-range-thumb:active {
  @media (min-width: 577px) {
   #userInfo {
     padding-left: 20px;
+    font-weight: 600 !important;
+
   }
   }
 
@@ -693,6 +695,8 @@ input[type=range]::-moz-range-thumb:active {
     #userInfo-mobile {
       display: block !important;
       margin-bottom: 8px;
+      color: #1f1f1f !important;
+      font-weight: 600 !important;
     }
     }
 
