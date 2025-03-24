@@ -130,17 +130,19 @@
 
 
 
-      <div class="modal fade" id="resultsModal" tabindex="-1" aria-labelledby="resultsModalLabel" aria-hidden="true">
+      <div class="modal fade" id="resultsModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="resultsModalLabel">Мои результаты</h5>
+              <h5 class="modal-title"></h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <div class="justify-content-between align-items-center mb-3">
-                <div class="align-items-center">
-                  <div id="resultsList"></div>
+              <div class="container-fluid">
+                <div class="row">
+                  <div class="col-12">
+                    <div id="resultsList"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -290,7 +292,7 @@
     </div>
   </div>
 
-  <!-- Модальное окно для уведомления об успешной загрузке результата -->
+  <!-- Модальное окно уведомления об успешной загрузке результата -->
   <div class="modal fade" id="loadSuccessModal" tabindex="-1" aria-labelledby="loadSuccessModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -305,7 +307,7 @@
     </div>
   </div>
 
-  <!-- Модальное окно для уведомления об успешном сохранении -->
+  <!-- Модальное окно уведомления об успешном сохранении -->
   <div class="modal fade" id="saveSuccessModal" tabindex="-1" aria-labelledby="saveSuccessModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -320,20 +322,18 @@
     </div>
   </div>
 
-  <!-- Модальное окно для подтверждения удаления -->
+  <!-- Модальное окно подтверждения удаления -->
   <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Подтверждение</h5>
+          <h5 class="modal-title"></h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
-          Точно удалить результат?
-        </div>
+        <div class="modal-body"></div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-          <button type="button" class="btn btn-danger" id="deleteConfirmBtn">Удалить</button>
+          <button type="button" class="btn btn-secondary"></button>
+          <button type="button" class="btn btn-danger"></button>
         </div>
       </div>
     </div>

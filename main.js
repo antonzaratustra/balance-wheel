@@ -147,7 +147,11 @@ const modalTranslations = {
     deleted: "Результат удален!",
     loginRequired: "Сначала войдите в систему!",
     myResults: "Мои результаты",
-    success: "Успех"
+    success: "Успех",
+    delete: "Удалить",
+    noResults: "Пока нет сохранённых результатов",
+    load: "Загрузить",
+    cancel: "Отмена"
   },
   en: {
     savedToCloud: "Result successfully saved to the cloud!",
@@ -156,7 +160,11 @@ const modalTranslations = {
     deleted: "Result deleted!",
     loginRequired: "Please log in first!",
     myResults: "My Results",
-    success: "Success"
+    success: "Success",
+    delete: "Delete",
+    noResults: "No saved results yet",
+    load: "Load",
+    cancel: "Cancel"
   }
 };
 
@@ -1604,6 +1612,8 @@ function showConfirmDeleteModal(onConfirm) {
     const translations = modalTranslations[currentLanguage];
     const modalTitle = modal.querySelector('.modal-title');
     const modalBody = modal.querySelector('.modal-body');
+    const confirmBtn = modal.querySelector('.btn-danger');
+    const cancelBtn = modal.querySelector('.btn-secondary');
     
     if (modalTitle) {
       modalTitle.textContent = translations.deleteConfirm;
@@ -1612,25 +1622,28 @@ function showConfirmDeleteModal(onConfirm) {
       modalBody.textContent = translations.deleteConfirm;
     }
     
-    new bootstrap.Modal(modal).show();
-    
-    // Находим и обновляем кнопки
-    const confirmBtn = modal.querySelector('.btn-primary');
-    const cancelBtn = modal.querySelector('.btn-secondary');
-    
     if (confirmBtn) {
-      confirmBtn.textContent = translations.deleteConfirm;
+      confirmBtn.textContent = translations.delete;
       confirmBtn.onclick = () => {
-        new bootstrap.Modal(modal).hide();
+        // Сначала скрываем модальное окно подтверждения
+        const modalInstance = new bootstrap.Modal(modal);
+        modalInstance.hide();
+        
+        // Затем выполняем подтверждение
         onConfirm();
       };
     }
+    
     if (cancelBtn) {
       cancelBtn.textContent = translations.cancel || 'Cancel';
       cancelBtn.onclick = () => {
-        new bootstrap.Modal(modal).hide();
+        const modalInstance = new bootstrap.Modal(modal);
+        modalInstance.hide();
       };
     }
+    
+    // Показываем модальное окно в конце
+    new bootstrap.Modal(modal).show();
   }
 }
 
@@ -1644,3 +1657,126 @@ function showLoadResultModal(date) {
   showModal("loadResultModal", 'loaded');
 }
 })(); // Закрывающая скобка для внешнего обработчика событий
+
+function updateResultsModalTitle() {
+  const resultsModalTitle = document.querySelector('#resultsModal .modal-title');
+  if (resultsModalTitle) {
+    resultsModalTitle.textContent = modalTranslations[currentLanguage].myResults;
+  }
+}
+
+// Обновляем функцию showResultsBtn для использования переведенного заголовка
+showResultsBtn.addEventListener("click", async () => {
+  if (!auth.currentUser) {
+    showModal("authModal", 'loginRequired');
+    return;
+  }
+  
+  try {
+    const entries = await loadResultsList();
+    
+    // Обновляем заголовок модального окна
+    updateResultsModalTitle();
+    
+    // Создаем контент для списка результатов
+    const resultsList = document.getElementById("resultsList");
+    if (resultsList) {
+      resultsList.innerHTML = "";
+      
+      if (entries.length === 0) {
+        resultsList.innerHTML = `<p class="text-center">${modalTranslations[currentLanguage].noResults}</p>`;
+        return;
+      }
+      
+      entries.forEach((entry, index) => {
+        const date = new Date(entry.date);
+        const formattedDate = date.toLocaleString();
+        
+        const entryDiv = document.createElement("div");
+        entryDiv.className = "card mb-2";
+        entryDiv.innerHTML = `
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <span>${formattedDate}</span>
+              <div>
+                <button class="btn btn-sm btn-primary me-2" data-entry-id="${entry.id}">
+                  ${modalTranslations[currentLanguage].load}
+                </button>
+                <button class="btn btn-sm btn-danger" data-entry-id="${entry.id}">
+                  ❌
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        resultsList.appendChild(entryDiv);
+      });
+    }
+    
+    // Показываем модальное окно
+    new bootstrap.Modal(document.getElementById("resultsModal")).show();
+    
+    // Добавляем обработчики для кнопок загрузки и удаления
+    document.querySelectorAll("#resultsList .btn-primary").forEach(btn => {
+      btn.onclick = async () => {
+        const data = await loadSavedResult(btn.dataset.entryId);
+        if (!data) {
+          showModal("loadErrorModal", 'loaded');
+          return;
+        }
+        
+        // Обновляем данные на странице
+        Object.keys(data.spheres).forEach(sphereId => {
+          const sphereData = data.spheres[sphereId];
+          sphereData.questions.forEach((question, index) => {
+            const slider = document.getElementById(`slider_${sphereId}_${index}`);
+            if (slider) {
+              slider.value = question.value;
+              updateSliderDisplay(sphereId, index, question.value);
+            }
+          });
+        });
+        
+        // Обновляем дату
+        document.getElementById("currentDate").textContent = 
+          `(${data.date.toLocaleString()})`;
+        
+        // Обновляем средние значения
+        updateSphereAverage(sphereId);
+        updateOverallAverage();
+        
+        // Обновляем колесо
+        drawWheel();
+        
+        // Показываем модальное окно об успешной загрузке
+        showModal("loadSuccessModal", 'loaded');
+      };
+    });
+    
+    document.querySelectorAll("#resultsList .btn-danger").forEach(btn => {
+      btn.onclick = () => {
+        showConfirmDeleteModal(async () => {
+          try {
+            await deleteSavedResult(btn.dataset.entryId);
+            // Обновляем список результатов
+            showResultsBtn.click();
+            // Обновляем слайдер истории
+            initializeHistorySlider();
+            const successModal = new bootstrap.Modal(document.getElementById("deleteSuccessModal"));
+            successModal.show();
+            document.querySelector("#deleteSuccessModal .btn-primary").onclick = () => {
+              successModal.hide();
+            };
+          } catch (error) {
+            console.error("Ошибка при удалении:", error);
+            showModal("deleteErrorModal", 'deleteConfirm');
+          }
+        });
+      };
+    });
+  } catch (error) {
+    console.error("Ошибка при загрузке результатов:", error);
+    showModal("loadErrorModal", 'loaded');
+  }
+});
