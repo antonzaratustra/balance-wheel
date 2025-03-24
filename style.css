@@ -1054,3 +1054,72 @@ body.dark-mode #historyDateDisplay {
   font-weight: 600;
   text-align: center;
 }
+
+/* Анимации для элементов после загрузки */
+#faqContent {
+  transition: transform 0.3s ease-out;
+  position: relative;
+  left: 0;
+}
+
+/* Медленные анимации для десктопа */
+@media (min-width: 992px) {
+  .col-md-7, #canvas-wrapper {
+    transition: transform 0.2s ease-out;
+  }
+  
+  .col-md-7 {
+    position: relative;
+    left: 0;
+  }
+  
+  #canvas-wrapper {
+    position: relative;
+    right: 0;
+    width: 600px;
+
+  }
+}
+
+/* Стили для мобильных */
+@media (max-width: 991px) {
+  .row {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .col-md-7, #canvas-wrapper {
+    width: 90%;
+    margin: 0 auto;
+    max-width: 90%;
+  }
+
+  #canvas-wrapper {
+    position: relative;
+  }
+}
+
+/* Инициальное состояние элементов */
+.col-md-7.loading {
+  transform: translateX(-100%);
+  position: relative;
+  left: 0;
+}
+
+#canvas-wrapper.loading {
+  transform: translateX(100%);
+  position: relative;
+  width: 600px;
+}
+
+/* Дополнительные стили для правильного позиционирования */
+.col-md-7 {
+  position: relative;
+  width: 100%;
+}
+
+#canvas-wrapper {
+  position: relative;
+  width: 600px;
+}

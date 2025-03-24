@@ -65,8 +65,7 @@ export function applySlidersFromData(data) {
 export async function saveResultToFirestore(title, spheres) {
   const user = auth.currentUser;
   if (!user) {
-    alert("Пользователь не авторизован!");
-    return;
+    return false;
   }
   // Собираем данные с ползунков
   const resultData = collectCurrentSliders(spheres);
@@ -86,10 +85,10 @@ export async function saveResultToFirestore(title, spheres) {
   try {
     // addDoc — добавляет новый документ с автогенерированным ID
     await addDoc(subcolRef, entry);
-    alert("Результат успешно сохранён в Firestore!");
+    return true;
   } catch (error) {
     console.error("Ошибка при сохранении:", error);
-    alert("Ошибка сохранения: " + error.message);
+    return false;
   }
 }
 

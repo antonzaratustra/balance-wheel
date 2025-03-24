@@ -14,12 +14,17 @@
       padding-top: 70px;
     }
     /* Фон navbar такой же, как фон страницы */
-    body.dark-mode .navbar {
+    body.dark-mode {
       background-color: #161616;
+    }
+    body:not(.dark-mode) {
+      background-color: #ffffff;
+    }
+    
+    body.dark-mode .navbar {
       border: none;
     }
     body:not(.dark-mode) .navbar {
-      background-color: #ffffff !important;
       border: none;
     }
     /* На мобильных: дата переносится на новую строку */
@@ -237,19 +242,16 @@
     </div>
   </div>
 
-  <!-- Модальное окно для успешного сохранения -->
-  <div class="modal fade" id="saveSuccessModal" tabindex="-1" aria-hidden="true">
+  <!-- Модальное окно для уведомления об успешном сохранении -->
+  <div class="modal fade" id="saveSuccessModal" tabindex="-1" aria-labelledby="saveSuccessModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Успех</h5>
+          <h5 class="modal-title" id="saveSuccessModalLabel">Успех</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          Результат успешно сохранен!
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+          <p>Результат успешно сохранён в Firestore!</p>
         </div>
       </div>
     </div>

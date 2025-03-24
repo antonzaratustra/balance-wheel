@@ -50,11 +50,32 @@ document.addEventListener("DOMContentLoaded", () => {
     loader.remove();
   }
 
+  function initLoadingAnimation() {
+    const colMd7 = document.querySelector('.col-md-7');
+    const canvasWrapper = document.getElementById('canvas-wrapper');
+    const faqContent = document.getElementById('faqContent');
+    
+    // Добавляем класс loading для инициального состояния
+    colMd7.classList.add('loading');
+    canvasWrapper.classList.add('loading');
+    faqContent.classList.add('loading');
+    
+    // Удаляем класс loading через небольшой таймаут для запуска анимации
+    setTimeout(() => {
+      colMd7.classList.remove('loading');
+      canvasWrapper.classList.remove('loading');
+      faqContent.classList.remove('loading');
+    }, 50); // 50ms для инициализации стилей
+  }
+
+  initLoadingAnimation();
+
 // Глобальная переменная для определения мобильного устройства
 let isMobile = window.innerWidth < 576;
 window.addEventListener("resize", () => {
   isMobile = window.innerWidth < 576;
 });
+
 
 
 
@@ -115,17 +136,35 @@ let darkMode = true;        // по умолчанию тёмная тема
 
 
 
-
-
 const saveToCloudBtn = document.getElementById("saveToCloudBtn");
-saveToCloudBtn.addEventListener("click", () => {
-  if (!auth.currentUser) {
-    showModal("authModal");
-    return;
+
+// Функция для отображения модального окна
+function showModal(modalId) {
+  const modal = new bootstrap.Modal(document.getElementById(modalId));
+  modal.show();
+}
+
+// Функция для сохранения результата
+async function saveResult() {
+  try {
+    await saveResultToFirestore(new Date().toLocaleString(), spheres);
+    showModal('saveSuccessModal');
+  } catch (error) {
+    console.error('Ошибка при сохранении:', error);
+    // Здесь можно добавить обработку ошибки
   }
-  // Сохраняем с текущей датой/временем как названием
-  saveResultToFirestore(new Date().toLocaleString(), spheres);
-});
+}
+
+// Добавляем обработчик для кнопки сохранения
+if (saveToCloudBtn) {
+  saveToCloudBtn.addEventListener('click', () => {
+    if (!auth.currentUser) {
+      showModal("authModal");
+      return;
+    }
+    saveResult();
+  });
+}
 
 
 
@@ -668,7 +707,7 @@ function updateSliderDisplay(sphereId, questionId, value) {
   if (!sphere) return;
   const question = sphere.questions.find(q => q.id === questionId);
   if (!question) return;
-  const descElem = document.getElementById(`desc_${sphereId}_${question.id}`);
+  const descElem = document.getElementById(`desc_${sphereId}_${questionId}`);
   const dict = question.descriptions[value];
   descElem.innerText = dict ? dict[currentLanguage] : "";
   let val = parseInt(value, 10);
