@@ -1111,12 +1111,16 @@ body.dark-mode #historyDateDisplay {
   transform: translateX(-100%);
   position: relative;
   left: 0;
+  margin-top: 0 !important;
+  transition: transform 0.3s ease;
 }
 
 #canvas-wrapper.loading {
   transform: translateX(100%);
   position: relative;
   width: 600px;
+  margin-top: 0 !important;
+  transition: transform 0.3s ease;
 }
 
 /* Дополнительные стили для правильного позиционирования */
