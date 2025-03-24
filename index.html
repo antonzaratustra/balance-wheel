@@ -153,51 +153,6 @@
 
       <div id="userInfo" style="display: inline-block; color: #ccc;"></div>
 
-
-
-
-
-      <div class="modal fade" id="resultsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title"></h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">❌</button>
-            </div>
-            <div class="modal-body">
-              <div class="container-fluid">
-                <div class="row">
-                  <div class="col-12">
-                    <div id="resultsList"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       <!-- Правый блок с остальными кнопками -->
       <div class="ms-auto">
         <div class="btn-group" role="group">
@@ -215,59 +170,26 @@
     </div>
   </nav>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- Модальное окно для входа (Bootstrap 5) -->
-<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content text-dark">
-      <div class="modal-header">
-        <h5 class="modal-title" id="loginModalLabel">Вход</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">❌</button>
-      </div>
-      <div class="modal-body">
-        <p>Войдите с помощью:</p>
-        <button id="googleSignInBtn" class="btn btn-danger mb-2 w-100">Google</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Модальное окно для временной линии результатов -->
-<div class="modal fade" id="timelineModal" tabindex="-1" aria-labelledby="timelineModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="timelineModalLabel">История изменений</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">❌</button>
-      </div>
-      <div class="modal-body">
-        <div class="d-flex flex-column align-items-center">
-          <!-- Канвас для временной линии -->
-          <canvas id="timelineCanvas" class="mb-4" style="max-height: 600px; width: auto;"></canvas>
-          
-          <!-- Слайдер с датами -->
-          <div class="timeline-slider-container w-100">
-            <div id="timelineDateDisplay" class="text-center mb-2"></div>
-            <input type="range" id="timelineSlider" class="w-100" min="0" max="0">
+  <!-- Модальное окно результатов -->
+  <div class="modal fade" id="resultsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">❌</button>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-12">
+                <div id="resultsList"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
   <!-- Основной контент -->
   <div class="container mt-4 position-relative">
@@ -317,8 +239,48 @@
     </div>
   </div>
 
-  <!-- Модальные окна -->
-  <!-- Модальное окно для входа в систему -->
+  <!-- Модальное окно для входа (Bootstrap 5) -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-dark">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">Вход</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">❌</button>
+      </div>
+      <div class="modal-body">
+        <p>Войдите с помощью:</p>
+        <button id="googleSignInBtn" class="btn btn-danger mb-2 w-100">Google</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно для временной линии результатов -->
+<div class="modal fade" id="timelineModal" tabindex="-1" aria-labelledby="timelineModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="timelineModalLabel">История изменений</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">❌</button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex flex-column align-items-center">
+          <!-- Канвас для временной линии -->
+          <canvas id="timelineCanvas" class="mb-4" style="max-height: 600px; width: auto;"></canvas>
+          
+          <!-- Слайдер с датами -->
+          <div class="timeline-slider-container w-100">
+            <div id="timelineDateDisplay" class="text-center mb-2"></div>
+            <input type="range" id="timelineSlider" class="w-100" min="0" max="0">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Модальное окна -->
+  <!-- Модальное окно входа в систему -->
   <div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
