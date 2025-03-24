@@ -44,6 +44,11 @@ import {
 } from "./firestore-utils.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Удаляем загрузчик
+  const loader = document.getElementById("loader");
+  if (loader) {
+    loader.remove();
+  }
 
 // Глобальная переменная для определения мобильного устройства
 let isMobile = window.innerWidth < 576;
