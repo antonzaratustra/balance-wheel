@@ -136,7 +136,7 @@ input[type=range]::-webkit-slider-runnable-track {
 }
 input[type=range]::-moz-range-track {
   height: 6px;
-  background: #ddd;
+  /* background: #ddd; */
   border-radius: 3px;
 }
 
@@ -801,12 +801,18 @@ body.dark-mode .modal-title {
   width: 100%;
   height: 8px;
   border-radius: 4px;
-  background: #464646;
+  background: #ddd;
   outline: none;
   opacity: 0.7;
   -webkit-transition: opacity 0.2s;
   transition: opacity 0.2s;
   margin: 0;
+}
+
+
+
+.dark-mode #historySlider {
+  background: #444;
 }
 
 #historySlider:hover {
@@ -1122,4 +1128,38 @@ body.dark-mode #historyDateDisplay {
 #canvas-wrapper {
   position: relative;
   width: 600px;
+}
+
+/* === СТИЛИ ДЛЯ ПОЛЗУНКА ИСТОРИИ === */
+#historySlider {
+  width: 100%;
+  margin: 10px 0;
+}
+
+/* Стили для трека ползунка в светлой теме */
+:root:not(.dark-mode) #historySlider::-webkit-slider-runnable-track {
+  background-color: #ccc;
+  border: none;
+}
+
+/* Стили для трека ползунка в тёмной теме */
+:root.dark-mode #historySlider::-webkit-slider-runnable-track {
+  background-color: #666;
+  border: none;
+}
+
+/* Общие стили для ползунка */
+#historySlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#historySlider::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
 }
