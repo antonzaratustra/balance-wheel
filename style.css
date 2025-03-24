@@ -690,6 +690,10 @@ input[type=range]::-moz-range-thumb:active {
     #userInfo {
       display: none !important;
     }
+    #userInfo-mobile {
+      display: block !important;
+      margin-bottom: 8px;
+    }
     }
 
   

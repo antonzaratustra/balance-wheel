@@ -1685,6 +1685,7 @@ canvasContainer.addEventListener('mouseleave', () => {
 
 const loginBtn = document.getElementById("loginBtn");
 const userInfo = document.getElementById("userInfo"); // div, где показываем имя
+const userInfoMobile = document.getElementById("userInfo-mobile"); // div, где показываем имя на мобильном
 
 auth.onAuthStateChanged((user) => {
   if (user) {
@@ -1695,11 +1696,13 @@ auth.onAuthStateChanged((user) => {
     loginBtn.innerText = currentLanguage === "ru" ? "👤 Выйти" : "👤 Logout";
     // Выводим имя пользователя или email
     userInfo.textContent = user.displayName || user.email || "";
+    userInfoMobile.textContent = user.displayName || user.email || "";
   } else {
     console.log("Пользователь не авторизован");
     // Пользователь не вошёл
     loginBtn.innerText = currentLanguage === "ru" ? "👤 Войти" : "👤 Login";
     userInfo.textContent = "";
+    userInfoMobile.textContent = "";
     // Скрываем слайдер если пользователь вышел
     const historySliderContainer = document.getElementById("historySliderContainer");
     if (historySliderContainer) {
@@ -1708,6 +1711,59 @@ auth.onAuthStateChanged((user) => {
   }
   updateUILanguage();
 });
+
+// Обновляем функцию обновления userInfo
+function updateUserInfo() {
+  const userInfo = document.getElementById('userInfo');
+  const userInfoMobile = document.getElementById('userInfo-mobile');
+  
+  if (userInfo && userInfoMobile) {
+    const user = auth.currentUser;
+    if (user) {
+      const email = user.email;
+      const displayName = user.displayName || email;
+      const text = `👤 ${displayName}`;
+      userInfo.textContent = text;
+      userInfoMobile.textContent = text;
+    } else {
+      userInfo.textContent = '';
+      userInfoMobile.textContent = '';
+    }
+  }
+}
+
+// Обновляем функцию updateUILanguage для вызова updateUserInfo
+function updateUILanguage() {
+  updateUserInfo();
+  // ... остальной код функции
+}
+
+// Обновляем функцию updateUserInfo для вызова updateUILanguage
+function updateUserInfo() {
+  const userInfo = document.getElementById('userInfo');
+  const userInfoMobile = document.getElementById('userInfo-mobile');
+  
+  if (userInfo && userInfoMobile) {
+    const user = auth.currentUser;
+    if (user) {
+      const email = user.email;
+      const displayName = user.displayName || email;
+      const text = `👤 ${displayName}`;
+      userInfo.textContent = text;
+      userInfoMobile.textContent = text;
+    } else {
+      userInfo.textContent = '';
+      userInfoMobile.textContent = '';
+    }
+  }
+  updateUILanguage();
+}
+
+// Обновляем функцию updateUILanguage для вызова updateUserInfo
+function updateUILanguage() {
+  updateUserInfo();
+  // ... остальной код функции
+}
 
 // Обработчик клика по кнопке Login/Logout
 loginBtn.addEventListener("click", () => {
@@ -1832,7 +1888,9 @@ function showConfirmDeleteModal(onConfirm) {
       confirmBtn.onclick = () => {
         // Сначала скрываем модальное окно подтверждения
         const modalInstance = bootstrap.Modal.getInstance(modal);
-        modalInstance.hide();
+        if (modalInstance) {
+          modalInstance.hide();
+        }
         
         // Затем выполняем подтверждение
         onConfirm();
