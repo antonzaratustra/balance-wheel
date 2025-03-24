@@ -139,16 +139,54 @@ let darkMode = true;        // по умолчанию тёмная тема
 const saveToCloudBtn = document.getElementById("saveToCloudBtn");
 
 // Функция для отображения модального окна
-function showModal(modalId) {
-  const modal = new bootstrap.Modal(document.getElementById(modalId));
-  modal.show();
+const modalTranslations = {
+  ru: {
+    savedToCloud: "Результат успешно сохранён в облако!",
+    loaded: "Результат успешно загружен!",
+    deleteConfirm: "Точно удалить результат?",
+    deleted: "Результат удален!",
+    loginRequired: "Сначала войдите в систему!",
+    myResults: "Мои результаты",
+    success: "Успех"
+  },
+  en: {
+    savedToCloud: "Result successfully saved to the cloud!",
+    loaded: "Result successfully loaded!",
+    deleteConfirm: "Are you sure you want to delete the result?",
+    deleted: "Result deleted!",
+    loginRequired: "Please log in first!",
+    myResults: "My Results",
+    success: "Success"
+  }
+};
+
+function showModal(modalId, messageKey = null) {
+  const modal = document.getElementById(modalId);
+  if (modal && messageKey) {
+    const modalTitle = modal.querySelector('.modal-title');
+    const modalBody = modal.querySelector('.modal-body');
+    
+    // Получаем переводы для текущего языка
+    const translations = modalTranslations[currentLanguage];
+    
+    // Обновляем заголовок и текст модального окна
+    if (modalTitle) {
+      modalTitle.textContent = translations[messageKey] || translations.success;
+    }
+    if (modalBody) {
+      modalBody.textContent = translations[messageKey] || translations.success;
+    }
+  }
+  if (modal) {
+    new bootstrap.Modal(modal).show();
+  }
 }
 
 // Функция для сохранения результата
 async function saveResult() {
   try {
     await saveResultToFirestore(new Date().toLocaleString(), spheres);
-    showModal('saveSuccessModal');
+    showModal('saveSuccessModal', 'savedToCloud');
     // Обновляем слайдер истории после сохранения
     initializeHistorySlider();
   } catch (error) {
@@ -161,7 +199,7 @@ async function saveResult() {
 if (saveToCloudBtn) {
   saveToCloudBtn.addEventListener('click', () => {
     if (!auth.currentUser) {
-      showModal("authModal");
+      showModal("authModal", 'loginRequired');
       return;
     }
     saveResult();
@@ -177,7 +215,7 @@ const resultsListEl = document.getElementById("resultsList");
 
 showResultsBtn.addEventListener("click", async () => {
   if (!auth.currentUser) {
-    showModal("authModal");
+    showModal("authModal", 'loginRequired');
     return;
   }
 
@@ -245,7 +283,7 @@ showResultsBtn.addEventListener("click", async () => {
     loadBtn.addEventListener("click", async () => {
       const data = await loadSavedResult(entry.id);
       if (!data) {
-        showModal("loadErrorModal");
+        showModal("loadErrorModal", 'loaded');
         return;
       }
       
@@ -271,7 +309,7 @@ showResultsBtn.addEventListener("click", async () => {
       modal.hide();
       
       // Показываем модальное окно об успешной загрузке
-      showModal("loadSuccessModal");
+      showModal("loadSuccessModal", 'loaded');
     });
 
     delBtn.addEventListener("click", async () => {
@@ -285,10 +323,10 @@ showResultsBtn.addEventListener("click", async () => {
           showResultsBtn.click();
           // Обновляем слайдер истории
           initializeHistorySlider();
-          showModal("deleteSuccessModal");
+          showModal("deleteSuccessModal", 'deleted');
         } catch (error) {
           console.error("Ошибка при удалении:", error);
-          showModal("deleteErrorModal");
+          showModal("deleteErrorModal", 'deleteConfirm');
         }
       });
     });
@@ -650,13 +688,39 @@ function updateSphereAverage(sphereId) {
   updateOverallAverage();
 }
 
+// Функция для обновления отображения даты
+function updateDateDisplay() {
+  const now = new Date();
+  const monthsEn = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  const monthsRu = [
+    "Января", "Февраля", "Марта", "Апреля", "Мая", "Июня",
+    "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"
+  ];
+  const day = now.getDate();
+  const monthIndex = now.getMonth();
+  const year = now.getFullYear();
+  
+  if (currentLanguage === "ru") {
+    // Для русского: "24 марта 2025"
+    const monthName = monthsRu[monthIndex];
+    const dateString = `${day} ${monthName} ${year}`;
+    document.getElementById("currentDate").innerText = `(${dateString})`;
+  } else {
+    // Для английского: "March 24, 2025"
+    const monthName = monthsEn[monthIndex];
+    const dateString = `${monthName} ${day}, ${year}`;
+    document.getElementById("currentDate").innerText = `(${dateString})`;
+  }
+}
 
 function updateSliderDisplay(sphereId, questionId, value) {
   const sphere = spheres.find(s => s.id === sphereId);
   if (!sphere) return;
   const question = sphere.questions.find(q => q.id === questionId);
   if (!question) return;
-
   const descElem = document.getElementById(`desc_${sphereId}_${questionId}`);
   const dict = question.descriptions[value];
   descElem.innerText = dict ? dict[currentLanguage] : "";
@@ -683,8 +747,6 @@ function updateOverallAverage() {
   document.getElementById("overallAverage").innerText =
     (currentLanguage === "ru" ? "Общее среднее: " : "Overall Average: ") + overall;
 }
-
-
 
 function updateTabStyles() {
   const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
@@ -742,7 +804,6 @@ function updateSphereAverage(sphereId) {
 
   updateOverallAverage();
 }
-
 
 /****************************************
  * 4. РИСОВАНИЕ «КОЛЕСА» (СЕКТОРОВ)
@@ -866,8 +927,6 @@ function drawWheel() {
              centerY + maxRadius * Math.sin(startAngle));
   ctx.stroke();
 }
-
-
 
 /****************************************
  * 5. ПЕРЕКЛЮЧАТЕЛИ ТЕМЫ И ЯЗЫКА
@@ -1110,7 +1169,7 @@ function initializeHistorySlider() {
     });
   }).catch(error => {
     console.error("Ошибка при загрузке результатов:", error);
-    showModal("loadErrorModal");
+    showModal("loadErrorModal", 'loaded');
   });
 }
 
@@ -1448,7 +1507,7 @@ loginBtn.addEventListener("click", () => {
       })
       .catch((err) => {
         console.error("Ошибка при выходе:", err);
-        showModal("logoutErrorModal");
+        showModal("logoutErrorModal", 'loginRequired');
       });
   } else {
     // Пользователь не залогинен – открываем модальное окно для входа
@@ -1476,7 +1535,7 @@ loginBtn.addEventListener("click", () => {
 //     console.log("Пользователь авторизован:", result.user.uid);
 //   } catch (error) {
 //     console.error("Ошибка при входе:", error);
-//     showModal("loginErrorModal");
+//     showModal("loginErrorModal", 'loginRequired');
 //   }
 // });
 
@@ -1487,7 +1546,7 @@ loginBtn.addEventListener("click", () => {
 //     console.log("Пользователь вышел");
 //   } catch (error) {
 //     console.error("Ошибка при выходе:", error);
-//     showModal("logoutErrorModal");
+//     showModal("logoutErrorModal", 'loginRequired');
 //   }
 // });
 
@@ -1517,25 +1576,71 @@ function updateUILanguage() {
   // Если у вас есть другие элементы с переводом – обновите и их
 }
 
-function showModal(modalId) {
-  const modal = new bootstrap.Modal(document.getElementById(modalId));
-  modal.show();
+function showModal(modalId, messageKey = null) {
+  const modal = document.getElementById(modalId);
+  if (modal && messageKey) {
+    const modalTitle = modal.querySelector('.modal-title');
+    const modalBody = modal.querySelector('.modal-body');
+    
+    // Получаем переводы для текущего языка
+    const translations = modalTranslations[currentLanguage];
+    
+    // Обновляем заголовок и текст модального окна
+    if (modalTitle) {
+      modalTitle.textContent = translations[messageKey] || translations.success;
+    }
+    if (modalBody) {
+      modalBody.textContent = translations[messageKey] || translations.success;
+    }
+  }
+  if (modal) {
+    new bootstrap.Modal(modal).show();
+  }
 }
 
 function showConfirmDeleteModal(onConfirm) {
-  const modal = new bootstrap.Modal(document.getElementById("confirmDeleteModal"));
-  modal.show();
-  
-  // Добавляем обработчик для кнопки подтверждения
-  const confirmBtn = document.getElementById("deleteConfirmBtn");
-  confirmBtn.onclick = () => {
-    modal.hide();
-    onConfirm();
-  };
+  const modal = document.getElementById('confirmDeleteModal');
+  if (modal) {
+    const translations = modalTranslations[currentLanguage];
+    const modalTitle = modal.querySelector('.modal-title');
+    const modalBody = modal.querySelector('.modal-body');
+    
+    if (modalTitle) {
+      modalTitle.textContent = translations.deleteConfirm;
+    }
+    if (modalBody) {
+      modalBody.textContent = translations.deleteConfirm;
+    }
+    
+    new bootstrap.Modal(modal).show();
+    
+    // Находим и обновляем кнопки
+    const confirmBtn = modal.querySelector('.btn-primary');
+    const cancelBtn = modal.querySelector('.btn-secondary');
+    
+    if (confirmBtn) {
+      confirmBtn.textContent = translations.deleteConfirm;
+      confirmBtn.onclick = () => {
+        new bootstrap.Modal(modal).hide();
+        onConfirm();
+      };
+    }
+    if (cancelBtn) {
+      cancelBtn.textContent = translations.cancel || 'Cancel';
+      cancelBtn.onclick = () => {
+        new bootstrap.Modal(modal).hide();
+      };
+    }
+  }
 }
 
 function showLoadResultModal(date) {
   document.getElementById("loadResultDate").textContent = date.toLocaleString();
-  showModal("loadResultModal");
+  showModal("loadResultModal", 'loaded');
 }
-});
+
+function showLoadResultModal(date) {
+  document.getElementById("loadResultDate").textContent = date.toLocaleString();
+  showModal("loadResultModal", 'loaded');
+}
+})(); // Закрывающая скобка для внешнего обработчика событий
