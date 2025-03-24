@@ -214,8 +214,44 @@ if (saveToCloudBtn) {
   });
 }
 
+// Добавляем функциональность для мобильных кнопок
+const mobileSaveBtn = document.getElementById('mobile-save-btn');
+const mobileLoginBtn = document.getElementById('mobile-login-btn');
+const mobileViewBtn = document.getElementById('mobile-view-btn');
 
+const updateMobileButtons = () => {
+  const isLoggedIn = auth.currentUser;
+  mobileSaveBtn.textContent = currentLanguage === "ru" ? '💾 Сохранить' : '💾 Save';
+  mobileLoginBtn.textContent = isLoggedIn ? (currentLanguage === "ru" ? '🔑 Выйти' : '🔑 Logout') : (currentLanguage === "ru" ? '🔑 Войти' : '🔑 Login');
+  mobileViewBtn.textContent = currentLanguage === "ru" ? '☁️ Просмотреть' : '☁️ View Results';
+};
 
+mobileSaveBtn.addEventListener('click', () => {
+  if (!auth.currentUser) {
+    showModal("authModal", 'loginRequired');
+    return;
+  }
+  saveResult();
+});
+
+mobileLoginBtn.addEventListener('click', () => {
+  toggleAuth();
+  updateMobileButtons();
+});
+
+mobileViewBtn.addEventListener('click', () => {
+  if (!auth.currentUser) {
+    showModal("authModal", 'loginRequired');
+    return;
+  }
+  showResults();
+});
+
+// Обновляем кнопки при изменении языка
+function updateUILanguage() {
+  updateMobileButtons();
+  // ... остальной код функции
+}
 
 const showResultsBtn = document.getElementById("showResultsBtn");
 const resultsModalEl = document.getElementById("resultsModal");

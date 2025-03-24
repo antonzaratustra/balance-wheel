@@ -208,7 +208,7 @@
           </button>
           <button id="langToggle" class="btn btn-secondary">🌐 EN</button>
           <button id="themeToggle" class="btn btn-secondary">🌙 Dark</button>
-          <button id="loginBtn" class="btn btn-secondary">👤Login</button>
+          <button id="loginBtn" class="btn btn-secondary d-none d-md-inline-block">👤Login</button>
           <button id="savePDF" class="btn btn-primary">🔽 PDF</button>
         </div>
       </div>
@@ -280,6 +280,16 @@
         <div id="faqContent" style="display: none; padding: 20px;"></div>
       </div>
     </div>
+
+    <!-- Блок с кнопками для мобильной версии -->
+    <div class="d-block d-md-none text-center mb-3">
+      <div class="btn-group">
+        <button id="mobile-save-btn" class="btn btn-primary me-2">💾 Сохранить</button>
+        <button id="mobile-login-btn" class="btn btn-secondary me-2">🔑 Войти/Выйти</button>
+        <button id="mobile-view-btn" class="btn btn-primary">☁️ Просмотреть</button>
+      </div>
+    </div>
+
     <!-- Абсолютно позиционированный блок для канваса -->
     <div id="canvas-wrapper">
       <!-- Контейнер для колеса баланса -->
