@@ -1378,6 +1378,19 @@ sphereTabs.forEach(tab => {
   });
 });
 
+// Добавляем обработчик для прокрутки при переключении вкладок
+const tabLinks = document.querySelectorAll('.nav-link');
+
+tabLinks.forEach(tab => {
+  tab.addEventListener('click', (e) => {
+    // Прокручиваем страницу к верху с анимацией
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  });
+});
+
 // Функция для инициализации слайдера истории изменений
 function initializeHistorySlider() {
   console.log("Инициализация слайдера истории");
@@ -1685,12 +1698,11 @@ let bounds;
 function rotateCanvas(e) {
   const mouseX = e.clientX;
   const mouseY = e.clientY;
-  const rect = wheelContainer.getBoundingClientRect();
-  const leftX = mouseX - rect.left;
-  const topY = mouseY - rect.top;
+  const leftX = mouseX - bounds.x;
+  const topY = mouseY - bounds.y;
   const center = {
-    x: leftX - rect.width / 2,
-    y: topY - rect.height / 2
+    x: leftX - bounds.width / 2,
+    y: topY - bounds.height / 2
   };
   const distance = Math.sqrt(center.x ** 2 + center.y ** 2);
 
@@ -2022,10 +2034,9 @@ showResultsBtn.addEventListener("click", async () => {
         
         resultsList.appendChild(entryDiv);
       });
+
+      resultsModal.show();
     }
-    
-    // Показываем модальное окно
-    new bootstrap.Modal(document.getElementById("resultsModal")).show();
     
     // Добавляем обработчики для кнопок загрузки и удаления
     document.querySelectorAll("#resultsList .btn-primary").forEach(btn => {

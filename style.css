@@ -14,7 +14,16 @@ body {
 /* --- Мобильный отступ для контента вкладок --- */
 @media (max-width: 576px) {
   #sphereTabContent {
-    /* padding-top: 100px; */
+    padding-top: 100px;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .nav-tabs {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
   }
 }
 
@@ -583,6 +592,7 @@ input[type=range]::-moz-range-thumb:active {
   border-radius: 50%;
   border: none;
   cursor: pointer;
+  transition: box-shadow 0.1s ease;
   /* (24 - 6)/2 = 9 => чтобы центрировать thumb по вертикали над треком */
   margin-top: -9px;
 }
@@ -595,6 +605,7 @@ input[type=range]::-moz-range-thumb:active {
   border-radius: 50%;
   border: none;
   cursor: pointer;
+  transition: box-shadow 0.1s ease;
 }
 
 /* Стили для временной линии */
@@ -1200,4 +1211,31 @@ body.dark-mode #historyDateDisplay {
   max-width: 250px;
   line-height: 1.2em;
   z-index: 99999;
+}
+
+
+
+@media (max-width: 576px) {
+  #sphereTabContent {
+    padding-top: 100px;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .nav-tabs {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+  }
+
+  /* Отключаем отступы для row и container на мобильных */
+  .row {
+    margin-left: 0 !important;
+  }
+
+  .container.mt-4.position-relative {
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+  }
 }
