@@ -1332,64 +1332,39 @@ window.addEventListener("scroll", function() {
 
 // Добавляем обработку движения мыши для 3D эффекта
 const canvasContainer = document.getElementById('balanceWheelContainer');
-const canvas = document.getElementById('balanceWheel');
+let bounds;
 
-let mouseX = 0;
-let mouseY = 0;
-let targetX = 0;
-let targetY = 0;
-let speed = 0.1;
+function rotateCanvas(e) {
+  const mouseX = e.clientX;
+  const mouseY = e.clientY;
+  const leftX = mouseX - bounds.x;
+  const topY = mouseY - bounds.y;
+  const center = {
+    x: leftX - bounds.width / 2,
+    y: topY - bounds.height / 2
+  };
+  const distance = Math.sqrt(center.x ** 2 + center.y ** 2);
 
-function handleMouseMove(e) {
-  const rect = canvasContainer.getBoundingClientRect();
-  const centerX = rect.left + rect.width / 2;
-  const centerY = rect.top + rect.height / 2;
-  
-  mouseX = e.clientX - centerX;
-  mouseY = e.clientY - centerY;
-  
-  // Нормализуем значения в диапазоне -100..100
-  mouseX = Math.min(Math.max(mouseX, -100), 100);
-  mouseY = Math.min(Math.max(mouseY, -100), 100);
+  canvasContainer.style.transform = `
+    scale3d(1.07, 1.07, 1.07)
+    rotate3d(
+      ${center.y / 100},
+      ${-center.x / 100},
+      0,
+      ${Math.log(distance) * 2}deg
+    )
+  `;
 }
 
-function animate3D() {
-  // Вычисляем углы вращения
-  const maxX = 15; // максимальный угол по оси X
-  const maxY = 15; // максимальный угол по оси Y
-  
-  // Применяем нелинейное преобразование для более естественного эффекта
-  const angleX = Math.sin(mouseY / 100 * Math.PI) * maxX;
-  const angleY = Math.sin(mouseX / 100 * Math.PI) * maxY;
-  
-  // Плавно изменяем углы
-  targetX = angleY;
-  targetY = angleX;
-  
-  const currentTransform = canvas.style.transform;
-  const currentRotation = currentTransform ? currentTransform.match(/rotateX\((-?\d+\.?\d*)deg\) rotateY\((-?\d+\.?\d*)deg\)/) : null;
-  
-  const currentX = currentRotation ? parseFloat(currentRotation[1]) : 0;
-  const currentY = currentRotation ? parseFloat(currentRotation[2]) : 0;
-  
-  const newX = currentX + (targetX - currentX) * speed;
-  const newY = currentY + (targetY - currentY) * speed;
-  
-  canvas.style.transform = `rotateX(${newY}deg) rotateY(${newX}deg)`;
-  
-  requestAnimationFrame(animate3D);
-}
+canvasContainer.addEventListener('mouseenter', () => {
+  bounds = canvasContainer.getBoundingClientRect();
+  document.addEventListener('mousemove', rotateCanvas);
+});
 
-// Добавляем обработчики событий
-if (canvasContainer) {
-  canvasContainer.addEventListener('mousemove', handleMouseMove);
-  canvasContainer.addEventListener('mouseenter', () => {
-    requestAnimationFrame(animate3D);
-  });
-  canvasContainer.addEventListener('mouseleave', () => {
-    canvas.style.transform = 'rotateX(0deg) rotateY(0deg)';
-  });
-}
+canvasContainer.addEventListener('mouseleave', () => {
+  document.removeEventListener('mousemove', rotateCanvas);
+  canvasContainer.style.transform = '';
+});
 
 const loginBtn = document.getElementById("loginBtn");
 const userInfo = document.getElementById("userInfo"); // div, где показываем имя
