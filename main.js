@@ -149,6 +149,8 @@ async function saveResult() {
   try {
     await saveResultToFirestore(new Date().toLocaleString(), spheres);
     showModal('saveSuccessModal');
+    // Обновляем слайдер истории после сохранения
+    initializeHistorySlider();
   } catch (error) {
     console.error('Ошибка при сохранении:', error);
     // Здесь можно добавить обработку ошибки
@@ -281,6 +283,8 @@ showResultsBtn.addEventListener("click", async () => {
           modal.hide();
           // Обновляем список результатов
           showResultsBtn.click();
+          // Обновляем слайдер истории
+          initializeHistorySlider();
           showModal("deleteSuccessModal");
         } catch (error) {
           console.error("Ошибка при удалении:", error);
