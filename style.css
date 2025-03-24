@@ -402,6 +402,14 @@ input[type=range]::-moz-range-thumb:active {
   }
 }
 
+
+
+
+.mt-3.text-muted {
+  color: rgb(184, 184, 184) !important;
+}
+
+
 /* Стили для мобильных кнопок */
 @media (max-width: 576px) {
   #btn-group-padding {
