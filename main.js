@@ -141,28 +141,38 @@ const saveToCloudBtn = document.getElementById("saveToCloudBtn");
 // Функция для отображения модального окна
 const modalTranslations = {
   ru: {
-    savedToCloud: "Результат успешно сохранён в облако!",
-    loaded: "Результат успешно загружен!",
-    deleteConfirm: "Точно удалить результат?",
-    deleted: "Результат удален!",
-    loginRequired: "Сначала войдите в систему!",
-    myResults: "Мои результаты",
+    savedToCloud: "Успех",
+    savedToCloudContent: "Результат сохранён",
+    loaded: "Успех",
+    loadedContent: "Результат загружен",
+    deleteConfirm: "Внимание",
+    deleteConfirmContent: "Удалить результат?",
+    deleted: "Успех",
+    deletedContent: "Результат удален",
+    loginRequired: "Вход",
+    loginRequiredContent: "Сначала войдите в систему!",
+    myResults: "Результаты",
     success: "Успех",
     delete: "Удалить",
-    noResults: "Пока нет сохранённых результатов",
+    noResults: "Нет результатов",
     load: "Загрузить",
     cancel: "Отмена"
   },
   en: {
-    savedToCloud: "Result successfully saved to the cloud!",
-    loaded: "Result successfully loaded!",
-    deleteConfirm: "Are you sure you want to delete the result?",
-    deleted: "Result deleted!",
-    loginRequired: "Please log in first!",
-    myResults: "My Results",
+    savedToCloud: "Success",
+    savedToCloudContent: "Result saved",
+    loaded: "Success",
+    loadedContent: "Result loaded",
+    deleteConfirm: "Warning",
+    deleteConfirmContent: "Delete result?",
+    deleted: "Success",
+    deletedContent: "Result deleted",
+    loginRequired: "Login",
+    loginRequiredContent: "Please log in first!",
+    myResults: "Results",
     success: "Success",
     delete: "Delete",
-    noResults: "No saved results yet",
+    noResults: "No results",
     load: "Load",
     cancel: "Cancel"
   }
@@ -182,7 +192,7 @@ function showModal(modalId, messageKey = null) {
       modalTitle.textContent = translations[messageKey] || translations.success;
     }
     if (modalBody) {
-      modalBody.textContent = translations[messageKey] || translations.success;
+      modalBody.textContent = translations[`${messageKey}Content`] || translations.success;
     }
   }
   if (modal) {
@@ -1859,7 +1869,7 @@ function showModal(modalId, messageKey = null) {
       modalTitle.textContent = translations[messageKey] || translations.success;
     }
     if (modalBody) {
-      modalBody.textContent = translations[messageKey] || translations.success;
+      modalBody.textContent = translations[`${messageKey}Content`] || translations.success;
     }
   }
   if (modal) {
@@ -1880,7 +1890,7 @@ function showConfirmDeleteModal(onConfirm) {
       modalTitle.textContent = translations.deleteConfirm;
     }
     if (modalBody) {
-      modalBody.textContent = translations.deleteConfirm;
+      modalBody.textContent = translations.deleteConfirmContent;
     }
     
     if (confirmBtn) {
