@@ -569,50 +569,23 @@ function renderTabs() {
   updateTabStyles();
 }
 
-// Инициализируем слайдер истории после загрузки страницы
-document.addEventListener("DOMContentLoaded", () => {
-  initializeHistorySlider();
-  renderTabs();
-  updateDateDisplay();
-  drawWheel();
-  setupButtons();
-
-  // Добавляем задержку перед показом FAQ
-  setTimeout(() => {
-    const faqBtn = document.getElementById("faqBtnDesktop") || document.getElementById("faqBtnMobile");
-    if (faqBtn) {
-      faqBtn.click();
-    }
-  }, 2000); // Задержка в 2 секунды
-});
-
 function updateTabStyles() {
   const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
   const isMobileView = window.innerWidth < 576; // true, если ширина < 576px
 
   tabLinks.forEach(tab => {
+    const sphereColor = tab.getAttribute("data-color");
+    
     if (tab.classList.contains("active")) {
-      // Активная вкладка — цвет сферы (как было)
-      // Пишем с !important, чтобы перебить любые другие стили
-      tab.style.setProperty("background-color", tab.getAttribute("data-color"), "important");
+      // Активная вкладка — цвет сферы
+      tab.style.setProperty("background-color", sphereColor, "important");
       tab.style.color = "#333"; 
     } else {
-      // НЕактивная вкладка
-      if (darkMode) {
-        // Тёмная тема
-        // На мобильном у вас фон контейнера #333333 => вкладка делаем #444444 
-        // На десктопе фон контейнера #1f1f1f => вкладку делаем #2a2a2a (или чуть темнее/светлее по вкусу)
-        let inactiveBg = isMobileView ? "#444444" : "#2a2a2a";
-        tab.style.setProperty("background-color", inactiveBg, "important");
-        tab.style.color = "#fff";
-      } else {
-        // Светлая тема
-        // На мобильном фон контейнера #e0e0e0 => вкладку делаем #dddddd (или #d0d0d0)
-        // На десктопе фон контейнера #f0f0f0 => вкладку делаем #e0e0e0
-        let inactiveBg = isMobileView ? "#dddddd" : "#e0e0e0";
-        tab.style.setProperty("background-color", inactiveBg, "important");
-        tab.style.color = "#000";
-      }
+      // НЕактивная вкладка — более темный оттенок цвета сферы
+      // Используем CSS-фильтр для затемнения
+      tab.style.setProperty("background-color", sphereColor, "important");
+      tab.style.filter = "brightness(0.7)";
+      tab.style.color = "#fff";
     }
   });
 }
@@ -923,6 +896,17 @@ function setupButtons() {
       // Показываем FAQ, скрываем контент сфер
       sphereTabContent.style.display = "none";
       faqContent.style.display = "block";
+
+      // Снимаем активное состояние со всех вкладок сфер
+      const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
+      tabLinks.forEach(tab => {
+        tab.classList.remove("active");
+        tab.style.boxShadow = 'none';
+        const targetPane = document.querySelector(tab.getAttribute("data-bs-target"));
+        if (targetPane) {
+          targetPane.classList.remove("show", "active");
+        }
+      });
 
       console.log("FAQ content updated and shown");
       console.log("faqContent display:", faqContent.style.display);

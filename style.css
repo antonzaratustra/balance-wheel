@@ -139,6 +139,10 @@ input[type=range]::-moz-range-track {
   background: #ddd;
   border-radius: 3px;
 }
+
+
+
+/* Эффект свечения для thumbs */
 input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
   margin-top: -9px;
@@ -148,7 +152,13 @@ input[type=range]::-webkit-slider-thumb {
   border-radius: 50%;
   border: none;
   cursor: pointer;
+  transition: box-shadow 0.1 ease;
 }
+
+input[type=range]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 20px var(--slider-thumb-color, #007bff);
+}
+
 input[type=range]::-moz-range-thumb {
   width: 24px;
   height: 24px;
@@ -156,8 +166,23 @@ input[type=range]::-moz-range-thumb {
   border-radius: 50%;
   border: none;
   cursor: pointer;
+  transition: box-shadow 0.1s ease;
 }
 
+input[type=range]::-moz-range-thumb:hover {
+  box-shadow: 0 0 20px var(--slider-thumb-color, #007bff);
+}
+
+/* Убираем белую границу при активации ползунка */
+input[type=range]::-webkit-slider-thumb:active {
+  box-shadow: none;
+  outline: none;
+}
+
+input[type=range]::-moz-range-thumb:active {
+  box-shadow: none;
+  outline: none;
+}
 
 /* === БЛОК КНОПОК ВВЕРХУ === */
 .top-buttons {
@@ -392,8 +417,8 @@ input[type=range]::-moz-range-thumb {
 }
 
 @media (max-width: 576px) {
-  #canvas-wrapper {
-    margin-top: 40px;
+#canvas-wrapper {
+  margin-top: 40px;
 
   }
   }
