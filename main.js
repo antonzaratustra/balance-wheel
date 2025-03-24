@@ -8,17 +8,19 @@ const faqInstructions = {
   <strong>4. Оценка:</strong> В каждой сфере есть 5 вопросов. Используйте слайдеры для оценки от 0 до 10.<br><br>
   <strong>5. Визуализация:</strong> Колесо баланса наглядно показывает ваши оценки.<br><br>
   <strong>6. Среднее:</strong> Для каждой сферы и общее среднее значение рассчитываются автоматически.<br><br>
-  <strong>7. Сохранение:</strong> Для сохранения результатов нажмите <span class="btn-like">👤 Login</span>, чтобы войти. После этого используйте кнопку <span class="btn-like">💾</span> для сохранения в облако или <span class="btn-like">☁️</span> для просмотра сохранённых результатов. Кнопка <span class="btn-like">🔽 PDF</span> позволяет скачать результаты в формате PDF.`,
+  <strong>7. Сохранение:</strong> Для сохранения результатов нажмите <span class="btn-like">👤 Login</span>, чтобы войти. После этого используйте кнопку <span class="btn-like">💾</span> для сохранения в облако или <span class="btn-like">☁️</span> для просмотра сохранённых результатов. Кнопка <span class="btn-like">🔽 PDF</span> позволяет скачать результаты в формате PDF.<br><br>
+  <strong>8. История:</strong> После входа в систему вы можете использовать слайдер истории для просмотра предыдущих результатов. Слайдер находится под колесом баланса и позволяет перемещаться между сохранёнными датами. При выборе даты колесо обновляется с оценками на эту дату.`,
     
     en: `<strong>Welcome to Mentorist Life Balance Wheel!</strong><br><br>
   This is a tool for assessing life balance across 8 key areas: Health, Relationships, Environment, Calling, Finance, Self-Improvement, Life Brightness, and Spirituality.<br><br>
-  <strong>1. Theme & Language:</strong> Use buttons to change theme and language <span class="btn-like">🌐 EN</span> and <span class="btn-like">🌙 Dark</span> / <span class="btn-like">🌞 Light</span>.<br><br>
-  <strong>2. FAQ:</strong> Click <span class="btn-like">💡 FAQ</span> to view this guide; to return to the areas, click an area tab, e.g. <span class="btn-like">❤️ Health (5.0)</span>.<br><br>
-  <strong>3. Navigation:</strong> Use the tabs above to switch between life areas.<br><br>
+  <strong>1. Theme and Language:</strong> Use the buttons to switch theme and language <span class="btn-like">🌐 EN</span> and <span class="btn-like">🌙 Dark</span> / <span class="btn-like">🌞 Light</span>.<br><br>
+  <strong>2. FAQ:</strong> Click <span class="btn-like">💡 FAQ</span> for this instruction; to return to spheres - click the sphere tab, e.g., <span class="btn-like">❤️ Health (5.0)</span>.<br><br>
+  <strong>3. Switching:</strong> Tabs at the top allow you to switch between life areas.<br><br>
   <strong>4. Assessment:</strong> Each area has 5 questions. Use sliders to rate from 0 to 10.<br><br>
-  <strong>5. Visualization:</strong> The balance wheel visually represents your ratings.<br><br>
-  <strong>6. Average:</strong> For each area and overall, averages are calculated automatically.<br><br>
-  <strong>7. Saving:</strong> To save your results, click <span class="btn-like">👤 Login</span> to sign in. Then use the <span class="btn-like">💾</span> button to save to the cloud or <span class="btn-like">☁️</span> to view saved results. The <span class="btn-like">🔽 PDF</span> button allows you to download results as PDF.`
+  <strong>5. Visualization:</strong> The balance wheel visually displays your ratings.<br><br>
+  <strong>6. Average:</strong> Average values for each area and overall are calculated automatically.<br><br>
+  <strong>7. Saving:</strong> To save results, click <span class="btn-like">👤 Login</span> to log in. Then use the <span class="btn-like">💾</span> button to save to the cloud or <span class="btn-like">☁️</span> to view saved results. The <span class="btn-like">🔽 PDF</span> button allows you to download results as PDF.<br><br>
+  <strong>8. History:</strong> After logging in, you can use the history slider to view previous results. The slider is located below the balance wheel and allows you to navigate between saved dates. When you select a date, the wheel updates with ratings from that date.`,
 };
 
 // Импорт auth из firebase-init.js
@@ -325,6 +327,11 @@ function drawWheel(ctx, width, height) {
     const sphereTitle = sphere.title[currentLanguage] || sphere.title["en"];
     let text = "";
     let shift = { x: 0, y: 0 };
+
+    // Специальные сдвиги для сфер "Саморазвитие" и "Яркость жизни"
+    if (sphere.id === "selfImprovement" || sphere.id === "lifeBrightness") {
+      shift.x = 10; // сдвиг вправо на 10 пикселей
+    }
 
     if (sphere.id === "health") {
       // Для health используем фиксированный порядок, но не смещаем текст вручную
@@ -796,6 +803,11 @@ function drawWheel() {
     const sphereTitle = sphere.title[currentLanguage] || sphere.title["en"];
     let text = "";
     let shift = { x: 0, y: 0 };
+
+    // Специальные сдвиги для сфер "Саморазвитие" и "Яркость жизни"
+    if (sphere.id === "selfImprovement" || sphere.id === "lifeBrightness") {
+      shift.x = 10; // сдвиг вправо на 10 пикселей
+    }
 
     if (sphere.id === "health") {
       // Для health используем фиксированный порядок, но не смещаем текст вручную
