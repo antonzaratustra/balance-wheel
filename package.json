@@ -7,13 +7,11 @@
     "start": "gh-pages -d .",
     "deploy": "gh-pages -d ."
   },
+  "homepage": "/balance-wheel/",
   "dependencies": {
     "firebase": "^11.4.0"
   },
   "devDependencies": {
     "gh-pages": "^5.0.0"
-  }
-  {
-    "homepage": "/balance-wheel/"
   }
 }
