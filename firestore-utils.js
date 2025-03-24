@@ -128,7 +128,6 @@ export async function loadResultsList() {
 export async function loadSavedResult(entryId) {
   const user = auth.currentUser;
   if (!user) {
-    console.error("Пользователь не авторизован!");
     return null;
   }
 
@@ -138,12 +137,10 @@ export async function loadSavedResult(entryId) {
 
   try {
     const docSnap = await getDoc(entryRef);
-    if (!docSnap.exists()) {
-      console.error("Документ не найден!");
-      return null;
+    if (docSnap.exists()) {
+      return docSnap.data().data;
     }
-    const entryData = docSnap.data();
-    return entryData.data; // Возвращаем данные ползунков
+    return null;
   } catch (error) {
     console.error("Ошибка при загрузке:", error);
     return null;

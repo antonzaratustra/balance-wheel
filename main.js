@@ -264,10 +264,11 @@ showResultsBtn.addEventListener("click", async () => {
       updateOverallAverage();
       drawWheel();
       
-      // Закрываем модальное окно
+      // Закрываем модальное окно результатов
       const modal = bootstrap.Modal.getInstance(resultsModalEl);
       modal.hide();
       
+      // Показываем модальное окно об успешной загрузке
       showModal("loadSuccessModal");
     });
 
@@ -609,21 +610,14 @@ function renderTabs() {
 
 function updateTabStyles() {
   const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
-  const isMobileView = window.innerWidth < 576; // true, если ширина < 576px
-
   tabLinks.forEach(tab => {
-    const sphereColor = tab.getAttribute("data-color");
-    
     if (tab.classList.contains("active")) {
-      // Активная вкладка — цвет сферы
-      tab.style.setProperty("background-color", sphereColor, "important");
+      tab.style.backgroundColor = tab.getAttribute("data-color");
       tab.style.color = "#333"; 
     } else {
-      // НЕактивная вкладка — более темный оттенок цвета сферы
-      // Используем CSS-фильтр для затемнения
-      tab.style.setProperty("background-color", sphereColor, "important");
-      tab.style.filter = "brightness(0.7)";
-      tab.style.color = "#fff";
+      tab.style.backgroundColor = "";
+      // В тёмной теме неактивные вкладки – белый текст, в светлой – чёрный
+      tab.style.color = darkMode ? "#fff" : "#000";
     }
   });
 }
