@@ -1217,7 +1217,7 @@ body.dark-mode #historyDateDisplay {
 
 @media (max-width: 576px) {
   #sphereTabContent {
-    padding-top: 100px;
+    padding-top: 10px;
     position: relative;
     z-index: 1;
   }
