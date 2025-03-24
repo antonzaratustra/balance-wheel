@@ -223,14 +223,14 @@ const mobileViewBtn = document.getElementById('mobile-view-btn');
 const buttonTexts = {
   ru: {
     save: '💾 Сохранить',
-    login: '🔑 Войти',
-    logout: '🔑 Выйти',
+    login: '👤 Войти',
+    logout: '👤 Выйти',
     view: '☁️ Просмотреть'
   },
   en: {
     save: '💾 Save',
-    login: '🔑 Login',
-    logout: '🔑 Logout',
+    login: '👤 Login',
+    logout: '👤 Logout',
     view: '☁️ View Results'
   }
 };
@@ -260,24 +260,161 @@ mobileSaveBtn.addEventListener('click', () => {
 });
 
 mobileLoginBtn.addEventListener('click', () => {
-  if (!auth.currentUser) {
-    signInWithGoogle();
-  } else {
-    signOut(auth).then(() => {
-      updateMobileButtons();
-    }).catch((error) => {
-      console.error("Ошибка при выходе:", error);
-    });
-  }
+  const loginModalEl = document.getElementById("loginModal");
+  const loginModal = new bootstrap.Modal(loginModalEl, {
+    backdrop: "static",
+    keyboard: true
+  });
+  loginModal.show();
 });
 
-mobileViewBtn.addEventListener('click', () => {
+mobileViewBtn.addEventListener('click', async () => {
   if (!auth.currentUser) {
     showModal("authModal", 'loginRequired');
     return;
   }
-  showResults();
+  
+  const resultsModalEl = document.getElementById("resultsModal");
+  const resultsModal = new bootstrap.Modal(resultsModalEl, {
+    backdrop: "static",
+    keyboard: true
+  });
+  
+  try {
+    const entries = await loadResultsList();
+    
+    // Очищаем содержимое
+    const resultsListEl = document.getElementById("resultsList");
+    resultsListEl.innerHTML = "";
+
+    if (entries.length === 0) {
+      // Если нет результатов, показываем Траволту
+      const noResultsDiv = document.createElement("div");
+      noResultsDiv.classList.add("text-center", "py-4");
+      
+      const travoltaImg = document.createElement("img");
+      travoltaImg.src = "img/travolta.gif";
+      travoltaImg.alt = "Нет результатов";
+      travoltaImg.style.maxWidth = "200px";
+      
+      const noResultsText = document.createElement("p");
+      noResultsText.classList.add("mt-3", "text-muted");
+      noResultsText.textContent = currentLanguage === "ru" ? 
+        "Пока нет сохранённых результатов" : 
+        "No saved results yet";
+      
+      noResultsDiv.appendChild(travoltaImg);
+      noResultsDiv.appendChild(noResultsText);
+      resultsListEl.appendChild(noResultsDiv);
+      return;
+    }
+
+    entries.forEach((entry) => {
+      const row = document.createElement("div");
+      row.classList.add("d-flex", "justify-content-between", "align-items-center", "mb-2");
+
+      const titleSpan = document.createElement("span");
+      titleSpan.style.flexGrow = "1";
+      titleSpan.style.marginRight = "1rem";
+      const dateStr = entry.createdAt?.seconds
+        ? new Date(entry.createdAt.seconds * 1000).toLocaleString()
+        : new Date().toLocaleString();
+      titleSpan.textContent = dateStr;
+
+      const buttonsContainer = document.createElement("div");
+      buttonsContainer.classList.add("d-flex", "align-items-center");
+      buttonsContainer.style.flexShrink = "0";
+
+      const loadBtn = document.createElement("button");
+      loadBtn.className = "btn btn-sm btn-primary me-2";
+      loadBtn.textContent = "▶️";
+      loadBtn.style.width = "40px";
+
+      const delBtn = document.createElement("button");
+      delBtn.className = "btn btn-sm btn-danger";
+      delBtn.textContent = "❌";
+      delBtn.style.width = "40px";
+
+      loadBtn.addEventListener("click", async () => {
+        const data = await loadSavedResult(entry.id);
+        if (!data) {
+          showModal("loadErrorModal", 'loaded');
+          return;
+        }
+        
+        Object.keys(data).forEach(sphereId => {
+          const sphereData = data[sphereId];
+          Object.keys(sphereData).forEach(questionId => {
+            const slider = document.getElementById(`slider_${sphereId}_${questionId}`);
+            if (slider) {
+              slider.value = sphereData[questionId];
+              updateSliderDisplay(sphereId, questionId, sphereData[questionId]);
+            }
+          });
+          updateSphereAverage(sphereId);
+        });
+        
+        updateOverallAverage();
+        drawWheel();
+        
+        const modal = bootstrap.Modal.getInstance(resultsModalEl);
+        if (modal) {
+          modal.hide();
+        }
+        
+        showModal("loadSuccessModal", 'loaded');
+      });
+
+      delBtn.addEventListener("click", async () => {
+        showConfirmDeleteModal(async () => {
+          try {
+            await deleteSavedResult(entry.id);
+            const modal = bootstrap.Modal.getInstance(resultsModalEl);
+            if (modal) {
+              modal.hide();
+            }
+            mobileViewBtn.click();
+            initializeHistorySlider();
+            showModal("deleteSuccessModal", 'deleted');
+          } catch (error) {
+            console.error("Ошибка при удалении:", error);
+            showModal("deleteErrorModal", 'deleteConfirm');
+          }
+        });
+      });
+
+      buttonsContainer.appendChild(loadBtn);
+      buttonsContainer.appendChild(delBtn);
+      row.appendChild(titleSpan);
+      row.appendChild(buttonsContainer);
+      resultsListEl.appendChild(row);
+    });
+
+    resultsModal.show();
+  } catch (error) {
+    console.error("Ошибка при загрузке результатов:", error);
+    showModal("loadErrorModal", 'loaded');
+  }
 });
+
+// Обработчик для кнопки "Войти через Google" в модальном окне
+const googleSignInBtn = document.getElementById("googleSignInBtn");
+if (googleSignInBtn) {
+  googleSignInBtn.addEventListener("click", async () => {
+    try {
+      const user = await signInWithGoogle();
+      if (user) {
+        const loginModal = bootstrap.Modal.getInstance(document.getElementById("loginModal"));
+        if (loginModal) {
+          loginModal.hide();
+        }
+        updateMobileButtons();
+      }
+    } catch (error) {
+      console.error("Ошибка при входе:", error);
+    }
+  });
+}
 
 // Обновляем кнопки при изменении языка
 function updateUILanguage() {
@@ -1735,7 +1872,7 @@ showResultsBtn.addEventListener("click", async () => {
     showModal("authModal", 'loginRequired');
     return;
   }
-  
+
   try {
     const entries = await loadResultsList();
     
