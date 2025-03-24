@@ -14,7 +14,7 @@ body {
 /* --- Мобильный отступ для контента вкладок --- */
 @media (max-width: 576px) {
   #sphereTabContent {
-    padding-top: 100px;
+    /* padding-top: 100px; */
   }
 }
 
@@ -491,14 +491,18 @@ input[type=range]::-moz-range-thumb:active {
   }
   
 
-  
- 
+  @media (max-width: 576px) {
 
+   /* Добавляем padding к общему контейнеру */
+  .tab-content-container {
+    padding-top: 100px !important;
+  }
+  }
 
  
   @media (max-width: 576px) {
     #faqContent {
-      margin-top: 80px !important;
+      /* margin-top: 80px !important; */
     }
   }
 
@@ -695,7 +699,7 @@ input[type=range]::-moz-range-thumb:active {
     #userInfo-mobile {
       display: block !important;
       margin-bottom: 8px;
-      color: #1f1f1f !important;
+      color: #5a5a5a !important;
       font-weight: 600 !important;
     }
     }
