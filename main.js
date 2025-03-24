@@ -1332,6 +1332,7 @@ window.addEventListener("scroll", function() {
 
 // Добавляем обработку движения мыши для 3D эффекта
 const canvasContainer = document.getElementById('balanceWheelContainer');
+const glow = document.querySelector('.glow');
 let bounds;
 
 function rotateCanvas(e) {
@@ -1354,6 +1355,17 @@ function rotateCanvas(e) {
       ${Math.log(distance) * 2}deg
     )
   `;
+
+  // Обновляем позицию блеска
+  glow.style.backgroundImage = `
+    radial-gradient(
+      circle at
+      ${center.x * 2 + bounds.width/2}px
+      ${center.y * 2 + bounds.height/2}px,
+      #ffffff55,
+      #0000000f
+    )
+  `;
 }
 
 canvasContainer.addEventListener('mouseenter', () => {
@@ -1364,6 +1376,7 @@ canvasContainer.addEventListener('mouseenter', () => {
 canvasContainer.addEventListener('mouseleave', () => {
   document.removeEventListener('mousemove', rotateCanvas);
   canvasContainer.style.transform = '';
+  glow.style.backgroundImage = 'radial-gradient(circle at 50% -20%, #ffffff22, #0000000f)';
 });
 
 const loginBtn = document.getElementById("loginBtn");
