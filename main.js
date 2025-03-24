@@ -1626,7 +1626,7 @@ function showConfirmDeleteModal(onConfirm) {
       confirmBtn.textContent = translations.delete;
       confirmBtn.onclick = () => {
         // Сначала скрываем модальное окно подтверждения
-        const modalInstance = new bootstrap.Modal(modal);
+        const modalInstance = bootstrap.Modal.getInstance(modal);
         modalInstance.hide();
         
         // Затем выполняем подтверждение
@@ -1636,10 +1636,6 @@ function showConfirmDeleteModal(onConfirm) {
     
     if (cancelBtn) {
       cancelBtn.textContent = translations.cancel || 'Cancel';
-      cancelBtn.onclick = () => {
-        const modalInstance = new bootstrap.Modal(modal);
-        modalInstance.hide();
-      };
     }
     
     // Показываем модальное окно в конце
@@ -1759,15 +1755,14 @@ showResultsBtn.addEventListener("click", async () => {
         showConfirmDeleteModal(async () => {
           try {
             await deleteSavedResult(btn.dataset.entryId);
+            // Закрываем модальное окно
+            const modal = bootstrap.Modal.getInstance(resultsModalEl);
+            modal.hide();
             // Обновляем список результатов
             showResultsBtn.click();
             // Обновляем слайдер истории
             initializeHistorySlider();
-            const successModal = new bootstrap.Modal(document.getElementById("deleteSuccessModal"));
-            successModal.show();
-            document.querySelector("#deleteSuccessModal .btn-primary").onclick = () => {
-              successModal.hide();
-            };
+            showModal("deleteSuccessModal", 'deleted');
           } catch (error) {
             console.error("Ошибка при удалении:", error);
             showModal("deleteErrorModal", 'deleteConfirm');
