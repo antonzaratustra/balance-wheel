@@ -708,75 +708,80 @@ input[type=range]::-moz-range-thumb:active {
     
 /* === СТИЛИ ДЛЯ МОДАЛЬНЫХ ОКОН === */
 .modal-content {
-  border-radius: 12px;
+  border-radius: 15px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.modal-header {
-  border-bottom: 1px solid var(--bs-border-color);
-  padding: 1.5rem 1.5rem 1rem;
+/* Светлая тема */
+body:not(.dark-mode) .modal-content {
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
 }
 
-.modal-title {
-  font-weight: 600;
-  color: var(--bs-primary);
+body:not(.dark-mode) .modal-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
 }
 
-.modal-body {
-  padding: 1.5rem;
-  color: var(--bs-body-color);
+body:not(.dark-mode) .modal-footer {
+  border-top: 1px solid #dee2e6;
 }
 
-.modal-footer {
-  border-top: 1px solid var(--bs-border-color);
-  padding: 1rem 1.5rem 1.5rem;
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
+/* Тёмная тема */
+body.dark-mode .modal-content {
+  background-color: #2a2a2a;
+  border: 1px solid #3a3a3a;
 }
 
-.btn-close {
-  opacity: 0.7;
-  transition: opacity 0.2s;
+body.dark-mode .modal-header {
+  background-color: #2a2a2a;
+  border-bottom: 1px solid #3a3a3a;
+  color: #e0e0e0;
 }
 
-.btn-close:hover {
+body.dark-mode .modal-footer {
+  border-top: 1px solid #3a3a3a;
+}
+
+body.dark-mode .modal-body {
+  color: #e0e0e0;
+}
+
+body.dark-mode .modal-header .close {
+  color: #e0e0e0;
+  opacity: 0.8;
+}
+
+body.dark-mode .modal-header .close:hover {
   opacity: 1;
 }
 
 /* Стили для кнопок в модальных окнах */
-.btn-primary {
-  background-color: var(--bs-primary);
-  border-color: var(--bs-primary);
-  padding: 0.5rem 1.5rem;
-  border-radius: 6px;
-  font-weight: 500;
+body.dark-mode .modal-footer button {
+  background-color: #3a3a3a;
+  color: #e0e0e0;
 }
 
-.btn-primary:hover {
-  background-color: var(--bs-primary-rgb);
-  border-color: var(--bs-primary-rgb);
+body.dark-mode .modal-footer button:hover {
+  background-color: #4a4a4a;
 }
 
-.btn-secondary {
-  background-color: var(--bs-secondary);
-  border-color: var(--bs-secondary);
-  padding: 0.5rem 1.5rem;
-  border-radius: 6px;
-  font-weight: 500;
+body.dark-mode .modal-footer button:active {
+  background-color: #3a3a3a;
+  transform: translateY(1px);
 }
 
-.btn-danger {
-  background-color: var(--bs-danger);
-  border-color: var(--bs-danger);
-  padding: 0.5rem 1.5rem;
-  border-radius: 6px;
-  font-weight: 500;
+/* Стили для заголовков в модальных окнах */
+.modal-title {
+  font-weight: 600;
 }
 
-.btn-danger:hover {
-  background-color: var(--bs-danger-rgb);
-  border-color: var(--bs-danger-rgb);
+body:not(.dark-mode) .modal-title {
+  color: #000;
+}
+
+body.dark-mode .modal-title {
+  color: #e0e0e0;
 }
 
 /* === СТИЛИ ДЛЯ КОНТЕЙНЕРА СЛАЙДЕРА ИСТОРИИ === */
