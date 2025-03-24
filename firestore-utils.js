@@ -100,22 +100,35 @@ export async function saveResultToFirestore(title, spheres) {
 export async function loadResultsList() {
   const user = auth.currentUser;
   if (!user) {
-    console.log("Пользователь не авторизован");
     return [];
   }
 
+  const userDocRef = doc(db, "results", user.uid);
+  const subcolRef = collection(userDocRef, "savedEntries");
+
   try {
-    console.log("Загрузка результатов для пользователя:", user.uid);
-    const userDocRef = doc(db, "results", user.uid);
-    const subcolRef = collection(userDocRef, "savedEntries");
     const querySnapshot = await getDocs(subcolRef);
+    const entries = [];
     
-    console.log("Получены результаты:", querySnapshot.docs.length);
-    
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      entries.push({
+        id: doc.id,
+        title: data.title,
+        createdAt: data.createdAt,
+        data: data.data
+      });
+    });
+
+    // Сортируем по дате в порядке убывания (сначала новые)
+    entries.sort((a, b) => {
+      if (a.createdAt.seconds && b.createdAt.seconds) {
+        return b.createdAt.seconds - a.createdAt.seconds;
+      }
+      return 0;
+    });
+
+    return entries;
   } catch (error) {
     console.error("Ошибка при загрузке результатов:", error);
     return [];
