@@ -101,40 +101,8 @@ let currentLanguage = "en"; // по умолчанию английский
 let darkMode = true;        // по умолчанию тёмная тема
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Глобальный массив для хранения геометрии секторов
+let wheelSectors = [];
 
 const saveToCloudBtn = document.getElementById("saveToCloudBtn");
 
@@ -804,7 +772,8 @@ function renderTabs() {
       const initVal = slider.value;
       desc.innerText = question.descriptions[initVal]
         ? question.descriptions[initVal][currentLanguage]
-        : "";
+        : '';
+      
       let val = parseInt(initVal, 10);
       let fraction = val / 10; // <-- вместо (val - 1)/9
       let r = Math.round(255 * (1 - fraction));
@@ -1040,6 +1009,9 @@ function drawWheel() {
   const height = canvas.height;
   ctx.clearRect(0, 0, width, height);
   
+  // Очищаем массив секторов перед рисованием
+  wheelSectors = [];
+  
   const centerX = width / 2;
   const centerY = height / 2;
   const maxRadius = Math.min(width, height) / 2 - 30;
@@ -1082,6 +1054,15 @@ function drawWheel() {
     ctx.fill();
     ctx.strokeStyle = darkMode ? "#ccc" : "#666";
     ctx.stroke();
+
+    // Сохраняем геометрию сектора
+    wheelSectors.push({
+      sphereId: sphere.id,
+      startAngle: startAngle,
+      endAngle: endAngle,
+      radius: sectorRadius,
+      sphereObj: sphere
+    });
 
     // Вычисляем позицию для текста по середине сектора
     const midAngle = startAngle + anglePerSphere / 2;
@@ -1149,6 +1130,57 @@ function drawWheel() {
   ctx.lineTo(centerX + maxRadius * Math.cos(startAngle),
              centerY + maxRadius * Math.sin(startAngle));
   ctx.stroke();
+}
+
+// Утилитная функция: проверяет, лежит ли угол между start и end на окружности
+function isAngleInArc(angle, start, end) {
+  if (start <= end) {
+    return angle >= start && angle <= end;
+  } else {
+    // Если дуга переходит через 2π
+    return (angle >= start && angle < 2 * Math.PI) || (angle >= 0 && angle <= end);
+  }
+}
+
+// Функция для определения сектора под курсором
+function getSectorUnderCursor(mouseX, mouseY) {
+  const canvas = document.getElementById("balanceWheel");
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+
+  // Вектор от центра к точке мыши
+  const dx = mouseX - centerX;
+  const dy = mouseY - centerY;
+  // Расстояние от центра
+  const r = Math.sqrt(dx * dx + dy * dy);
+
+  // Угол от вершины колеса (начинаем с -π/2)
+  let angle = Math.atan2(dy, dx);
+  
+  // Приводим угол к диапазону [0, 2π)
+  if (angle < 0) {
+    angle += 2 * Math.PI;
+  }
+
+  // Проверяем каждый сектор
+  for (let sector of wheelSectors) {
+    // Приводим углы сектора к диапазону [0, 2π)
+    let startAngle = sector.startAngle;
+    let endAngle = sector.endAngle;
+    
+    if (startAngle < 0) startAngle += 2 * Math.PI;
+    if (endAngle < 0) endAngle += 2 * Math.PI;
+
+    // Проверяем, лежит ли угол в диапазоне сектора
+    if (isAngleInArc(angle, startAngle, endAngle)) {
+      // И проверяем расстояние
+      if (r <= sector.radius) {
+        return sector;
+      }
+    }
+  }
+  
+  return null;
 }
 
 /****************************************
@@ -1645,22 +1677,25 @@ window.addEventListener("scroll", function() {
 }, false);
 
 // Добавляем обработку движения мыши для 3D эффекта
-const canvasContainer = document.getElementById('balanceWheelContainer');
-const glow = document.querySelector('.glow');
+const canvasWrapper = document.getElementById('canvas-wrapper');
+const wheelContainer = document.getElementById('balanceWheelContainer');
+const glow = wheelContainer.querySelector('.glow');
 let bounds;
 
 function rotateCanvas(e) {
   const mouseX = e.clientX;
   const mouseY = e.clientY;
-  const leftX = mouseX - bounds.x;
-  const topY = mouseY - bounds.y;
+  const rect = wheelContainer.getBoundingClientRect();
+  const leftX = mouseX - rect.left;
+  const topY = mouseY - rect.top;
   const center = {
-    x: leftX - bounds.width / 2,
-    y: topY - bounds.height / 2
+    x: leftX - rect.width / 2,
+    y: topY - rect.height / 2
   };
   const distance = Math.sqrt(center.x ** 2 + center.y ** 2);
 
-  canvasContainer.style.transform = `
+  // Применяем 3D-трансформацию
+  wheelContainer.style.transform = `
     scale3d(1.07, 1.07, 1.07)
     rotate3d(
       ${center.y / 100},
@@ -1674,23 +1709,29 @@ function rotateCanvas(e) {
   glow.style.backgroundImage = `
     radial-gradient(
       circle at
-      ${center.x * 2 + bounds.width/2}px
-      ${center.y * 2 + bounds.height/2}px,
-      #ffffff55,
-      #0000000f
+      ${leftX}px ${topY}px,
+      rgba(255, 255, 255, 0.2),
+      transparent 70%
     )
   `;
+
+  // Показываем tooltip
+  showSphereTooltip(e);
 }
 
-canvasContainer.addEventListener('mouseenter', () => {
-  bounds = canvasContainer.getBoundingClientRect();
+canvasWrapper.addEventListener('mouseenter', () => {
+  bounds = wheelContainer.getBoundingClientRect();
   document.addEventListener('mousemove', rotateCanvas);
 });
 
-canvasContainer.addEventListener('mouseleave', () => {
+canvasWrapper.addEventListener('mouseleave', () => {
   document.removeEventListener('mousemove', rotateCanvas);
-  canvasContainer.style.transform = '';
-  glow.style.backgroundImage = 'radial-gradient(circle at 50% -20%, #ffffff22, #0000000f)';
+  wheelContainer.style.transform = 'scale3d(1, 1, 1) rotate3d(0, 0, 0, 0deg)';
+  glow.style.backgroundImage = 'none';
+  const tooltip = document.getElementById('canvasTooltip');
+  if (tooltip) {
+    tooltip.style.display = 'none';
+  }
 });
 
 const loginBtn = document.getElementById("loginBtn");
@@ -2048,3 +2089,95 @@ showResultsBtn.addEventListener("click", async () => {
     showModal("loadErrorModal", 'loaded');
   }
 });
+
+// Функция для отображения tooltip при наведении на сектор
+function showSphereTooltip(e) {
+  const canvas = document.getElementById("balanceWheel");
+  const tooltip = document.getElementById("canvasTooltip");
+
+  // 1) Определяем координаты внутри canvas
+  const rect = canvas.getBoundingClientRect();
+  const xInCanvas = e.clientX - rect.left;
+  const yInCanvas = e.clientY - rect.top;
+
+  // 2) Пытаемся найти сектор
+  const hoveredSector = getSectorUnderCursor(xInCanvas, yInCanvas);
+
+  if (!hoveredSector) {
+    // Сектор не найден – прячем tooltip
+    tooltip.style.display = 'none';
+    return;
+  }
+
+  // 3) Если сектор найден – собираем текст:
+  const sphere = hoveredSector.sphereObj;
+  const sphereTitle = sphere.title[currentLanguage] || sphere.title["en"];
+
+  // Собираем список "вопрос: ответ"
+  let questionsHtml = '';
+  sphere.questions.forEach(question => {
+    const sliderId = `slider_${sphere.id}_${question.id}`;
+    const sliderEl = document.getElementById(sliderId);
+    if (!sliderEl) return;
+
+    const val = sliderEl.value;
+    const desc = question.descriptions[val] 
+                   ? question.descriptions[val][currentLanguage] 
+                   : '';
+    
+    questionsHtml += `<div style="margin-bottom:2px;">
+      <strong>${question.title[currentLanguage]}:</strong> ${desc}
+    </div>`;
+  });
+
+  // Общая HTML-структура
+  const tooltipHtml = `
+    <div style="font-weight:600; margin-bottom:6px;">${sphereTitle}</div>
+    ${questionsHtml}
+  `;
+
+  tooltip.innerHTML = tooltipHtml;
+
+  // 4) Позиционируем tooltip рядом с курсором
+  tooltip.style.left = (e.pageX + 15) + 'px';
+  tooltip.style.top  = (e.pageY + 15) + 'px';
+
+  // 5) Показываем
+  tooltip.style.display = 'block';
+}
+
+function rotateCanvas(e) {
+  const mouseX = e.clientX;
+  const mouseY = e.clientY;
+  const leftX = mouseX - bounds.x;
+  const topY = mouseY - bounds.y;
+  const center = {
+    x: leftX - bounds.width / 2,
+    y: topY - bounds.height / 2
+  };
+  const distance = Math.sqrt(center.x ** 2 + center.y ** 2);
+
+  // Применяем 3D-эффект
+  canvasContainer.style.transform = `
+    scale3d(1.07, 1.07, 1.07)
+    rotate3d(
+      ${center.y / 100},
+      ${-center.x / 100},
+      0,
+      ${Math.log(center.x ** 2 + center.y ** 2) * 2}deg
+    )
+  `;
+
+  // Обновляем позицию блеска
+  glow.style.backgroundImage = `
+    radial-gradient(
+      circle at
+      ${leftX}px ${topY}px,
+      rgba(255, 255, 255, 0.2),
+      transparent 70%
+    )
+  `;
+
+  // Показываем tooltip
+  showSphereTooltip(e);
+}
