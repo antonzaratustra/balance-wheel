@@ -219,13 +219,38 @@ const mobileSaveBtn = document.getElementById('mobile-save-btn');
 const mobileLoginBtn = document.getElementById('mobile-login-btn');
 const mobileViewBtn = document.getElementById('mobile-view-btn');
 
-const updateMobileButtons = () => {
-  const isLoggedIn = auth.currentUser;
-  mobileSaveBtn.textContent = currentLanguage === "ru" ? '💾 Сохранить' : '💾 Save';
-  mobileLoginBtn.textContent = isLoggedIn ? (currentLanguage === "ru" ? '🔑 Выйти' : '🔑 Logout') : (currentLanguage === "ru" ? '🔑 Войти' : '🔑 Login');
-  mobileViewBtn.textContent = currentLanguage === "ru" ? '☁️ Просмотреть' : '☁️ View Results';
+// Объект для текстов кнопок
+const buttonTexts = {
+  ru: {
+    save: '💾 Сохранить',
+    login: '🔑 Войти',
+    logout: '🔑 Выйти',
+    view: '☁️ Просмотреть'
+  },
+  en: {
+    save: '💾 Save',
+    login: '🔑 Login',
+    logout: '🔑 Logout',
+    view: '☁️ View Results'
+  }
 };
 
+// Функция для обновления текста кнопок
+function updateMobileButtons() {
+  const isLoggedIn = auth.currentUser;
+  
+  // Устанавливаем текст на кнопках
+  mobileSaveBtn.textContent = buttonTexts[currentLanguage].save;
+  mobileLoginBtn.textContent = isLoggedIn 
+    ? buttonTexts[currentLanguage].logout
+    : buttonTexts[currentLanguage].login;
+  mobileViewBtn.textContent = buttonTexts[currentLanguage].view;
+}
+
+// Инициализируем текст кнопок при загрузке страницы
+updateMobileButtons();
+
+// Обработчики для мобильных кнопок
 mobileSaveBtn.addEventListener('click', () => {
   if (!auth.currentUser) {
     showModal("authModal", 'loginRequired');
@@ -235,8 +260,15 @@ mobileSaveBtn.addEventListener('click', () => {
 });
 
 mobileLoginBtn.addEventListener('click', () => {
-  toggleAuth();
-  updateMobileButtons();
+  if (!auth.currentUser) {
+    signInWithGoogle();
+  } else {
+    signOut(auth).then(() => {
+      updateMobileButtons();
+    }).catch((error) => {
+      console.error("Ошибка при выходе:", error);
+    });
+  }
 });
 
 mobileViewBtn.addEventListener('click', () => {
