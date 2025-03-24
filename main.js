@@ -231,7 +231,7 @@ const buttonTexts = {
     save: '💾 Save',
     login: '👤 Login',
     logout: '👤 Logout',
-    view: '☁️ View Results'
+    view: '☁️ Results'
   }
 };
 

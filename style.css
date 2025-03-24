@@ -670,7 +670,7 @@ input[type=range]::-moz-range-thumb:active {
 
 @media (max-width: 576px) {
 .btn {
-  font-size: 0.7rem !important;
+  font-size: 1rem !important;
 }
 }
 
