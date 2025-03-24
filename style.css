@@ -1245,3 +1245,55 @@ body.dark-mode #historyDateDisplay {
     padding-left: 0 !important;
   }
 }
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #000; /* Проверка на черном и белом */
+  height: 100vh;
+}
+
+.powered-by {
+  position: fixed;
+  /* top: 20px; */
+  left: 25px;
+  bottom: 25px;
+  /* background-color: rgba(255, 255, 255, 0.1); */
+  border: 1px solid rgba(128, 128, 128, 0.6);
+  color: rgba(128, 128, 128, 0.8);
+  font-family: sans-serif;
+  font-size: 16px;
+  padding: 10px 10px;
+  border-radius: 12px;
+  /* backdrop-filter: blur(5px); */
+  z-index: 9999;
+}
+
+.i-dot-container {
+  position: relative;
+  display: inline-block;
+}
+
+.i-dot {
+  position: absolute;
+  left: 50%;
+  top: 3px;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  box-shadow: 0 0 6px currentColor;
+  animation: glow 6s infinite;
+}
+
+@keyframes glow {
+  0%   { background-color: #4DB6AC; color: #4DB6AC; }  /* Бирюзовый */
+  12.5% { background-color: #FFCC80; color: #FFCC80; } /* Желтый */
+  25% { background-color: #EF5350; color: #EF5350; }   /* Красный */
+  37.5% { background-color: #42A5F5; color: #42A5F5; } /* Голубой */
+  50% { background-color: #26C6DA; color: #26C6DA; }   /* Сине-бирюзовый */
+  62.5% { background-color: #FF7043; color: #FF7043; } /* Оранжево-красный */
+  75% { background-color: #FDD835; color: #FDD835; }   /* Желтый яркий */
+  87.5% { background-color: #29B6F6; color: #29B6F6; } /* Светло-синий */
+  100% { background-color: #4DB6AC; color: #4DB6AC; }
+}

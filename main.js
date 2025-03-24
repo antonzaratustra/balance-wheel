@@ -44,7 +44,7 @@ import {
 } from "./firestore-utils.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Удаляем загрузчик
+  // Удаляем "загрузчик"
   const loader = document.getElementById("loader");
   if (loader) {
     loader.remove();
@@ -85,10 +85,10 @@ document.addEventListener("DOMContentLoaded", () => {
   /***************************************************
    * 1. ПАРАМЕТРЫ ПО УМОЛЧАНИЮ: ТЁМНАЯ ТЕМА + АНГЛИЙСКИЙ
    ***************************************************/
-  let currentLanguage = "en"; // по умолчанию английский
-  let darkMode = true;        // по умолчанию тёмная тема
+  let currentLanguage = "en"; 
+  let darkMode = true;       
 
-  // Глобальный массив для хранения геометрии секторов
+  // Глобальный массив для хранения геометрии секторов колеса
   let wheelSectors = [];
 
   // Объект для текстов кнопок (используем и для десктопа, и для мобильной версии)
@@ -147,6 +147,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
+  /**
+   * Универсальная функция показа модального окна по ID.  
+   * messageKey — ключ для перевода (например 'loginRequired'),
+   * чтобы заголовок и текст подставились из modalTranslations.
+   */
   function showModal(modalId, messageKey = null) {
     const modal = document.getElementById(modalId);
     if (modal && messageKey) {
@@ -165,6 +170,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  /**
+   * Окно подтверждения удаления
+   */
   function showConfirmDeleteModal(onConfirm) {
     const modal = document.getElementById('confirmDeleteModal');
     if (modal) {
@@ -206,28 +214,28 @@ document.addEventListener("DOMContentLoaded", () => {
   // Модальное окно логина
   const loginModalEl = document.getElementById("loginModal");
 
-  // Кнопка Google внутри модалки
+  // Кнопка Google внутри этой модалки
   const googleSignInBtn = document.getElementById("googleSignInBtn");
 
-  // Отображение имени пользователя
+  // Отображение имени пользователя (в шапке десктопа и мобильного)
   const userInfo = document.getElementById("userInfo"); 
   const userInfoMobile = document.getElementById("userInfo-mobile"); 
 
-  // Универсальная функция входа через Google (чтобы можно было вызвать из разных мест)
+  // Универсальная функция входа через Google
   async function signInWithGoogle() {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
     return result.user;
   }
 
-  // Обработчик нажатия «Войти через Google» (кнопка в модалке)
+  // Обработчик нажатия «Войти через Google» (кнопка в модалке `loginModal`)
   if (googleSignInBtn) {
     googleSignInBtn.addEventListener("click", async () => {
       try {
         const user = await signInWithGoogle();
         if (user) {
           // Закрываем модалку после успешного входа
-          const loginModal = bootstrap.Modal.getInstance(document.getElementById("loginModal"));
+          const loginModal = bootstrap.Modal.getInstance(loginModalEl);
           if (loginModal) {
             loginModal.hide();
           }
@@ -248,7 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .catch((err) => {
         console.error("Ошибка при выходе:", err);
-        showModal("logoutErrorModal", 'loginRequired');
+        // Можете показать окно ошибки, если хотите
       });
   }
 
@@ -258,7 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Уже залогинен – выходим
       handleSignOut();
     } else {
-      // Не залогинен – показываем модалку
+      // Не залогинен – показываем окно входа
       const loginModal = new bootstrap.Modal(loginModalEl, {
         backdrop: true,
         keyboard: true
@@ -267,7 +275,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Навешиваем на обе кнопки
+  // Навешиваем обработчик на обе кнопки входа (десктоп и мобильная)
   loginBtn.addEventListener("click", handleLoginClick);
   mobileLoginBtn.addEventListener("click", handleLoginClick);
 
@@ -294,11 +302,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Обработчик десктопной кнопки «сохранить»
+  // Обработчик десктопной кнопки «Сохранить»
   if (saveToCloudBtn) {
     saveToCloudBtn.addEventListener('click', () => {
       if (!auth.currentUser) {
-        showModal("authModal", 'loginRequired');
+        // Если не залогинен, показываем окно входа
+        const loginModal = new bootstrap.Modal(loginModalEl);
+        loginModal.show();
         return;
       }
       saveResult();
@@ -308,25 +318,28 @@ document.addEventListener("DOMContentLoaded", () => {
   // Обработчики мобильных кнопок (save/view)
   mobileSaveBtn.addEventListener('click', () => {
     if (!auth.currentUser) {
-      showModal("authModal", 'loginRequired');
+      const loginModal = new bootstrap.Modal(loginModalEl);
+      loginModal.show();
       return;
     }
     saveResult();
   });
 
-  mobileViewBtn.addEventListener('click', async () => {
+  mobileViewBtn.addEventListener('click', () => {
     if (!auth.currentUser) {
-      showModal("authModal", 'loginRequired');
+      const loginModal = new bootstrap.Modal(loginModalEl);
+      loginModal.show();
       return;
     }
     // Показываем модалку результатов
     showResultsModal();
   });
 
-  // Десктопная кнопка «показать результаты»
-  showResultsBtn.addEventListener("click", async () => {
+  // Десктопная кнопка «Показать результаты»
+  showResultsBtn.addEventListener("click", () => {
     if (!auth.currentUser) {
-      showModal("authModal", 'loginRequired');
+      const loginModal = new bootstrap.Modal(loginModalEl);
+      loginModal.show();
       return;
     }
     showResultsModal();
@@ -339,10 +352,10 @@ document.addEventListener("DOMContentLoaded", () => {
       backdrop: "static",
       keyboard: true
     });
+
     try {
       const entries = await loadResultsList();
       const resultsListEl = document.getElementById("resultsList");
-
       resultsListEl.innerHTML = "";
 
       if (entries.length === 0) {
@@ -357,14 +370,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const noResultsText = document.createElement("p");
         noResultsText.classList.add("mt-3", "text-muted");
-        noResultsText.textContent = currentLanguage === "ru" 
-          ? "Пока нет сохранённых результатов" 
+        noResultsText.textContent = (currentLanguage === "ru")
+          ? "Пока нет сохранённых результатов"
           : "No saved results yet";
 
         noResultsDiv.appendChild(travoltaImg);
         noResultsDiv.appendChild(noResultsText);
         resultsListEl.appendChild(noResultsDiv);
+
       } else {
+        // Если результаты есть, рисуем список
         entries.forEach((entry) => {
           const row = document.createElement("div");
           row.classList.add("d-flex", "justify-content-between", "align-items-center", "mb-2");
@@ -372,6 +387,8 @@ document.addEventListener("DOMContentLoaded", () => {
           const titleSpan = document.createElement("span");
           titleSpan.style.flexGrow = "1";
           titleSpan.style.marginRight = "1rem";
+
+          // Преобразуем дату
           const dateStr = entry.createdAt?.seconds
             ? new Date(entry.createdAt.seconds * 1000).toLocaleString()
             : new Date().toLocaleString();
@@ -391,6 +408,7 @@ document.addEventListener("DOMContentLoaded", () => {
           delBtn.textContent = "❌";
           delBtn.style.width = "40px";
 
+          // Загрузка сохранённого результата
           loadBtn.addEventListener("click", async () => {
             const data = await loadSavedResult(entry.id);
             if (!data) {
@@ -411,22 +429,24 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             updateOverallAverage();
             drawWheel();
-            const modal = bootstrap.Modal.getInstance(resultsModalEl);
-            if (modal) {
-              modal.hide();
-            }
+
+            // Закрываем модалку «Результаты» и показываем «Успех загружено»
+            const modalInstance = bootstrap.Modal.getInstance(resultsModalEl);
+            if (modalInstance) modalInstance.hide();
             showModal("loadSuccessModal", 'loaded');
           });
 
-          delBtn.addEventListener("click", async () => {
+          // Удаление сохранённого результата
+          delBtn.addEventListener("click", () => {
             showConfirmDeleteModal(async () => {
               try {
                 await deleteSavedResult(entry.id);
-                const modal = bootstrap.Modal.getInstance(resultsModalEl);
-                if (modal) {
-                  modal.hide();
+                const modalInstance = bootstrap.Modal.getInstance(resultsModalEl);
+                if (modalInstance) {
+                  modalInstance.hide();
                 }
-                showResultsModal(); // перегружаем список
+                // Обновляем список
+                showResultsModal();
                 initializeHistorySlider();
                 showModal("deleteSuccessModal", 'deleted');
               } catch (error) {
@@ -444,28 +464,23 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
 
-      // Обновляем заголовок модалки «Мои результаты»
+      // Заголовок «Мои результаты»
       const resultsModalTitle = document.querySelector('#resultsModal .modal-title');
       if (resultsModalTitle) {
         resultsModalTitle.textContent = modalTranslations[currentLanguage].myResults;
       }
 
       resultsModal.show();
+
     } catch (error) {
       console.error("Ошибка при загрузке результатов:", error);
       showModal("loadErrorModal", 'loaded');
     }
   }
-
   // ==================== КОНЕЦ БЛОКА СОХРАНЕНИЯ/ПРОСМОТРА ====================
 
 
-  // ==================  ФУНКЦИИ ОБНОВЛЕНИЯ ТЕКСТА КНОПОК  ====================
-  /**
-   * Меняет текст кнопок Login/Logout (десктоп+моб.) в зависимости от:
-   *   - текущего языка (currentLanguage)
-   *   - auth.currentUser (залогинен или нет)
-   */
+  // ==================  ФУНКЦИИ ОБНОВЛЕНИЯ ТЕКСТА КНОПОК и USERINFO  ====================
   function updateLoginButtons() {
     if (auth.currentUser) {
       // Пользователь залогинен
@@ -478,10 +493,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  /**
-   * Меняет текст кнопок «Сохранить» и «Просмотреть результаты» (десктоп+моб.)
-   * в зависимости от currentLanguage.
-   */
   function updateSaveButtons() {
     // Десктоп
     if (saveToCloudBtn) {
@@ -499,7 +510,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Функция для обновления имени/емейла пользователя в шапке
+  // Обновление имени/email пользователя в шапке
   function updateUserInfo() {
     const user = auth.currentUser;
     if (user) {
@@ -512,21 +523,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  /**
-   * updateUILanguage() — обновляет весь UI под выбранный язык:
-   *   - кнопки логина/логаута
-   *   - кнопки сохранения/просмотра
-   *   - модалки, заголовки, прочее
-   */
   function updateUILanguage() {
-    // 1. Обновляем текст кнопок (Login/Logout + Save/View)
+    // Кнопки «Login/Logout» + «Save/View»
     updateLoginButtons();
     updateSaveButtons();
-
-    // 2. Обновляем userInfo
+    // Имя пользователя
     updateUserInfo();
 
-    // 3. Обновляем текст модалки логина
+    // Локализация самой модалки логина
     const loginModalLabel = document.getElementById("loginModalLabel");
     const modalBodyText = document.querySelector("#loginModal .modal-body p");
     if (currentLanguage === "ru") {
@@ -536,7 +540,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (loginModalLabel) loginModalLabel.innerText = "Login";
       if (modalBodyText) modalBodyText.innerText = "Sign in with:";
     }
-    // 4. И т.д. — при необходимости
   }
   // ===========================================================================
 
@@ -545,23 +548,26 @@ document.addEventListener("DOMContentLoaded", () => {
   onAuthStateChanged(auth, (user) => {
     if (user) {
       console.log("Пользователь авторизован:", user.uid);
-      // Инициализируем слайдер истории после авторизации
+      // Инициализируем слайдер истории (если есть >1 результат)
       initializeHistorySlider();
     } else {
       console.log("Пользователь не авторизован");
-      // Если пользователь вышел — скрыть слайдер
+      // Скрываем слайдер истории
       const historySliderContainer = document.getElementById("historySliderContainer");
       if (historySliderContainer) {
         historySliderContainer.classList.add("d-none");
       }
     }
-    // При любом изменении состояния — обновляем кнопки и имя пользователя
-    updateUILanguage(); // внутри неё вызываются updateLoginButtons(), updateUserInfo() и т.д.
+    // При любом изменении (логин/логаут) — обновляем кнопки и имя
+    updateUILanguage();
   });
   // ===========================================================================
 
 
   // ======================== РАБОТА С ТАБАМИ/КОЛЕСОМ ==========================
+  /**
+   * Создание вкладок сфер (и их контента) динамически
+   */
   function renderTabs() {
     const savedValues = {};
     spheres.forEach(sphere => {
@@ -577,9 +583,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const tabList = document.getElementById("sphereTabs");
     const tabContent = document.getElementById("sphereTabContent");
 
-    // Сохраняем ID активной вкладки
+    // Сохраняем ID активной вкладки, если был
     const activeTabId = document.querySelector("#sphereTabs .nav-link.active")?.id;
 
+    // Очищаем контент
     tabList.innerHTML = "";
     tabContent.innerHTML = "";
 
@@ -607,8 +614,8 @@ document.addEventListener("DOMContentLoaded", () => {
           avg = (sum / count).toFixed(1);
         }
       }
-      let isMobileView = window.innerWidth < 576;
-      if (isMobileView) {
+      const isMob = window.innerWidth < 576;
+      if (isMob) {
         btn.innerHTML = `<span class="tab-emoji">${sphere.emoji || ""}</span> <span class="tab-average">${avg}</span>`;
       } else {
         btn.innerHTML = `<span class="tab-emoji">${sphere.emoji || ""}</span> <span class="tab-title">${sphere.title[currentLanguage]}</span> <span class="tab-average">(${avg})</span>`;
@@ -683,6 +690,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateOverallAverage();
 
+    // Если до этого какая-то вкладка была активна — восстанавливаем
     if (activeTabId) {
       const newActiveTab = document.getElementById(activeTabId);
       if (newActiveTab) {
@@ -693,22 +701,25 @@ document.addEventListener("DOMContentLoaded", () => {
           activePane.classList.add("show", "active");
         }
       }
-    } else {
-      // Если активной вкладки нет, показываем FAQ
-      const faqTab = document.getElementById("faqBtnDesktop") || document.getElementById("faqBtnMobile");
-      if (faqTab) {
-        faqTab.click();
-      }
     }
 
+    // Подключаем обработчики на вкладки, чтобы при клике скрывать FAQ и показывать сферы
     const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
     tabLinks.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Когда пользователь кликает по сфере — прячем FAQ, показываем sphereTabContent
+        const faqContent = document.getElementById("faqContent");
+        const sphereTabContent = document.getElementById("sphereTabContent");
+        if (faqContent) faqContent.style.display = "none";
+        if (sphereTabContent) sphereTabContent.style.display = "block";
+      });
+
+      // Дополнительные «красивости»
       tab.addEventListener("shown.bs.tab", () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
         updateTabStyles();
       });
       tab.addEventListener("hidden.bs.tab", () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
         updateTabStyles();
       });
       tab.addEventListener('mouseenter', () => {
@@ -717,10 +728,8 @@ document.addEventListener("DOMContentLoaded", () => {
       tab.addEventListener('mouseleave', () => {
         tab.style.boxShadow = 'none';
       });
-      tab.addEventListener('click', () => {
-        tab.style.boxShadow = `0 0 10px 5px ${tab.getAttribute("data-color")}`;
-      });
     });
+
     updateTabStyles();
   }
 
@@ -765,9 +774,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const avg = (sum / (count || 1)).toFixed(1);
     const tabButton = document.getElementById("tab-" + sphereId);
-    const isMobile = window.innerWidth < 576;
+    const isMobileView = window.innerWidth < 576;
 
-    if (isMobile) {
+    if (isMobileView) {
       tabButton.innerHTML = `<span class="tab-emoji">${sphere.emoji || ""}</span> <span class="tab-average">${avg}</span>`;
     } else {
       tabButton.innerHTML = `<span class="tab-emoji">${sphere.emoji || ""}</span> <span class="tab-title">${sphere.title[currentLanguage]}</span> <span class="tab-average">(${avg})</span>`;
@@ -842,6 +851,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.strokeStyle = darkMode ? "#ccc" : "#666";
       ctx.stroke();
 
+      // Сохраняем геометрию сектора для tooltip
       wheelSectors.push({
         sphereId: sphere.id,
         startAngle: startAngle,
@@ -850,6 +860,7 @@ document.addEventListener("DOMContentLoaded", () => {
         sphereObj: sphere
       });
 
+      // Подпись у края сектора
       const midAngle = startAngle + anglePerSphere / 2;
       const cosMid = Math.cos(midAngle);
       const sinMid = Math.sin(midAngle);
@@ -861,6 +872,7 @@ document.addEventListener("DOMContentLoaded", () => {
       let text = "";
       let shift = { x: 0, y: 0 };
 
+      // Небольшие сдвиги, чтобы текст не налезал
       if (sphere.id === "selfImprovement" || sphere.id === "lifeBrightness") {
         shift.x = 10;
       }
@@ -893,19 +905,25 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.fillText(text, labelX, labelY);
       ctx.shadowBlur = 0;
 
+      // Разделительная линия
       ctx.beginPath();
       ctx.moveTo(centerX, centerY);
-      ctx.lineTo(centerX + maxRadius * Math.cos(startAngle),
-                 centerY + maxRadius * Math.sin(startAngle));
+      ctx.lineTo(
+        centerX + maxRadius * Math.cos(startAngle),
+        centerY + maxRadius * Math.sin(startAngle)
+      );
       ctx.stroke();
 
       startAngle = endAngle;
     });
 
+    // Последняя разделительная линия
     ctx.beginPath();
     ctx.moveTo(centerX, centerY);
-    ctx.lineTo(centerX + maxRadius * Math.cos(startAngle),
-               centerY + maxRadius * Math.sin(startAngle));
+    ctx.lineTo(
+      centerX + maxRadius * Math.cos(startAngle),
+      centerY + maxRadius * Math.sin(startAngle)
+    );
     ctx.stroke();
   }
 
@@ -997,6 +1015,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Кнопка «Сохранить результаты в JSON» (если присутствует)
   document.getElementById("saveResults")?.addEventListener("click", () => {
     let results = {};
     results.date = new Date().toISOString();
@@ -1017,6 +1036,7 @@ document.addEventListener("DOMContentLoaded", () => {
     downloadAnchor.remove();
   });
 
+  // Кнопка «Сохранить в PDF»
   document.getElementById("savePDF")?.addEventListener("click", async () => {
     await document.fonts.ready;
     const originalDarkMode = darkMode;
@@ -1064,6 +1084,7 @@ document.addEventListener("DOMContentLoaded", () => {
       yPos += 220;
       doc.setFontSize(10);
 
+      // Перебираем сферы, выводим оценки и описания
       spheres.forEach((sphere) => {
         let sum = 0, count = 0;
         sphere.questions.forEach((question) => {
@@ -1087,7 +1108,9 @@ document.addEventListener("DOMContentLoaded", () => {
         sphere.questions.forEach((question) => {
           const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
           const value = slider.value;
-          const answer = question.descriptions[value] ? question.descriptions[value][currentLanguage] : "";
+          const answer = question.descriptions[value]
+            ? question.descriptions[value][currentLanguage]
+            : "";
           const questionLine = `${question.title[currentLanguage]}: ${answer}`;
 
           let questionLines = doc.splitTextToSize(questionLine, maxTextWidth);
@@ -1103,6 +1126,7 @@ document.addEventListener("DOMContentLoaded", () => {
         yPos += 10;
       });
 
+      // Общий средний балл
       let total = 0, globalCount = 0;
       spheres.forEach((sphere) => {
         sphere.questions.forEach((question) => {
@@ -1144,12 +1168,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const faqContent = document.getElementById("faqContent");
     const sphereTabContent = document.getElementById("sphereTabContent");
 
+    // **По умолчанию показываем FAQ**, а сферы скрываем
     if (faqContent) {
       faqContent.style.display = "block";
       faqContent.innerHTML = faqInstructions[currentLanguage];
     }
     if (sphereTabContent) {
-      sphereTabContent.style.display = "block";
+      sphereTabContent.style.display = "none";
     }
 
     const themeBtn = document.getElementById("themeToggle");
@@ -1166,16 +1191,18 @@ document.addEventListener("DOMContentLoaded", () => {
       drawWheel();
     });
 
-    // FAQ-кнопки
+    // FAQ-кнопки (десктоп + мобильная)
     const faqBtnDesktop = document.getElementById("faqBtnDesktop");
     const faqBtnMobile = document.getElementById("faqBtnMobile");
 
+    // Функция, которая показывает FAQ и скрывает сферы
     function handleFaqClick() {
       if (!faqContent || !sphereTabContent) return;
       faqContent.innerHTML = faqInstructions[currentLanguage];
       sphereTabContent.style.display = "none";
       faqContent.style.display = "block";
 
+      // Снимаем "active" у всех вкладок, прячем pane
       const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
       tabLinks.forEach(tab => {
         tab.classList.remove("active");
@@ -1185,17 +1212,20 @@ document.addEventListener("DOMContentLoaded", () => {
           targetPane.classList.remove("show", "active");
         }
       });
+
       if (window.innerWidth <= 576) {
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
     }
+
     if (faqBtnDesktop) faqBtnDesktop.addEventListener("click", handleFaqClick);
     if (faqBtnMobile) faqBtnMobile.addEventListener("click", handleFaqClick);
 
+    // Кнопка смены языка
     langBtn.addEventListener("click", () => {
-      const faqContent = document.getElementById("faqContent");
-      const faqIsOpen = faqContent.style.display !== "none";
+      const faqIsOpen = (faqContent && faqContent.style.display !== "none");
 
+      // Сохраняем значения ползунков
       const savedValues = {};
       spheres.forEach(sphere => {
         sphere.questions.forEach(question => {
@@ -1214,8 +1244,10 @@ document.addEventListener("DOMContentLoaded", () => {
       themeBtn.innerText = darkMode
         ? (currentLanguage === "ru" ? "🌙 Тёмная" : "🌙 Dark")
         : (currentLanguage === "ru" ? "🌞 Светлая" : "🌞 Light");
+
       const savePdfBtn = document.getElementById("savePDF");
       if (savePdfBtn) {
+        // В нашем случае, PDF-кнопка везде одинаковая, можно не менять
         savePdfBtn.innerText = (currentLanguage === "ru") ? "🔽 PDF" : "🔽 PDF";
       }
 
@@ -1223,12 +1255,13 @@ document.addEventListener("DOMContentLoaded", () => {
       updateUILanguage();
 
       renderTabs();
+      // Восстанавливаем ползунки
       spheres.forEach(sphere => {
         if (savedValues[sphere.id]) {
           sphere.questions.forEach(question => {
             const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
-            if (slider && savedValues[sphere.id][question.id]) {
-              slider.value = savedValues[sphere.id][question.id];
+            if (slider) {
+              slider.value = savedValues[sphere.id][question.id] || 5;
               updateSliderDisplay(sphere.id, question.id, slider.value);
             }
           });
@@ -1238,16 +1271,24 @@ document.addEventListener("DOMContentLoaded", () => {
       updateTabStyles();
       drawWheel();
 
+      // Если до переключения языка FAQ был открыт — оставим его открытым
       if (faqIsOpen) {
-        faqContent.innerHTML = faqInstructions[currentLanguage];
-      }
-      const sphereTabs = document.querySelectorAll("#sphereTabs .nav-link");
-      sphereTabs.forEach(tab => {
-        tab.addEventListener("click", () => {
+        if (faqContent) {
+          faqContent.innerHTML = faqInstructions[currentLanguage];
+          faqContent.style.display = "block";
+        }
+        if (sphereTabContent) {
+          sphereTabContent.style.display = "none";
+        }
+      } else {
+        // Если же FAQ был закрыт, наоборот, скрываем FAQ
+        if (faqContent) {
           faqContent.style.display = "none";
-          document.getElementById("sphereTabContent").style.display = "block";
-        });
-      });
+        }
+        if (sphereTabContent) {
+          sphereTabContent.style.display = "block";
+        }
+      }
     });
   }
 
@@ -1276,9 +1317,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const glow = wheelContainer.querySelector('.glow');
   let bounds;
 
+  /**
+   * Tooltip — НЕ учитываем реальный 3D-поворот,
+   * а просто смотрим позицию внутри «неповёрнутого» канваса.
+   */
   function showSphereTooltip(e) {
     const canvas = document.getElementById("balanceWheel");
     const tooltip = document.getElementById("canvasTooltip");
+    // Координаты мыши внутри канваса
     const rect = canvas.getBoundingClientRect();
     const xInCanvas = e.clientX - rect.left;
     const yInCanvas = e.clientY - rect.top;
@@ -1290,6 +1336,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const sphere = hoveredSector.sphereObj;
     const sphereTitle = sphere.title[currentLanguage] || sphere.title["en"];
+
+    // Собираем текст для подсказки
     let questionsHtml = '';
     sphere.questions.forEach(question => {
       const sliderId = `slider_${sphere.id}_${question.id}`;
@@ -1313,10 +1361,12 @@ document.addEventListener("DOMContentLoaded", () => {
     tooltip.style.display = 'block';
   }
 
+  // Определяем, попал ли угол мыши в сектор
   function isAngleInArc(angle, start, end) {
     if (start <= end) {
       return angle >= start && angle <= end;
     } else {
+      // Если дуга "переваливает" через 2π
       return (angle >= start && angle < 2 * Math.PI) || (angle >= 0 && angle <= end);
     }
   }
@@ -1328,6 +1378,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const dx = mouseX - centerX;
     const dy = mouseY - centerY;
     const r = Math.sqrt(dx * dx + dy * dy);
+
     let angle = Math.atan2(dy, dx);
     if (angle < 0) {
       angle += 2 * Math.PI;
@@ -1335,9 +1386,13 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let sector of wheelSectors) {
       let startAngle = sector.startAngle;
       let endAngle = sector.endAngle;
+      // Приводим тоже к диапазону [0..2π)
       if (startAngle < 0) startAngle += 2 * Math.PI;
       if (endAngle < 0) endAngle += 2 * Math.PI;
+
+      // Проверяем, попадает ли угол в сектор
       if (isAngleInArc(angle, startAngle, endAngle)) {
+        // И проверяем радиус
         if (r <= sector.radius) {
           return sector;
         }
@@ -1346,26 +1401,32 @@ document.addEventListener("DOMContentLoaded", () => {
     return null;
   }
 
+  /**
+   * 3D-поворот колеса — игнорируем его для tooltip,
+   * но саму анимацию/наклон оставляем.
+   */
   function rotateCanvas(e) {
-    const mouseX = e.clientX;
-    const mouseY = e.clientY;
-    const leftX = mouseX - bounds.x;
-    const topY = mouseY - bounds.y;
-    const center = {
-      x: leftX - bounds.width / 2,
-      y: topY - bounds.height / 2
-    };
-    const distance = Math.sqrt(center.x ** 2 + center.y ** 2);
+    // Координаты относительно центра wheelContainer
+    const rect = wheelContainer.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const dx = e.clientX - centerX;
+    const dy = e.clientY - centerY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
 
+    // Поворот
     wheelContainer.style.transform = `
       scale3d(1.07, 1.07, 1.07)
       rotate3d(
-        ${center.y / 100},
-        ${-center.x / 100},
+        ${dy / 100},
+        ${-dx / 100},
         0,
         ${Math.log(distance) * 2}deg
       )
     `;
+    // Блик
+    const leftX = e.clientX - rect.left;
+    const topY = e.clientY - rect.top;
     glow.style.backgroundImage = `
       radial-gradient(
         circle at
@@ -1374,6 +1435,7 @@ document.addEventListener("DOMContentLoaded", () => {
         transparent 70%
       )
     `;
+    // Tooltip (не учитывает реальный 3D-поворот)
     showSphereTooltip(e);
   }
 
