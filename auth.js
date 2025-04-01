@@ -13,29 +13,51 @@ function checkAuthState() {
 }
 
 // Функция для входа через Google
+// Функция для определения мобильного устройства
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+// Обработчик результата редиректа
+async function handleRedirectResult() {
+  try {
+    const result = await getRedirectResult(auth);
+    if (result) {
+      const user = result.user;
+      console.log("Пользователь вошёл после редиректа:", user);
+      localStorage.setItem("uid", user.uid);
+      return user;
+    }
+  } catch (error) {
+    console.error("Ошибка при обработке редиректа:", error);
+    if (error.code !== "auth/cancelled-popup-request") {
+      alert("Ошибка входа: " + error.message);
+    }
+    throw error;
+  }
+  return null;
+}
+
+// Проверяем результат редиректа при загрузке страницы
+handleRedirectResult();
+
 async function signInWithGoogle() {
   try {
     const provider = new GoogleAuthProvider();
     
-    // Определяем, является ли браузер Safari
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-    
     let user;
     
-    if (isSafari) {
-      // Для Safari используем signInWithRedirect
-      console.log("Используем signInWithRedirect для Safari");
+    if (isMobileDevice()) {
+      // Для мобильных устройств используем signInWithRedirect
+      console.log("Используем signInWithRedirect для мобильного устройства");
       await signInWithRedirect(auth, provider);
-      // Примечание: результат будет обработан при перезагрузке страницы
-      // в обработчике getRedirectResult
-      return null; // Возвращаем null, так как пользователь будет доступен только после редиректа
+      return null; // Пользователь будет доступен только после редиректа
     } else {
-      // Для других браузеров используем signInWithPopup
+      // Для десктопов используем signInWithPopup
       const result = await signInWithPopup(auth, provider);
       user = result.user;
       console.log("Пользователь вошёл:", user);
       
-      // Сохраняем UID пользователя
       localStorage.setItem("uid", user.uid);
       
       // Закрываем модальное окно после успешного входа
