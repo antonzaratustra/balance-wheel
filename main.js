@@ -43,7 +43,22 @@ import {
   deleteSavedResult
 } from "./firestore-utils.js";
 
+
+
+
+
+
+
+
+
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
+  
+  
+  
+  
   // Удаляем "загрузчик"
   const loader = document.getElementById("loader");
   if (loader) {
@@ -1327,6 +1342,19 @@ faqContent.classList.add('faq-content2');
     }
     lastScrollTop = st <= 0 ? 0 : st;
   }, false);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // 3D-эффект при наведении на колесо
   const canvasWrapper = document.getElementById('canvas-wrapper');
