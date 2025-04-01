@@ -1502,5 +1502,38 @@ faqContent.classList.add('faq-content2');
       tooltip.style.display = 'none';
     }
   });
+
+  window.addEventListener('deviceorientation', function(event) {
+    const alpha = event.alpha; // Rotation around z-axis
+    const beta = event.beta; // Rotation around x-axis
+    const gamma = event.gamma; // Rotation around y-axis
+
+    // Calculate rotation based on device orientation
+    const rotateX = beta / 90; // Normalize to [-1, 1]
+    const rotateY = gamma / 90; // Normalize to [-1, 1]
+
+    // Apply rotation to the canvas
+    wheelContainer.style.transform = `
+      scale3d(1.07, 1.07, 1.07)
+      rotate3d(
+        ${rotateX},
+        ${-rotateY},
+        0,
+        ${Math.log(Math.abs(rotateX) + Math.abs(rotateY) + 1) * 2}deg
+      )
+    `;
+
+    // Adjust glow effect based on orientation
+    const leftX = (rotateY + 1) * rect.width / 2;
+    const topY = (rotateX + 1) * rect.height / 2;
+    glow.style.backgroundImage = `
+      radial-gradient(
+        circle at
+        ${leftX}px ${topY}px,
+        rgba(255, 255, 255, 0.2),
+        transparent 70%
+      )
+    `;
+  });
 });
 // Конец DOMContentLoaded
