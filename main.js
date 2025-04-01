@@ -1208,6 +1208,12 @@ const langBtn = isMobile ? document.getElementById("langToggle") : document.getE
 
     // Функция, которая показывает FAQ и скрывает сферы
     function handleFaqClick() {
+      faqContent.classList.remove('faq-content2');
+faqContent.classList.add('faq-content2');
+      
+
+
+
       if (!faqContent || !sphereTabContent) return;
       faqContent.innerHTML = faqInstructions[currentLanguage];
       sphereTabContent.style.display = "none";

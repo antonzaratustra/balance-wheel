@@ -371,6 +371,7 @@ input[type=range]::-moz-range-thumb:active {
 @media (max-width: 576px) {
   #overallAverage {
     text-align: center;
+    padding-bottom: 100px;
   }
 }
 
@@ -594,13 +595,13 @@ input[type=range]::-moz-range-thumb:active {
     line-height: 1.6 !important; /* или любое другое значение */
   }
   
-.faq-content {
-  display: block; /* Показываем по умолчанию */
-  padding: 20px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  margin: 20px 0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.faq-content2 {
+  /* display: block; Показываем по умолчанию */
+  /* padding: 20px; */
+  /* background-color: #f8f9fa; */
+   border-radius: 8px;
+  /* margin: 20px 0;  */
+  /* box-shadow: 0 2px 4px rgba(0,0,0,0.1); */
 }
 
 .faq-content strong {
@@ -1437,12 +1438,12 @@ body {
 }
 
 .btn-faq {
-  background-color: #FFD700 !important; /* Темный желтый для темной темы */
+  background-color: #f6b95a !important; /* Темный желтый для темной темы */
   color: #fff !important;
 }
 
 .dark-mode .btn-faq {
-  background-color: #FDD835 !important; /* Более светлый желтый для светлой темы */
+  background-color: #f6b95a !important; /* Более светлый желтый для светлой темы */
   color: #000 !important;
 }
 
@@ -1481,8 +1482,8 @@ body {
 
 /* Стили для кнопки темы */
 .btn-secondary {
-  background-color: #6c757d !important;
-  color: #fff !important;
+  background-color: #e0e0e0 !important;
+  color: #0f0f0f !important;
   border: none !important;
   border-radius: 4px !important;
   padding: 8px 16px !important;
@@ -1498,6 +1499,7 @@ body {
 @media (max-width: 576px) {
   .btn-secondary {
     width: 100%;
+  
     /* margin-bottom: 10px; */
     /* border-radius: 10px !important; */
   }
@@ -1790,6 +1792,15 @@ body.dark-mode #historyDateDisplay {
   box-shadow: 0 0 5px 2.5px var(--sphere-color);
 }
 
+.dark-mode .btn-secondary {
+background-color: #6c757d !important;
+color: #fff !important;
+
+
+}
+
+
+
 /* Убираем эффект сияния на мобильных устройствах */
 @media (max-width: 768px) {
   .sphere-tab-btn {
@@ -2130,12 +2141,12 @@ body {
 }
 
 .btn-faq {
-  background-color: #FFD700 !important; /* Темный желтый для темной темы */
+  background-color: #f6b95a !important; /* Темный желтый для темной темы */
   color: #fff !important;
 }
 
 .dark-mode .btn-faq {
-  background-color: #FDD835 !important; /* Более светлый желтый для светлой темы */
+  background-color: #f6b95a !important; /* Более светлый желтый для светлой темы */
   color: #000 !important;
 }
 
@@ -2788,42 +2799,42 @@ body {
 
 
 .btn-pdf {
-  background-color: #D32F2F !important; /* Темный красный для темной темы */
+  background-color: #f05f50 !important; /* Темный красный для темной темы */
   color: #fff !important;
 }
 
 .dark-mode .btn-pdf {
-  background-color: #EF5350 !important; /* Более светлый красный для светлой темы */
+  background-color: #f05f50 !important; /* Более светлый красный для светлой темы */
   color: #000 !important;
 }
 
 .btn-faq {
-  background-color: #FFD700 !important; /* Темный желтый для темной темы */
+  background-color: #f6b95a !important; /* Темный желтый для темной темы */
   color: #fff !important;
 }
 
 .dark-mode .btn-faq {
-  background-color: #FDD835 !important; /* Более светлый желтый для светлой темы */
+  background-color: #f6b95a !important; /* Более светлый желтый для светлой темы */
   color: #000 !important;
 }
 
 .btn-save {
-  background-color: #2196F3 !important; /* Темный синий для темной темы */
+  background-color: #27a2df !important; /* Темный синий для темной темы */
   color: #fff !important;
 }
 
 .dark-mode .btn-save {
-  background-color: #42A5F5 !important; /* Более светлый синий для светлой темы */
+  background-color: #27a2df !important; /* Более светлый синий для светлой темы */
   color: #000 !important;
 }
 
 .btn-results {
-  background-color: #2E7D32 !important; /* Темный зеленый для темной темы */
+  background-color: #45c4a1 !important; /* Темный зеленый для темной темы */
   color: #fff !important;
 }
 
 .dark-mode .btn-results {
-  background-color: #4DB6AC !important; /* Более светлый зеленый для светлой темы */
+  background-color: #45c4a1 !important; /* Более светлый зеленый для светлой темы */
   color: #000 !important;
 }
 

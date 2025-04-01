@@ -1,0 +1,15 @@
+@keyframes glowBorder {
+  0% {
+    box-shadow: 0 0 0 0 rgba(253, 216, 53, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(253, 216, 53, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(253, 216, 53, 0);
+  }
+}
+
+.faq-content2 {
+  animation: glowBorder 1s ease-out;
+}
