@@ -2813,3 +2813,47 @@ body {
 .btn-pdf:hover, .btn-faq:hover, .btn-save:hover, .btn-results:hover {
   opacity: 0.9 !important;
 }
+
+
+
+
+
+/* Стили для мобильной версии кнопок */
+@media (max-width: 576px) {
+  .d-lg-none {
+    display: flex !important;
+    flex-direction: row !important;
+    /* gap: 10px !important; */
+    padding: 5px !important;
+  }
+
+  .btn-secondary, .btn-faq, .btn-pdf {
+    width: auto !important;
+    flex: none !important;
+    min-width: auto !important;
+    padding: 8px 16px !important;
+    font-size: 0.875rem !important;
+  }
+
+  .btn-faq {
+    padding: 8px 12px !important;
+  }
+
+  .faq-text {
+    display: none !important;
+  }
+
+
+  #langToggle {
+  border-radius: 0 !important;
+  }
+  
+  #themeToggle {
+    border-radius: 0 !important;
+
+  }
+
+
+}
+
+
