@@ -24,6 +24,16 @@ async function signInWithGoogle() {
     
     // Сохраняем UID пользователя
     localStorage.setItem("uid", user.uid);
+    
+    // Закрываем модальное окно после успешного входа
+    const loginModalEl = document.getElementById("loginModal");
+    if (loginModalEl) {
+      const loginModal = bootstrap.Modal.getInstance(loginModalEl);
+      if (loginModal) {
+        loginModal.hide();
+      }
+    }
+    
     return user;
   } catch (error) {
     console.error("Ошибка авторизации:", error);
