@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // ================== БЛОК С МОДАЛЬНЫМИ ОКНАМИ ==================
+  // ================== БЛОК С МОДАЛЬНЫМ ОКНАМИ ==================
   const modalTranslations = {
     ru: {
       savedToCloud: "Успех",
@@ -221,12 +221,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const userInfo = document.getElementById("userInfo"); 
   const userInfoMobile = document.getElementById("userInfo-mobile"); 
 
-  // Универсальная функция входа через Google
-  async function signInWithGoogle() {
-    const provider = new GoogleAuthProvider();
-    const result = await signInWithPopup(auth, provider);
-    return result.user;
-  }
+  // // Универсальная функция входа через Google
+  // async function signInWithGoogle() {
+  //   const provider = new GoogleAuthProvider();
+  //   const result = await signInWithPopup(auth, provider);
+  //   return result.user;
+  // }
 
   // Обработчик нажатия «Войти через Google» (кнопка в модалке `loginModal`)
   if (googleSignInBtn) {
@@ -261,18 +261,26 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Единая функция-обработчик клика по кнопке Login/Logout (десктоп и мобильная)
+  let isLoginModalOpen = false;
+
   function handleLoginClick() {
-    if (auth.currentUser) {
-      // Уже залогинен – выходим
-      handleSignOut();
-    } else {
-      // Не залогинен – показываем окно входа
-      const loginModal = new bootstrap.Modal(loginModalEl, {
-        backdrop: true,
-        keyboard: true
-      });
-      loginModal.show();
-    }
+      if (auth.currentUser) {
+          // Уже залогинен – выходим
+          handleSignOut();
+      } else if (!isLoginModalOpen) {
+          // Не залогинен и окно не открыто – показываем окно входа
+          const loginModal = new bootstrap.Modal(loginModalEl, {
+              backdrop: true,
+              keyboard: true
+          });
+          loginModal.show();
+          isLoginModalOpen = true;
+  
+          // Событие закрытия модального окна
+          loginModalEl.addEventListener('hidden.bs.modal', () => {
+              isLoginModalOpen = false;
+          });
+      }
   }
 
   // Навешиваем обработчик на обе кнопки входа (десктоп и мобильная)

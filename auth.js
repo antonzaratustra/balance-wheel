@@ -17,12 +17,6 @@ async function signInWithGoogle() {
   try {
     const provider = new GoogleAuthProvider();
     
-    // Сначала проверяем текущее состояние аутентификации
-    const currentUser = await checkAuthState();
-    if (currentUser) {
-      return currentUser;
-    }
-
     // Вызываем signInWithPopup
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
@@ -53,6 +47,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // По клику на кнопку "Login" показываем модальное окно
   loginBtn.addEventListener("click", () => {
+    loginModalEl.addEventListener('hidden.bs.modal', () => {
+      document.body.classList.remove('modal-open');
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) {
+        backdrop.remove();
+      }
+    });
     loginModal.show();
   });
 
