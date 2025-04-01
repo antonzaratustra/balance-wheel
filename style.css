@@ -1471,7 +1471,7 @@ body {
 .btn-pdf, .btn-faq, .btn-save, .btn-results {
   border: none !important;
   border-radius: 4px !important;
-  padding: 8px 16px !important;
+  /* padding: 8px 16px !important; */
   font-weight: 600 !important;
   transition: all 0.2s ease !important;
 }
@@ -1486,7 +1486,7 @@ body {
   color: #0f0f0f !important;
   border: none !important;
   border-radius: 4px !important;
-  padding: 8px 16px !important;
+  /* padding: 8px 16px !important; */
   font-weight: 600 !important;
   transition: all 0.2s ease !important;
 }
@@ -2868,7 +2868,7 @@ body {
     width: auto !important;
     flex: none !important;
     min-width: auto !important;
-    padding: 8px 16px !important;
+    /* padding: 8px 16px !important; */
     font-size: 0.875rem !important;
   }
 
