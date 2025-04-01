@@ -1472,8 +1472,8 @@ body {
 @media (max-width: 576px) {
   .btn-secondary {
     width: 100%;
-    margin-bottom: 10px;
-    border-radius: 10px !important;
+    /* margin-bottom: 10px; */
+    /* border-radius: 10px !important; */
   }
 }
 
@@ -2854,6 +2854,30 @@ body {
   }
 
 
+
+    .btn-save {
+    border-radius:  10px 0 0 10px !important;
+    
+  }
+
+  .btn-secondary {
+    border-radius:  0 !important;
+
+  }
+
+  .btn-results {
+    border-radius:   0 10px 10px 0 !important;
+
+  }
+
+
+
 }
+
+
+
+
+
+
 
 
