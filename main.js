@@ -55,6 +55,10 @@ import {
 
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Добавляем обработчик поворота устройства
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener('deviceorientation', rotateCanvas);
+  }
   
   
   
@@ -1455,6 +1459,29 @@ faqContent.classList.add('faq-content2');
    * но саму анимацию/наклон оставляем.
    */
   function rotateCanvas(e) {
+  // Обработка события deviceorientation для мобильных устройств
+  if (e.type === 'deviceorientation') {
+    const alpha = e.alpha; // Компас: 0-360
+    const beta = e.beta;   // Наклон вперед/назад: -180-180
+    const gamma = e.gamma; // Наклон влево/вправо: -90-90
+
+    // Преобразуем данные гироскопа в поворот canvas
+    const dx = gamma * 10;
+    const dy = beta * 10;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    wheelContainer.style.transform = `
+      scale3d(1.07, 1.07, 1.07)
+      rotate3d(
+        ${dy / 100},
+        ${-dx / 100},
+        0,
+        ${Math.log(distance) * 2}deg
+      )
+    `;
+    return;
+  }
+
     // Координаты относительно центра wheelContainer
     const rect = wheelContainer.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
