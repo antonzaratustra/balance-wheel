@@ -1173,6 +1173,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Изначальная инициализация
   function setupButtons() {
+    const isMobile = window.innerWidth < 576;
+const themeBtn = isMobile ? document.getElementById("themeToggle") : document.getElementById("themeToggleDesktop");
+const langBtn = isMobile ? document.getElementById("langToggle") : document.getElementById("langToggleDesktop");
     const faqContent = document.getElementById("faqContent");
     const sphereTabContent = document.getElementById("sphereTabContent");
 
@@ -1185,8 +1188,8 @@ document.addEventListener("DOMContentLoaded", () => {
       sphereTabContent.style.display = "none";
     }
 
-    const themeBtn = document.getElementById("themeToggle");
-    const langBtn = document.getElementById("langToggle");
+    if (!themeBtn || !langBtn) return;
+
 
     themeBtn.addEventListener("click", () => {
       darkMode = !darkMode;

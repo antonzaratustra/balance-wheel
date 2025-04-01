@@ -133,38 +133,36 @@
   <!-- Фиксированная навигационная панель -->
   <nav class="navbar fixed-top navbar-expand-lg">
     <div class="container-fluid">
-      <!-- Кнопка FAQ для десктопа (видна на lg и выше) -->
-
-
-      <div class="d-none d-lg-block">
+      <!-- Левая группа кнопок (десктоп) -->
+      <div class="d-none d-lg-flex left-button-group">
         <button id="faqBtnDesktop" class="btn btn-faq">
           <span class="faq-emoji">💡</span>
           <span class="faq-text"> FAQ</span>
         </button>
+        <button id="saveToCloudBtn" class="btn btn-save">💾</button>
+        <button id="showResultsBtn" class="btn btn-results">☁️</button>
+        <button id="savePDF" class="btn btn-pdf">🔽 PDF</button>
       </div>
-
-
-      <div class="btn-group" id="btn-group-padding" role="group">
-        <button id="saveToCloudBtn" class="btn btn-save d-none d-sm-inline-block">💾</button>
-        <button id="showResultsBtn" class="btn btn-results d-none d-sm-inline-block">☁️</button>
-      </div>
-
-
 
       <div id="userInfo" style="display: inline-block; color: #ccc;"></div>
 
-      <!-- Правый блок с остальными кнопками -->
-      <div class="ms-auto">
-        <div class="btn-group" role="group">
-          <!-- Кнопка FAQ для мобильных (видна на md и ниже) -->
-          <button id="faqBtnMobile" class="btn btn-faq d-lg-none">
+      <!-- Правая группа кнопок -->
+      <div class="ms-auto right-button-group">
+        <!-- Мобильная версия кнопок -->
+        <div class="d-lg-none">
+          <button id="faqBtnMobile" class="btn btn-faq">
             <span class="faq-emoji">💡</span>
             <span class="faq-text"></span>
           </button>
           <button id="langToggle" class="btn btn-secondary">🌐 EN</button>
           <button id="themeToggle" class="btn btn-secondary">🌙 Dark</button>
-          <button id="loginBtn" class="btn btn-secondary d-none d-md-inline-block">👤Login</button>
           <button id="savePDF" class="btn btn-pdf">🔽 PDF</button>
+        </div>
+        <!-- Десктопная версия -->
+        <div class="d-none d-lg-flex">
+          <button id="langToggleDesktop" class="btn btn-secondary">🌐 EN</button>
+          <button id="themeToggleDesktop" class="btn btn-secondary">🌙 Dark</button>
+          <button id="loginBtn" class="btn btn-secondary d-none d-md-inline-block">👤Login</button>
         </div>
       </div>
     </div>
