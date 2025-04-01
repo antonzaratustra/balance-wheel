@@ -14,7 +14,7 @@ body {
 /* --- Мобильный отступ для контента вкладок --- */
 @media (max-width: 576px) {
   #sphereTabContent {
-    padding-top: 100px;
+    padding-top: 10px;
     position: relative;
     z-index: 1;
   }
@@ -24,6 +24,29 @@ body {
     top: 0;
     width: 100%;
     z-index: 1000;
+    /* padding: 0 15px; */
+    background-color: var(--bs-body-bg);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+
+  
+  .nav-tabs .nav-item {
+    display: block;
+    width: 100%;
+    margin-bottom: 0px;
+  }
+  
+  .nav-item {
+    margin-bottom: 0px !important;
+  }
+
+  .nav-tabs .nav-link {
+    display: block;
+    width: 100%;
+    padding: 0.5rem;
+    text-align: center;
+    margin: 0;
   }
 }
 
@@ -1290,15 +1313,18 @@ body.dark-mode #historyDateDisplay {
     width: 100%;
     z-index: 1000;
   }
-
-  /* Отключаем отступы для row и container на мобильных */
-  .row {
-    margin-left: 0 !important;
+  
+  .nav-tabs .nav-item {
+    display: block;
+    width: 100%;
+    margin-bottom: 5px;
   }
-
-  .container.mt-4.position-relative {
-    padding-right: 0 !important;
-    padding-left: 0 !important;
+  
+  .nav-tabs .nav-link {
+    display: block;
+    width: 100%;
+    padding: 0.5rem;
+    text-align: center;
   }
 }
 
@@ -2874,10 +2900,5 @@ body {
 
 }
 
-
-
-
-
-
-
-
+#faq-content {
+  border-radius: 10px !important;
