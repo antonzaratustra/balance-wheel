@@ -1369,10 +1369,12 @@ faqContent.classList.add('faq-content2');
   function showSphereTooltip(e) {
     const canvas = document.getElementById("balanceWheel");
     const tooltip = document.getElementById("canvasTooltip");
-    // Координаты мыши внутри канваса
-    const rect = canvas.getBoundingClientRect();
-    const xInCanvas = e.clientX - rect.left;
-    const yInCanvas = e.clientY - rect.top;
+    // Координаты мыши внутри канваса с учетом позиции wheelContainer
+    const wheelRect = wheelContainer.getBoundingClientRect();
+    const canvasRect = canvas.getBoundingClientRect();
+    // Используем координаты относительно wheelContainer, а не canvas
+    const xInCanvas = e.clientX - wheelRect.left;
+    const yInCanvas = e.clientY - wheelRect.top;
 
     const hoveredSector = getSectorUnderCursor(xInCanvas, yInCanvas);
     if (!hoveredSector) {
@@ -1418,8 +1420,10 @@ faqContent.classList.add('faq-content2');
 
   function getSectorUnderCursor(mouseX, mouseY) {
     const canvas = document.getElementById("balanceWheel");
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
+    // Используем реальные размеры канваса на экране
+    const canvasRect = canvas.getBoundingClientRect();
+    const centerX = canvasRect.width / 2;
+    const centerY = canvasRect.height / 2;
     const dx = mouseX - centerX;
     const dy = mouseY - centerY;
     const r = Math.sqrt(dx * dx + dy * dy);
