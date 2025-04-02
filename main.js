@@ -1442,6 +1442,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Переключаем язык
       currentLanguage = (currentLanguage === "ru") ? "en" : "ru";
+      
+      // Создаем и диспатчим событие изменения языка для timer.js
+      document.dispatchEvent(new CustomEvent('languageChanged', {
+        detail: { language: currentLanguage }
+      }));
 
       langBtn.innerText = (currentLanguage === "ru") ? "🌐 RU" : "🌐 EN";
       themeBtn.innerText = darkMode

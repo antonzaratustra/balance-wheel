@@ -13,6 +13,15 @@ let totalTimeLeft = 10 * 60; // 10 минут в секундах
 let questionTimeLeft = 15; // 15 секунд на вопрос
 let currentLanguage = 'en'; // Язык по умолчанию
 
+// Функция для получения текущего языка из main.js
+function getCurrentLanguage() {
+    // Проверяем, доступна ли глобальная переменная currentLanguage из main.js
+    if (window.currentLanguage) {
+        return window.currentLanguage;
+    }
+    return currentLanguage; // Возвращаем локальную переменную, если глобальная недоступна
+}
+
 // Инициализация таймера
 document.addEventListener("DOMContentLoaded", () => {
     // Добавляем стили для таймера
@@ -42,9 +51,16 @@ document.addEventListener("DOMContentLoaded", () => {
             document.addEventListener('languageChanged', (e) => {
                 if (e.detail && e.detail.language) {
                     currentLanguage = e.detail.language;
-                        // Обновляем контент в модальном окне при смене языка
+                    
+                    // Обновляем заголовок кнопки таймера
+                    const timerButton = document.getElementById('timer-button');
+                    if (timerButton) {
+                        timerButton.title = currentLanguage === 'ru' ? 'Запустить таймер' : 'Start timer';
+                    }
+                    
+                    // Обновляем контент в модальном окне при смене языка
                     const timerModal = document.getElementById('timerModal');
-                    if (timerModal.classList.contains('show')) {
+                    if (timerModal && timerModal.classList.contains('show')) {
                         showCurrentQuestion();
                         // Обновляем описание слайдера с текущим значением
                         const slider = document.getElementById('timer-slider');
@@ -67,6 +83,9 @@ document.addEventListener("DOMContentLoaded", () => {
 function initTimerButton() {
     const canvasWrapper = document.getElementById('balanceWheelContainer');
     
+    // Получаем актуальный язык
+    currentLanguage = getCurrentLanguage();
+    
     // Создаем кнопку с эмодзи часов
     const timerButton = document.createElement('button');
     timerButton.id = 'timer-button';
@@ -84,6 +103,9 @@ function initTimerButton() {
 function openTimerModal() {
     // Сбрасываем индексы и таймеры
     resetTimers();
+    
+    // Получаем актуальный язык перед открытием модального окна
+    currentLanguage = getCurrentLanguage();
     
     // Получаем модальное окно
     const timerModal = document.getElementById('timerModal');
