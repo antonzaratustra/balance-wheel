@@ -64,25 +64,34 @@ async function handleRedirectResult() {
     if (result) {
       const user = result.user;
       console.log("Пользователь вошёл после редиректа:", user);
-      localStorage.setItem("uid", user.uid);
       
-      // Обновляем UI для авторизованного пользователя
-      updateUIForAuthenticatedUser(user);
-      
-      // Закрываем модальное окно после успешной авторизации
-      const loginModalEl = document.getElementById("loginModal");
-      if (loginModalEl) {
-        const loginModal = bootstrap.Modal.getInstance(loginModalEl);
-        if (loginModal) {
-          loginModal.hide();
-          // Удаляем backdrop и очищаем стили
-          document.body.classList.remove('modal-open');
-          const backdrop = document.querySelector('.modal-backdrop');
-          if (backdrop) backdrop.remove();
-        }
-      }
-      
-      return user;
+      // Добавляем слушатель изменения состояния аутентификации
+      return new Promise((resolve) => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+          if (user) {
+            console.log("Состояние аутентификации обновлено:", user);
+            localStorage.setItem("uid", user.uid);
+            
+            // Обновляем UI для авторизованного пользователя
+            updateUIForAuthenticatedUser(user);
+            
+            // Закрываем модальное окно после успешной авторизации
+            const loginModalEl = document.getElementById("loginModal");
+            if (loginModalEl) {
+              const loginModal = bootstrap.Modal.getInstance(loginModalEl);
+              if (loginModal) {
+                loginModal.hide();
+                // Удаляем backdrop и очищаем стили
+                document.body.classList.remove('modal-open');
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) backdrop.remove();
+              }
+            }
+          }
+          unsubscribe();
+          resolve(user);
+        });
+      });
     }
   } catch (error) {
     console.error("Ошибка при обработке редиректа:", error);
