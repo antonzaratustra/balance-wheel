@@ -921,47 +921,52 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Функция для подсветки сектора
-  function highlightSector(sphereId, isHighlighted) {
+  let activeWheelSector = null; // Глобальная переменная для хранения активного сектора
+
+  function highlightSector(sphereId, isHighlighted, isActive = false) {
     const sector = wheelSectors.find(sector => sector.sphereId === sphereId);
-    console.log(`Highlighting sector: ${sphereId}, isHighlighted: ${isHighlighted}`);
+    console.log(`Highlighting sector: ${sphereId}, isHighlighted: ${isHighlighted}, isActive: ${isActive}`);
 
     if (sector) {
         const canvas = document.getElementById("balanceWheel");
         const ctx = canvas.getContext("2d");
         
-        // Сохраняем текущее состояние контекста
-        ctx.save();
+        // Очищаем весь canvas перед отрисовкой
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // Перерисовываем сектор с нужным цветом
-        ctx.beginPath();
-        ctx.moveTo(canvas.width / 2, canvas.height / 2);
-        ctx.arc(canvas.width / 2, canvas.height / 2, sector.radius, sector.startAngle, sector.endAngle);
-        ctx.closePath();
+        // Перерисовываем все сектора
+        wheelSectors.forEach(s => {
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, canvas.height / 2);
+            ctx.arc(canvas.width / 2, canvas.height / 2, s.radius, s.startAngle, s.endAngle);
+            ctx.closePath();
+            
+            if (s.sphereId === sphereId && (isHighlighted || isActive)) {
+                ctx.shadowColor = s.sphereObj.color || "#CCC";
+                ctx.shadowBlur = 20;
+                ctx.fillStyle = s.sphereObj.color || "#CCC";
+                ctx.globalAlpha = 0.8;
+            } else {
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = s.sphereObj.color || "#CCC";
+                ctx.globalAlpha = 0.6;
+            }
+            
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+            ctx.strokeStyle = darkMode ? "#ccc" : "#666";
+            ctx.stroke();
+            ctx.restore();
+            
+            // Перерисовываем текст
+            if (s.text) {
+                drawSectorText(s);
+            }
+        });
         
-        if (isHighlighted) {
-            // Добавляем эффект свечения
-            ctx.shadowColor = sector.sphereObj.color || "#CCC";
-            ctx.shadowBlur = 20;
-            // Используем цвет сферы с повышенной яркостью
-            ctx.fillStyle = sector.sphereObj.color || "#CCC";
-            ctx.globalAlpha = 0.8; // Делаем сектор ярче
-        } else {
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = sector.sphereObj.color || "#CCC";
-            ctx.globalAlpha = 0.6; // Возвращаем обычную прозрачность
-        }
-        
-        ctx.fill();
-        ctx.globalAlpha = 1.0;
-        ctx.strokeStyle = darkMode ? "#ccc" : "#666";
-        ctx.stroke();
-        
-        // Восстанавливаем состояние контекста
-        ctx.restore();
-        
-        // Перерисовываем текст
-        if (sector.text) {
-            drawSectorText(sector);
+        if (isActive) {
+            activeWheelSector = sphereId;
         }
     } else {
         console.error(`Sector not found for sphereId: ${sphereId}`);
@@ -977,13 +982,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (hoveredSector) {
         console.log(`Mouse over sector: ${hoveredSector.sphereId}`); // Логирование
         clearTimeout(highlightTimeout); // Очистка предыдущего таймера
-        highlightSector(hoveredSector.sphereId, true); // Добавляем эффект свечения
+        highlightSector(hoveredSector.sphereId, true, hoveredSector.sphereId === activeWheelSector); // Добавляем эффект свечения
+    }
+  });
+
+  // Обработчик события для ухода курсора с canvas
+  canvas.addEventListener('mouseleave', () => {
+    clearTimeout(highlightTimeout);
+    if (activeWheelSector) {
+        highlightSector(activeWheelSector, false, true); // Оставляем подсветку только на активном секторе
     } else {
-        console.log(`Mouse not over any sector`); // Логирование
-        clearTimeout(highlightTimeout); // Очистка предыдущего таймера
-        highlightTimeout = setTimeout(() => {
-            wheelSectors.forEach(sector => highlightSector(sector.sphereId, false)); // Убираем эффект свечения
-        }, 100); // Задержка перед удалением подсветки
+        drawWheel(); // Перерисовываем колесо в исходное состояние
     }
   });
 
@@ -997,11 +1006,27 @@ document.addEventListener("DOMContentLoaded", () => {
             tabButton.click(); // Кликаем на вкладку
             showTabContent(hoveredSector.sphereId); // Обновляем контент
         }
-        highlightActiveSector(hoveredSector.sphereId); // Подсвечиваем активный сектор
+        highlightSector(hoveredSector.sphereId, false, true); // Устанавливаем сектор как активный
     } else {
         console.log(`Clicked outside of sectors`); // Логирование
+        if (activeWheelSector) {
+            highlightSector(activeWheelSector, false, true); // Восстанавливаем подсветку активного сектора
+        }
     }
   });
+
+  // Обновляем обработчик изменения слайдера
+  function updateSliderDisplay(sphereId, questionId, value) {
+    const displayElement = document.getElementById(`value_${sphereId}_${questionId}`);
+    if (displayElement) {
+        displayElement.textContent = value;
+        updateSphereAverage(sphereId);
+        drawWheel();
+        if (activeWheelSector) {
+            highlightSector(activeWheelSector, false, true); // Сохраняем подсветку активного сектора
+        }
+    }
+  }
 
   // Функция для подсветки активного сектора
   function highlightActiveSector(sphereId) {
