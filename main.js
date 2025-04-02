@@ -673,6 +673,8 @@ document.addEventListener("DOMContentLoaded", () => {
           updateSliderDisplay(sphere.id, question.id, slider.value);
           updateSphereAverage(sphere.id);
           drawWheel();
+          // Подсвечиваем активный сектор при движении слайдера
+          highlightSector(sphere.id, true, true);
         });
 
         const desc = document.createElement("div");
