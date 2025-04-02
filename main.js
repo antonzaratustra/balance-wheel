@@ -951,15 +951,17 @@ document.addEventListener("DOMContentLoaded", () => {
             
             // Настраиваем стили в зависимости от состояния
             ctx.fillStyle = s.sphereObj.color || "#CCC";
-            ctx.globalAlpha = 0.95;
+            ctx.globalAlpha = 0.8;
             ctx.shadowBlur = 0;
             
             // Если это активный сектор или сектор, который нужно подсветить
             if (isCurrentActive || (s.sphereId === sphereId && (isHighlighted || isActive))) {
                 ctx.shadowColor = s.sphereObj.color || "#CCC";
-                ctx.shadowBlur = 30;
+                ctx.shadowBlur = 40;
                 ctx.globalAlpha = 1.0;
-                ctx.fillStyle = s.sphereObj.color || "#CCC";
+                // Используем более яркий оттенок цвета для активного сектора
+                const color = s.sphereObj.color || "#CCC";
+                ctx.fillStyle = color;
             }
             
             ctx.fill();
@@ -1058,6 +1060,12 @@ document.addEventListener("DOMContentLoaded", () => {
     activeWheelSector = sphereId;
     // Подсвечиваем активный сектор
     highlightSector(sphereId, true, true);
+    // Обновляем подсветку при движении слайдера истории
+    if (historySlider) {
+      historySlider.addEventListener('input', () => {
+        highlightSector(activeWheelSector, true, true);
+      });
+    }
   }
 
   // Слайдер истории
@@ -1112,6 +1120,9 @@ document.addEventListener("DOMContentLoaded", () => {
       updateSphereAverage(sphereId);
     });
     drawWheel();
+    if (activeWheelSector) {
+      highlightActiveSector(activeWheelSector);
+    }
   }
   // ===========================================================================
 
