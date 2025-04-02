@@ -5,13 +5,13 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDyzigwSvdr8neaujmOqL3arcuXLe83UVo",
-  authDomain: "mentorist-1111.firebaseapp.com",
-  projectId: "mentorist-1111",
-  storageBucket: "mentorist-1111.firebasestorage.app",
-  messagingSenderId: "73083879430",
-  appId: "1:73083879430:web:25b64c11f3cd75d80dc387",
-  measurementId: "G-RWCL6CQ31K"
+  apiKey: "AIzaSyBd7CvFe-ZQE1gebnQvY9TDzKOX-E_E4QM",
+  authDomain: "mentorist-ai.firebaseapp.com",
+  projectId: "mentorist-ai",
+  storageBucket: "mentorist-ai.firebasestorage.app",
+  messagingSenderId: "803934103485",
+  appId: "1:803934103485:web:47814d1df581a9255014d4",
+  measurementId: "G-Q7RPLCNV7B"
 };
 
 export const app = initializeApp(firebaseConfig);
