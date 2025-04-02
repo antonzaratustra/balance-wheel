@@ -257,6 +257,13 @@ function showCurrentQuestion() {
     function updateTimerSliderDescription(value) {
         if (sliderDesc) {
             sliderDesc.textContent = question.descriptions[value][currentLanguage];
+            
+            // Обновляем цвет текста в зависимости от значения слайдера
+            let val = parseInt(value, 10);
+            let fraction = val / 10;
+            let r = Math.round(255 * (1 - fraction));
+            let g = Math.round(255 * fraction);
+            sliderDesc.style.color = `rgb(${r}, ${g}, 0)`;
         }
     }
 }

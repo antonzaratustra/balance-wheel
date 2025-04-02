@@ -766,15 +766,34 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!sphere) return;
     const question = sphere.questions.find(q => q.id === questionId);
     if (!question) return;
+    
+    // Обновляем числовое значение (если есть)
+    const displayElement = document.getElementById(`value_${sphereId}_${questionId}`);
+    if (displayElement) {
+        displayElement.textContent = value;
+    }
+    
+    // Обновляем текстовое описание и его цвет
     const descElem = document.getElementById(`desc_${sphereId}_${questionId}`);
-    const dict = question.descriptions[value];
-    descElem.innerText = dict ? dict[currentLanguage] : "";
+    if (descElem) {
+        const dict = question.descriptions[value];
+        descElem.innerText = dict ? dict[currentLanguage] : "";
 
-    let val = parseInt(value, 10);
-    let fraction = val / 10;
-    let r = Math.round(255 * (1 - fraction));
-    let g = Math.round(255 * fraction);
-    descElem.style.color = `rgb(${r}, ${g}, 0)`;
+        let val = parseInt(value, 10);
+        let fraction = val / 10;
+        let r = Math.round(255 * (1 - fraction));
+        let g = Math.round(255 * fraction);
+        descElem.style.color = `rgb(${r}, ${g}, 0)`;
+    }
+    
+    // Обновляем среднее значение и колесо
+    updateSphereAverage(sphereId);
+    drawWheel();
+    
+    // Сохраняем подсветку активного сектора
+    if (activeWheelSector) {
+        highlightSector(activeWheelSector, false, true);
+    }
   }
 
   function updateSphereAverage(sphereId) {
@@ -1044,18 +1063,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Обновляем обработчик изменения слайдера
-  function updateSliderDisplay(sphereId, questionId, value) {
-    const displayElement = document.getElementById(`value_${sphereId}_${questionId}`);
-    if (displayElement) {
-        displayElement.textContent = value;
-        updateSphereAverage(sphereId);
-        drawWheel();
-        if (activeWheelSector) {
-            highlightSector(activeWheelSector, false, true); // Сохраняем подсветку активного сектора
-        }
-    }
-  }
+  // Обработчик изменения слайдера определен выше
 
   // Функция для подсветки активного сектора
   function highlightActiveSector(sphereId) {
