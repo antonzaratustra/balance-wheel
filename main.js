@@ -942,29 +942,58 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.arc(canvas.width / 2, canvas.height / 2, s.radius, s.startAngle, s.endAngle);
             ctx.closePath();
             
-            if (s.sphereId === sphereId && (isHighlighted || isActive)) {
+            // Определяем состояния сектора
+            const isCurrentActive = s.sphereId === activeWheelSector;
+            const isCurrentHighlighted = s.sphereId === sphereId && (isHighlighted || isActive);
+            const isHovered = s.sphereId === sphereId && isHighlighted;
+            
+            // Настраиваем стили в зависимости от состояния
+            ctx.fillStyle = s.sphereObj.color || "#CCC";
+            
+            if (isCurrentActive || isCurrentHighlighted) {
                 ctx.shadowColor = s.sphereObj.color || "#CCC";
                 ctx.shadowBlur = 20;
-                ctx.fillStyle = s.sphereObj.color || "#CCC";
-                ctx.globalAlpha = 0.8;
+                ctx.globalAlpha = 1.0;
+                
+                // Делаем активный сектор более насыщенным
+                if (isCurrentActive) {
+                    const color = s.sphereObj.color || "#CCC";
+                    ctx.fillStyle = color;
+                    ctx.shadowBlur = 25;
+                }
+                
+                // Если сектор и активный, и под курсором
+                if (isCurrentActive && isHovered) {
+                    ctx.shadowBlur = 30;
+                }
             } else {
+                // Неактивные сектора
                 ctx.shadowBlur = 0;
-                ctx.fillStyle = s.sphereObj.color || "#CCC";
-                ctx.globalAlpha = 0.6;
+                ctx.globalAlpha = 0.95;
+                
+                // Если курсор над неактивным сектором
+                if (isHovered) {
+                    ctx.globalAlpha = 1.0;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = s.sphereObj.color || "#CCC";
+                }
             }
             
             ctx.fill();
-            ctx.globalAlpha = 1.0;
             ctx.strokeStyle = darkMode ? "#ccc" : "#666";
             ctx.stroke();
             ctx.restore();
             
-            // Перерисовываем текст
+            // Всегда отображаем текст с полной непрозрачностью
             if (s.text) {
+                ctx.save();
+                ctx.globalAlpha = 1.0;
                 drawSectorText(s);
+                ctx.restore();
             }
         });
         
+        // Обновляем активный сектор
         if (isActive) {
             activeWheelSector = sphereId;
         }
