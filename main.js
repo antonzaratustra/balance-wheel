@@ -1335,6 +1335,9 @@ document.addEventListener("DOMContentLoaded", () => {
       updateUILanguage();
       updateTabStyles();
       drawWheel();
+      if (activeWheelSector) {
+        highlightSector(activeWheelSector, false, true);
+      }
     });
 
     // FAQ-кнопки (десктоп + мобильная)
@@ -1393,6 +1396,10 @@ document.addEventListener("DOMContentLoaded", () => {
       themeBtn.innerText = darkMode
         ? (currentLanguage === "ru" ? "🌙 Тёмная" : "🌙 Dark")
         : (currentLanguage === "ru" ? "🌞 Светлая" : "🌞 Light");
+      
+      if (activeWheelSector) {
+        highlightSector(activeWheelSector, false, true);
+      }
 
       const savePdfBtn = document.getElementById("savePDF");
       if (savePdfBtn) {
