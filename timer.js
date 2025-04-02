@@ -42,6 +42,21 @@ document.addEventListener("DOMContentLoaded", () => {
             document.addEventListener('languageChanged', (e) => {
                 if (e.detail && e.detail.language) {
                     currentLanguage = e.detail.language;
+                        // Обновляем контент в модальном окне при смене языка
+                    const timerModal = document.getElementById('timerModal');
+                    if (timerModal.classList.contains('show')) {
+                        showCurrentQuestion();
+                        // Обновляем описание слайдера с текущим значением
+                        const slider = document.getElementById('timer-slider');
+                        if (slider) {
+                            const sliderDesc = document.getElementById('timer-slider-desc');
+                            const currentSphere = spheres[currentSphereIndex];
+                            const question = currentSphere.questions[currentQuestionIndex];
+                            if (sliderDesc && question && question.descriptions[slider.value]) {
+                                sliderDesc.textContent = question.descriptions[slider.value][currentLanguage];
+                            }
+                        }
+                    }
                 }
             });
         })
@@ -255,8 +270,10 @@ function showCurrentQuestion() {
     
     // Функция для обновления описания слайдера
     function updateTimerSliderDescription(value) {
-        if (sliderDesc) {
-            sliderDesc.textContent = question.descriptions[value][currentLanguage];
+        if (sliderDesc && question && question.descriptions[value]) {
+            // Получаем актуальный язык
+            const lang = currentLanguage || 'en';
+            sliderDesc.textContent = question.descriptions[value][lang];
             
             // Обновляем цвет текста в зависимости от значения слайдера
             let val = parseInt(value, 10);
