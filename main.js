@@ -827,47 +827,63 @@ document.addEventListener("DOMContentLoaded", () => {
     const anglePerSphere = (2 * Math.PI) / spheres.length;
     let startAngle = -Math.PI / 2;
 
+    // Убедитесь, что контейнер для секторов существует
+    const sectorsContainer = document.getElementById('sectorsContainer');
+    if (!sectorsContainer) {
+        console.error("Container for sectors not found!");
+        return;
+    }
+
+    // Очищаем контейнер перед отрисовкой
+    sectorsContainer.innerHTML = '';
+
     spheres.forEach((sphere) => {
-      let sum = 0, count = 0;
-      sphere.questions.forEach((question) => {
-        const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
-        sum += parseInt(slider.value);
-        count++;
-      });
-      const avg = sum / (count || 1);
-      const fraction = avg / 10;
-      const sectorRadius = fraction * maxRadius;
+        let sum = 0, count = 0;
+        sphere.questions.forEach((question) => {
+            const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
+            sum += parseInt(slider.value);
+            count++;
+        });
+        const avg = sum / (count || 1);
+        const fraction = avg / 10;
+        const sectorRadius = fraction * maxRadius;
 
-      const endAngle = startAngle + anglePerSphere;
-      ctx.beginPath();
-      ctx.moveTo(centerX, centerY);
-      ctx.arc(centerX, centerY, sectorRadius, startAngle, endAngle);
-      ctx.closePath();
-      ctx.fillStyle = sphere.color || "#CCC";
-      ctx.fill();
-      ctx.strokeStyle = darkMode ? "#ccc" : "#666";
-      ctx.stroke();
+        const endAngle = startAngle + anglePerSphere;
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, sectorRadius, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fillStyle = sphere.color || "#CCC";
+        ctx.fill();
+        ctx.strokeStyle = darkMode ? "#ccc" : "#666";
+        ctx.stroke();
 
-      // Сохраняем геометрию сектора для tooltip
-      wheelSectors.push({
-        sphereId: sphere.id,
-        startAngle: startAngle,
-        endAngle: endAngle,
-        radius: sectorRadius,
-        sphereObj: sphere
-      });
+        // Сохраняем геометрию сектора для tooltip
+        wheelSectors.push({
+            sphereId: sphere.id,
+            startAngle: startAngle,
+            endAngle: endAngle,
+            radius: sectorRadius,
+            sphereObj: sphere
+        });
 
-      // Подпись у края сектора
-      const midAngle = startAngle + anglePerSphere / 2;
-      const labelRadius = maxRadius * 0.7;
-      const labelX = centerX + labelRadius * Math.cos(midAngle);
-      const labelY = centerY + labelRadius * Math.sin(midAngle);
-      
-      ctx.font = "16px sans-serif"; // Увеличиваем размер шрифта
-      ctx.fillStyle = darkMode ? "#fff" : "#000";
-      ctx.fillText(`${sphere.emoji || ""} ${sphere.title[currentLanguage]}`, labelX, labelY); // Добавляем эмодзи
+        // Создание элемента для сектора
+        const sectorElement = document.createElement('div');
+        sectorElement.id = "sector-" + sphere.id; // Убедитесь, что идентификатор соответствует
+        sectorElement.className = "sector"; // Добавьте нужные классы
+        sectorsContainer.appendChild(sectorElement); // Добавьте элемент в контейнер
 
-      startAngle = endAngle;
+        // Подпись у края сектора
+        const midAngle = startAngle + anglePerSphere / 2;
+        const labelRadius = maxRadius * 0.7;
+        const labelX = centerX + labelRadius * Math.cos(midAngle);
+        const labelY = centerY + labelRadius * Math.sin(midAngle);
+        
+        ctx.font = "16px sans-serif"; // Увеличиваем размер шрифта
+        ctx.fillStyle = darkMode ? "#fff" : "#000";
+        ctx.fillText(`${sphere.emoji || ""} ${sphere.title[currentLanguage]}`, labelX, labelY); // Добавляем эмодзи
+
+        startAngle = endAngle;
     });
   }
 
@@ -889,36 +905,112 @@ document.addEventListener("DOMContentLoaded", () => {
         tabContent.style.display = "block"; // Показываем содержимое вкладок
         faqContent.style.display = "none"; // Скрываем FAQ
         console.log(`Active pane shown: ${activePane.id}`); // Логирование
+        
+        // Подсвечиваем сектор при клике на вкладку
+        const sector = wheelSectors.find(s => s.sphereId === sphereId);
+        if (sector) {
+            highlightSector(sphereId, true);
+            // Убираем подсветку через небольшую задержку
+            setTimeout(() => {
+                highlightSector(sphereId, false);
+            }, 500);
+        }
     } else {
         console.error(`No active pane found for sphere: ${sphereId}`); // Логирование ошибки
     }
   }
 
-  // Обработчик события для клика на сектор
+  // Функция для подсветки сектора
+  function highlightSector(sphereId, isHighlighted) {
+    const sector = wheelSectors.find(sector => sector.sphereId === sphereId);
+    console.log(`Highlighting sector: ${sphereId}, isHighlighted: ${isHighlighted}`);
+
+    if (sector) {
+        const canvas = document.getElementById("balanceWheel");
+        const ctx = canvas.getContext("2d");
+        
+        // Сохраняем текущее состояние контекста
+        ctx.save();
+        
+        // Перерисовываем сектор с нужным цветом
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, canvas.height / 2);
+        ctx.arc(canvas.width / 2, canvas.height / 2, sector.radius, sector.startAngle, sector.endAngle);
+        ctx.closePath();
+        
+        if (isHighlighted) {
+            // Добавляем эффект свечения
+            ctx.shadowColor = sector.sphereObj.color || "#CCC";
+            ctx.shadowBlur = 20;
+            // Используем цвет сферы с повышенной яркостью
+            ctx.fillStyle = sector.sphereObj.color || "#CCC";
+            ctx.globalAlpha = 0.8; // Делаем сектор ярче
+        } else {
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = sector.sphereObj.color || "#CCC";
+            ctx.globalAlpha = 0.6; // Возвращаем обычную прозрачность
+        }
+        
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+        ctx.strokeStyle = darkMode ? "#ccc" : "#666";
+        ctx.stroke();
+        
+        // Восстанавливаем состояние контекста
+        ctx.restore();
+        
+        // Перерисовываем текст
+        if (sector.text) {
+            drawSectorText(sector);
+        }
+    } else {
+        console.error(`Sector not found for sphereId: ${sphereId}`);
+    }
+  }
+
+  // Обработчик события для наведения на сектор
   const canvas = document.getElementById("balanceWheel");
-  canvas.addEventListener('click', (e) => {
+  let highlightTimeout; // Переменная для хранения таймера
+
+  canvas.addEventListener('mousemove', (e) => {
     const hoveredSector = getSectorUnderCursor(e.clientX - canvas.getBoundingClientRect().left, e.clientY - canvas.getBoundingClientRect().top);
     if (hoveredSector) {
-        const tabButton = document.getElementById("tab-" + hoveredSector.sphereId);
-        if (tabButton) {
-            console.log(`Sector clicked: ${hoveredSector.sphereId}`); // Логирование
-            tabButton.click(); // Кликаем на вкладку
-            showTabContent(hoveredSector.sphereId); // Обновляем контент
-        } else {
-            console.error(`No tab button found for sphere: ${hoveredSector.sphereId}`); // Логирование ошибки
-        }
+        console.log(`Mouse over sector: ${hoveredSector.sphereId}`); // Логирование
+        clearTimeout(highlightTimeout); // Очистка предыдущего таймера
+        highlightSector(hoveredSector.sphereId, true); // Добавляем эффект свечения
+    } else {
+        console.log(`Mouse not over any sector`); // Логирование
+        clearTimeout(highlightTimeout); // Очистка предыдущего таймера
+        highlightTimeout = setTimeout(() => {
+            wheelSectors.forEach(sector => highlightSector(sector.sphereId, false)); // Убираем эффект свечения
+        }, 100); // Задержка перед удалением подсветки
     }
   });
 
-  // Подключаем обработчики на вкладки, чтобы при клике скрывать FAQ и показывать сферы
-  const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
-  tabLinks.forEach(tab => {
-    tab.addEventListener('click', () => {
-        const sphereId = tab.id.split('-')[1]; // Получаем ID сферы
-        console.log(`Tab clicked: ${sphereId}`); // Логирование
-        showTabContent(sphereId); // Показываем контент соответствующей сферы
-    });
+  // Обработчик события для клика на сектор
+  canvas.addEventListener('click', (e) => {
+    const hoveredSector = getSectorUnderCursor(e.clientX - canvas.getBoundingClientRect().left, e.clientY - canvas.getBoundingClientRect().top);
+    if (hoveredSector) {
+        console.log(`Clicked on sector: ${hoveredSector.sphereId}`); // Логирование
+        const tabButton = document.getElementById("tab-" + hoveredSector.sphereId);
+        if (tabButton) {
+            tabButton.click(); // Кликаем на вкладку
+            showTabContent(hoveredSector.sphereId); // Обновляем контент
+        }
+        highlightActiveSector(hoveredSector.sphereId); // Подсвечиваем активный сектор
+    } else {
+        console.log(`Clicked outside of sectors`); // Логирование
+    }
   });
+
+  // Функция для подсветки активного сектора
+  function highlightActiveSector(sphereId) {
+    console.log(`Highlighting active sector: ${sphereId}`); // Логирование
+    wheelSectors.forEach(sector => {
+        const isActive = sector.sphereId === sphereId;
+        highlightSector(sector.sphereId, isActive);
+    });
+  }
 
   // Слайдер истории
   function initializeHistorySlider() {
@@ -1369,16 +1461,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // Определяем, попал ли угол мыши в сектор
   function isAngleInArc(angle, start, end) {
     if (start <= end) {
-      return angle >= start && angle <= end;
+        return angle >= start && angle <= end;
     } else {
-      // Если дуга "переваливает" через 2π
-      return (angle >= start && angle < 2 * Math.PI) || (angle >= 0 && angle <= end);
+        // Если дуга "переваливает" через 2π
+        return (angle >= start && angle < 2 * Math.PI) || (angle >= 0 && angle <= end);
     }
   }
 
   function getSectorUnderCursor(mouseX, mouseY) {
     const canvas = document.getElementById("balanceWheel");
-    // Используем реальные размеры канваса на экране
     const canvasRect = canvas.getBoundingClientRect();
     const centerX = canvasRect.width / 2;
     const centerY = canvasRect.height / 2;
@@ -1388,22 +1479,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let angle = Math.atan2(dy, dx);
     if (angle < 0) {
-      angle += 2 * Math.PI;
+        angle += 2 * Math.PI;
     }
-    for (let sector of wheelSectors) {
-      let startAngle = sector.startAngle;
-      let endAngle = sector.endAngle;
-      // Приводим тоже к диапазону [0..2π)
-      if (startAngle < 0) startAngle += 2 * Math.PI;
-      if (endAngle < 0) endAngle += 2 * Math.PI;
 
-      // Проверяем, попадает ли угол в сектор
-      if (isAngleInArc(angle, startAngle, endAngle)) {
-        // И проверяем радиус
-        if (r <= sector.radius) {
-          return sector;
+    console.log(`Mouse Position: (${mouseX}, ${mouseY}), Angle: ${angle}, Radius: ${r}`); // Логирование
+
+    for (let sector of wheelSectors) {
+        let startAngle = sector.startAngle;
+        let endAngle = sector.endAngle;
+        if (startAngle < 0) startAngle += 2 * Math.PI;
+        if (endAngle < 0) endAngle += 2 * Math.PI;
+
+        // Проверяем, попадает ли угол в сектор
+        if (isAngleInArc(angle, startAngle, endAngle)) {
+            // И проверяем радиус
+            if (r <= sector.radius) {
+                console.log(`Sector found: ${sector.sphereId}`); // Логирование
+                // Подсвечиваем сектор при наведении
+                highlightSector(sector.sphereId, true);
+                // Добавляем обработчик для снятия подсветки при уходе курсора
+                canvas.addEventListener('mouseleave', () => {
+                    highlightSector(sector.sphereId, false);
+                }, { once: true });
+                return sector;
+            }
         }
-      }
     }
     return null;
   }

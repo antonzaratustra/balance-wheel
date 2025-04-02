@@ -136,7 +136,10 @@ body.dark-mode input[type=range]::-moz-range-track {
   transform-style: preserve-3d;
 }
 
-
+.sector-highlight {
+  box-shadow: 0 0 15px rgba(255, 255, 0, 0.8); /* Замените цвет и параметры по желанию */
+  transition: box-shadow 0.3s ease; /* Плавный переход */
+}
 
 #balanceWheel {
   background-color: transparent;
