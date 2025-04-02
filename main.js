@@ -875,13 +875,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Подпись у края сектора
         const midAngle = startAngle + anglePerSphere / 2;
-        const labelRadius = maxRadius * 0.7;
+        const labelRadius = Math.min(width, height) / 2 - 60;
         const labelX = centerX + labelRadius * Math.cos(midAngle);
         const labelY = centerY + labelRadius * Math.sin(midAngle);
         
-        ctx.font = "16px sans-serif"; // Увеличиваем размер шрифта
+        ctx.save();
+        ctx.font = "16px sans-serif";
         ctx.fillStyle = darkMode ? "#fff" : "#000";
-        ctx.fillText(`${sphere.emoji || ""} ${sphere.title[currentLanguage]}`, labelX, labelY); // Добавляем эмодзи
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(`${sphere.emoji || ""} ${sphere.title[currentLanguage]}`, labelX, labelY);
+        ctx.restore();
 
         startAngle = endAngle;
     });
