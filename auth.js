@@ -38,10 +38,10 @@ async function handleRedirectResult() {
   return null;
 }
 
-// Проверяем результат редиректа при загрузке страницы
-handleRedirectResult();
+// Результат редиректа проверяется в DOMContentLoaded
 
-async function signInWithGoogle() {
+// Экспортируем функцию для использования в main.js
+export async function signInWithGoogle() {
   try {
     const provider = new GoogleAuthProvider();
     
@@ -60,12 +60,16 @@ async function signInWithGoogle() {
       
       localStorage.setItem("uid", user.uid);
       
-      // Закрываем модальное окно после успешного входа
+      // Закрываем модальное окно после успешной авторизации
       const loginModalEl = document.getElementById("loginModal");
       if (loginModalEl) {
         const loginModal = bootstrap.Modal.getInstance(loginModalEl);
         if (loginModal) {
           loginModal.hide();
+          // Удаляем backdrop и очищаем стили
+          document.body.classList.remove('modal-open');
+          const backdrop = document.querySelector('.modal-backdrop');
+          if (backdrop) backdrop.remove();
         }
       }
       
@@ -100,44 +104,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         const loginModal = bootstrap.Modal.getInstance(loginModalEl);
         if (loginModal) {
           loginModal.hide();
+          // Удаляем backdrop и очищаем стили после закрытия
+          document.body.classList.remove('modal-open');
+          const backdrop = document.querySelector('.modal-backdrop');
+          if (backdrop) {
+            backdrop.remove();
+          }
         }
       }
     }
   } catch (error) {
     console.error("Ошибка при обработке редиректа:", error);
   }
-
-  // Находим элементы модального окна и кнопки
-  const loginBtn = document.getElementById("loginBtn");
-  const loginModalEl = document.getElementById("loginModal");
-  const loginModal = new bootstrap.Modal(loginModalEl, {
-    backdrop: "static",
-    keyboard: true
-  });
-
-  // По клику на кнопку "Login" показываем модальное окно
-  loginBtn.addEventListener("click", () => {
-    loginModalEl.addEventListener('hidden.bs.modal', () => {
-      document.body.classList.remove('modal-open');
-      const backdrop = document.querySelector('.modal-backdrop');
-      if (backdrop) {
-        backdrop.remove();
-      }
-    });
-    loginModal.show();
-  });
-
-  // Обработчик для кнопки "Войти через Google"
-  const googleSignInBtn = document.getElementById("googleSignInBtn");
-  googleSignInBtn.addEventListener("click", async () => {
-    try {
-      const user = await signInWithGoogle();
-      // Закрываем модальное окно только если это не Safari (для Safari редирект уже произошел)
-      if (user !== null) {
-        loginModal.hide();
-      }
-    } catch (error) {
-      // Ошибки уже обрабатываются в signInWithGoogle
-    }
-  });
 });

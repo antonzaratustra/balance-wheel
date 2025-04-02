@@ -30,11 +30,12 @@ import { spheres } from './js/spheres.js';
 
 // Импорт нужных методов из firebase/auth
 import {
-  GoogleAuthProvider,
-  signInWithPopup,
   signOut,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+// Импорт функции авторизации через Google
+import { signInWithGoogle } from './auth.js';
 
 import {
   saveResultToFirestore,
@@ -236,11 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const userInfoMobile = document.getElementById("userInfo-mobile"); 
 
   // Универсальная функция входа через Google
-  async function signInWithGoogle() {
-    const provider = new GoogleAuthProvider();
-    const result = await signInWithPopup(auth, provider);
-    return result.user;
-  }
+  // Функция signInWithGoogle импортирована из auth.js
 
   // Обработчик нажатия «Войти через Google» (кнопка в модалке `loginModal`)
   if (googleSignInBtn) {
@@ -293,7 +290,14 @@ document.addEventListener("DOMContentLoaded", () => {
           // Событие закрытия модального окна
           loginModalEl.addEventListener('hidden.bs.modal', () => {
               isLoginModalOpen = false;
+              document.body.classList.remove('modal-open');
+              const backdrop = document.querySelector('.modal-backdrop');
+              if (backdrop) {
+                  backdrop.remove();
+              }
           });
+
+          // Кнопка входа через Google уже имеет обработчик в auth.js
       }
   }
 
