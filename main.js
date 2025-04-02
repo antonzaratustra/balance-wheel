@@ -43,25 +43,11 @@ import {
   deleteSavedResult
 } from "./firestore-utils.js";
 
-
-
-
-
-
-
-
-
-
-
-
 document.addEventListener("DOMContentLoaded", () => {
   // Добавляем обработчик поворота устройства
   if (window.DeviceOrientationEvent) {
     window.addEventListener('deviceorientation', rotateCanvas);
   }
-  
-  
-  
   
   // Удаляем "загрузчик"
   const loader = document.getElementById("loader");
@@ -106,9 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
    ***************************************************/
   let currentLanguage = "en"; 
   let darkMode = true;       
-
-  // Глобальный массив для хранения геометрии секторов колеса
-  let wheelSectors = [];
+  let wheelSectors = []; // Глобальный массив для хранения геометрии секторов колеса
 
   // Объект для текстов кнопок (используем и для десктопа, и для мобильной версии)
   const buttonTexts = {
@@ -734,11 +718,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
     tabLinks.forEach(tab => {
       tab.addEventListener('click', () => {
-        // Когда пользователь кликает по сфере — прячем FAQ, показываем sphereTabContent
-        const faqContent = document.getElementById("faqContent");
-        const sphereTabContent = document.getElementById("sphereTabContent");
-        if (faqContent) faqContent.style.display = "none";
-        if (sphereTabContent) sphereTabContent.style.display = "block";
+        const sphereId = tab.id.split('-')[1]; // Получаем ID сферы
+        console.log(`Tab clicked: ${sphereId}`); // Логирование
+        showTabContent(sphereId); // Показываем контент соответствующей сферы
       });
 
       // Дополнительные «красивости»
@@ -845,18 +827,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const anglePerSphere = (2 * Math.PI) / spheres.length;
     let startAngle = -Math.PI / 2;
 
-    const shifts = {
-      leftShift:   { x: 45,  y: 0 },
-      rightShift:  { x: -60, y: 0 },
-      topShift:    { x: 0,   y: -10 },
-      bottomShift: { x: 0,   y: 10 }
-    };
-    const threshold = 0.2;
-
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.font = "18px sans-serif";
-
     spheres.forEach((sphere) => {
       let sum = 0, count = 0;
       sphere.questions.forEach((question) => {
@@ -889,70 +859,66 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Подпись у края сектора
       const midAngle = startAngle + anglePerSphere / 2;
-      const cosMid = Math.cos(midAngle);
-      const sinMid = Math.sin(midAngle);
-      const labelRadius = maxRadius + 10;
-      let labelX = centerX + labelRadius * cosMid;
-      let labelY = centerY + labelRadius * sinMid;
-
-      const sphereTitle = sphere.title[currentLanguage] || sphere.title["en"];
-      let text = "";
-      let shift = { x: 0, y: 0 };
-
-      // Небольшие сдвиги, чтобы текст не налезал
-      if (sphere.id === "selfImprovement" || sphere.id === "lifeBrightness") {
-        shift.x = 10;
-      }
-
-      if (sphere.id === "health") {
-        text = `${sphereTitle} ${avg.toFixed(1)} ${sphere.emoji || ""}`;
-      } else {
-        if (cosMid > threshold) {
-          shift = shifts.rightShift;
-          text = `${sphereTitle} ${avg.toFixed(1)} ${sphere.emoji || ""}`;
-        } else if (cosMid < -threshold) {
-          shift = shifts.leftShift;
-          text = `${sphere.emoji || ""} ${sphereTitle} ${avg.toFixed(1)}`;
-        } else {
-          if (sinMid > 0) {
-            shift = shifts.topShift;
-            text = `${sphere.emoji || ""} ${sphereTitle} ${avg.toFixed(1)}`;
-          } else {
-            shift = shifts.bottomShift;
-            text = `${sphere.emoji || ""} ${sphereTitle} ${avg.toFixed(1)}`;
-          }
-        }
-      }
-      labelX += shift.x;
-      labelY += shift.y;
-
-      ctx.shadowColor = darkMode ? "#000" : "#fff";
-      ctx.shadowBlur = 2;
+      const labelRadius = maxRadius * 0.7;
+      const labelX = centerX + labelRadius * Math.cos(midAngle);
+      const labelY = centerY + labelRadius * Math.sin(midAngle);
+      
+      ctx.font = "16px sans-serif"; // Увеличиваем размер шрифта
       ctx.fillStyle = darkMode ? "#fff" : "#000";
-      ctx.fillText(text, labelX, labelY);
-      ctx.shadowBlur = 0;
-
-      // Разделительная линия
-      ctx.beginPath();
-      ctx.moveTo(centerX, centerY);
-      ctx.lineTo(
-        centerX + maxRadius * Math.cos(startAngle),
-        centerY + maxRadius * Math.sin(startAngle)
-      );
-      ctx.stroke();
+      ctx.fillText(`${sphere.emoji || ""} ${sphere.title[currentLanguage]}`, labelX, labelY); // Добавляем эмодзи
 
       startAngle = endAngle;
     });
-
-    // Последняя разделительная линия
-    ctx.beginPath();
-    ctx.moveTo(centerX, centerY);
-    ctx.lineTo(
-      centerX + maxRadius * Math.cos(startAngle),
-      centerY + maxRadius * Math.sin(startAngle)
-    );
-    ctx.stroke();
   }
+
+  // Функция для отображения контента вкладки
+  function showTabContent(sphereId) {
+    console.log(`Showing content for sphere: ${sphereId}`); // Логирование
+    const tabContent = document.getElementById("sphereTabContent");
+    const activePane = document.querySelector(`#pane-${sphereId}`);
+    
+    // Скрываем все панели
+    const allPanes = document.querySelectorAll(".tab-pane");
+    allPanes.forEach(pane => {
+        pane.classList.remove("show", "active");
+    });
+
+    // Показываем активную панель
+    if (activePane) {
+        activePane.classList.add("show", "active");
+        tabContent.style.display = "block"; // Показываем содержимое вкладок
+        faqContent.style.display = "none"; // Скрываем FAQ
+        console.log(`Active pane shown: ${activePane.id}`); // Логирование
+    } else {
+        console.error(`No active pane found for sphere: ${sphereId}`); // Логирование ошибки
+    }
+  }
+
+  // Обработчик события для клика на сектор
+  const canvas = document.getElementById("balanceWheel");
+  canvas.addEventListener('click', (e) => {
+    const hoveredSector = getSectorUnderCursor(e.clientX - canvas.getBoundingClientRect().left, e.clientY - canvas.getBoundingClientRect().top);
+    if (hoveredSector) {
+        const tabButton = document.getElementById("tab-" + hoveredSector.sphereId);
+        if (tabButton) {
+            console.log(`Sector clicked: ${hoveredSector.sphereId}`); // Логирование
+            tabButton.click(); // Кликаем на вкладку
+            showTabContent(hoveredSector.sphereId); // Обновляем контент
+        } else {
+            console.error(`No tab button found for sphere: ${hoveredSector.sphereId}`); // Логирование ошибки
+        }
+    }
+  });
+
+  // Подключаем обработчики на вкладки, чтобы при клике скрывать FAQ и показывать сферы
+  const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
+  tabLinks.forEach(tab => {
+    tab.addEventListener('click', () => {
+        const sphereId = tab.id.split('-')[1]; // Получаем ID сферы
+        console.log(`Tab clicked: ${sphereId}`); // Логирование
+        showTabContent(sphereId); // Показываем контент соответствующей сферы
+    });
+  });
 
   // Слайдер истории
   function initializeHistorySlider() {
@@ -1193,8 +1159,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Изначальная инициализация
   function setupButtons() {
     const isMobile = window.innerWidth < 576;
-const themeBtn = isMobile ? document.getElementById("themeToggle") : document.getElementById("themeToggleDesktop");
-const langBtn = isMobile ? document.getElementById("langToggle") : document.getElementById("langToggleDesktop");
+    const themeBtn = isMobile ? document.getElementById("themeToggle") : document.getElementById("themeToggleDesktop");
+    const langBtn = isMobile ? document.getElementById("langToggle") : document.getElementById("langToggleDesktop");
     const faqContent = document.getElementById("faqContent");
     const sphereTabContent = document.getElementById("sphereTabContent");
 
@@ -1208,7 +1174,6 @@ const langBtn = isMobile ? document.getElementById("langToggle") : document.getE
     }
 
     if (!themeBtn || !langBtn) return;
-
 
     themeBtn.addEventListener("click", () => {
       darkMode = !darkMode;
@@ -1228,15 +1193,12 @@ const langBtn = isMobile ? document.getElementById("langToggle") : document.getE
     // Функция, которая показывает FAQ и скрывает сферы
     function handleFaqClick() {
       faqContent.classList.remove('faq-content2');
-faqContent.classList.add('faq-content2');
+      faqContent.classList.add('faq-content2');
       
-
-
-
       if (!faqContent || !sphereTabContent) return;
       faqContent.innerHTML = faqInstructions[currentLanguage];
-      sphereTabContent.style.display = "none";
-      faqContent.style.display = "block";
+      sphereTabContent.style.display = "none"; // Скрываем содержимое вкладок
+      faqContent.style.display = "block"; // Показываем FAQ
 
       // Снимаем "active" у всех вкладок, прячем pane
       const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
@@ -1329,10 +1291,15 @@ faqContent.classList.add('faq-content2');
   }
 
   // Инициализация при загрузке
-  renderTabs();
-  updateDateDisplay();
-  drawWheel();
-  setupButtons();
+  function init() {
+    renderTabs();
+    updateDateDisplay();
+    drawWheel();
+    setupButtons();
+  }
+
+  // Инициализация при загрузке
+  init();
 
   // Если на мобильном листаем вниз — скрываем вкладки, вверх — показываем
   let lastScrollTop = 0;
@@ -1346,19 +1313,6 @@ faqContent.classList.add('faq-content2');
     }
     lastScrollTop = st <= 0 ? 0 : st;
   }, false);
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   // 3D-эффект при наведении на колесо
   const canvasWrapper = document.getElementById('canvas-wrapper');
@@ -1459,28 +1413,28 @@ faqContent.classList.add('faq-content2');
    * но саму анимацию/наклон оставляем.
    */
   function rotateCanvas(e) {
-  // Обработка события deviceorientation для мобильных устройств
-  if (e.type === 'deviceorientation') {
-    const alpha = e.alpha; // Компас: 0-360
-    const beta = e.beta;   // Наклон вперед/назад: -180-180
-    const gamma = e.gamma; // Наклон влево/вправо: -90-90
+    // Обработка события deviceorientation для мобильных устройств
+    if (e.type === 'deviceorientation') {
+      const alpha = e.alpha; // Компас: 0-360
+      const beta = e.beta;   // Наклон вперед/назад: -180-180
+      const gamma = e.gamma; // Наклон влево/вправо: -90-90
 
-    // Преобразуем данные гироскопа в поворот canvas
-    const dx = gamma * 10;
-    const dy = beta * 10;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+      // Преобразуем данные гироскопа в поворот canvas
+      const dx = gamma * 10;
+      const dy = beta * 10;
+      const distance = Math.sqrt(dx * dx + dy * dy);
 
-    wheelContainer.style.transform = `
-      scale3d(1.07, 1.07, 1.07)
-      rotate3d(
-        ${dy / 100},
-        ${-dx / 100},
-        0,
-        ${Math.log(distance) * 2}deg
-      )
-    `;
-    return;
-  }
+      wheelContainer.style.transform = `
+        scale3d(1.07, 1.07, 1.07)
+        rotate3d(
+          ${dy / 100},
+          ${-dx / 100},
+          0,
+          ${Math.log(distance) * 2}deg
+        )
+      `;
+      return;
+    }
 
     // Координаты относительно центра wheelContainer
     const rect = wheelContainer.getBoundingClientRect();
