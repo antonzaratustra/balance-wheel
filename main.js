@@ -48,6 +48,17 @@ document.addEventListener("DOMContentLoaded", () => {
   if (window.DeviceOrientationEvent) {
     window.addEventListener('deviceorientation', rotateCanvas);
   }
+
+  // Добавляем обработчик для мобильной кнопки PDF
+  const savePDFMobileBtn = document.getElementById('savePDFMobile');
+  if (savePDFMobileBtn) {
+    savePDFMobileBtn.addEventListener('click', () => {
+      const savePDFBtn = document.getElementById('savePDF');
+      if (savePDFBtn) {
+        savePDFBtn.click(); // Вызываем клик на десктопной кнопке
+      }
+    });
+  }
   
   // Удаляем "загрузчик"
   const loader = document.getElementById("loader");
