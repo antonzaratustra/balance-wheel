@@ -271,9 +271,8 @@ function showCurrentQuestion() {
     // Функция для обновления описания слайдера
     function updateTimerSliderDescription(value) {
         if (sliderDesc && question && question.descriptions[value]) {
-            // Получаем актуальный язык
-            const lang = currentLanguage || 'en';
-            sliderDesc.textContent = question.descriptions[value][lang];
+            // Используем текущий язык для отображения описания
+            sliderDesc.textContent = question.descriptions[value][currentLanguage];
             
             // Обновляем цвет текста в зависимости от значения слайдера
             let val = parseInt(value, 10);

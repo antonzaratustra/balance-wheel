@@ -134,6 +134,7 @@ body.dark-mode input[type=range]::-moz-range-track {
   position: relative;
   perspective: 1000px;
   transform-style: preserve-3d;
+  cursor: pointer; /* Добавляем курсор указателя */
 }
 
 .sector-highlight {
@@ -2218,5 +2219,3 @@ body {
 .sector {
     box-shadow: none;
 }
-
-
