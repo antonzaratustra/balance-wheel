@@ -984,13 +984,19 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.stroke();
             ctx.restore();
             
-            // Всегда отображаем текст с полной непрозрачностью
-            if (s.text) {
-                ctx.save();
-                ctx.globalAlpha = 1.0;
-                drawSectorText(s);
-                ctx.restore();
-            }
+            // Отрисовываем подписи секторов
+            const midAngle = s.startAngle + (s.endAngle - s.startAngle) / 2;
+            const labelRadius = Math.min(canvas.width, canvas.height) / 2 - 60;
+            const labelX = canvas.width / 2 + labelRadius * Math.cos(midAngle);
+            const labelY = canvas.height / 2 + labelRadius * Math.sin(midAngle);
+            
+            ctx.save();
+            ctx.font = "16px sans-serif";
+            ctx.fillStyle = darkMode ? "#fff" : "#000";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(`${s.sphereObj.emoji || ""} ${s.sphereObj.title[currentLanguage]}`, labelX, labelY);
+            ctx.restore();
         });
         
         // Обновляем активный сектор
