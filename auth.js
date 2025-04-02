@@ -150,46 +150,29 @@ export async function signInWithGoogle() {
   }
 }
 
-// Функция для инициализации аутентификации
+// Инициализация аутентификации при загрузке страницы
 document.addEventListener("DOMContentLoaded", async () => {
-  // Проверяем, есть ли результат редиректа
   try {
+    // Проверяем результат редиректа
     const result = await getRedirectResult(auth);
     if (result) {
       const user = result.user;
       console.log("Пользователь вошёл после редиректа:", user);
-      
-      // Сохраняем UID пользователя
       localStorage.setItem("uid", user.uid);
-      
-      // Закрываем модальное окно, если оно открыто
-      const loginModalEl = document.getElementById("loginModal");
-      if (loginModalEl) {
-        const loginModal = bootstrap.Modal.getInstance(loginModalEl);
-        if (loginModal) {
-          loginModal.hide();
-          // Удаляем backdrop и очищаем стили после закрытия
-          document.body.classList.remove('modal-open');
-          const backdrop = document.querySelector('.modal-backdrop');
-          if (backdrop) {
-            backdrop.remove();
-          }
-        }
-      }
-      
-      // Обновляем UI для отображения состояния авторизации
-      const loginButton = document.getElementById('loginButton');
-      if (loginButton) {
-        loginButton.innerHTML = '👤 Logout';
-      }
-      
-      // Показываем кнопки сохранения и загрузки результатов
-      const saveResultButton = document.getElementById('saveResult');
-      const loadResultsButton = document.getElementById('loadResults');
-      if (saveResultButton) saveResultButton.style.display = 'inline-block';
-      if (loadResultsButton) loadResultsButton.style.display = 'inline-block';
+      updateUIForAuthenticatedUser(user);
+    }
+
+    // Проверяем текущее состояние аутентификации
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      console.log("Пользователь уже авторизован:", currentUser);
+      localStorage.setItem("uid", currentUser.uid);
+      updateUIForAuthenticatedUser(currentUser);
+    } else {
+      console.log("Пользователь не авторизован");
+      updateUIForUnauthenticatedUser();
     }
   } catch (error) {
-    console.error("Ошибка при обработке редиректа:", error);
+    console.error("Ошибка при инициализации аутентификации:", error);
   }
 });

@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // ================== БЛОК С МОДАЛЬНЫМ ОКНАМИ ==================
+  // ================== БЛОК С МОДАЛЬНЫМИ ОКНАМИ ==================
   const modalTranslations = {
     ru: {
       savedToCloud: "Успех",
@@ -557,7 +557,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateUserInfo();
     // Сохраняем подсветку активного сектора при смене языка
     if (activeWheelSector) {
-      highlightSector(activeWheelSector, true, true);
+        highlightSector(activeWheelSector, true, true);
     }
 
     // Локализация самой модалки логина
@@ -591,6 +591,27 @@ document.addEventListener("DOMContentLoaded", () => {
     // При любом изменении (логин/логаут) — обновляем кнопки и имя
     updateUILanguage();
   });
+  // ===========================================================================
+
+
+  // ======================== БЛОК С ПРОВЕРКОЙ СОСТОЯНИЯ АВТОРИЗАЦИИ ================================
+  if (typeof document.addEventListener === 'function') {
+    document.addEventListener('visibilitychange', async () => {
+      if (document.visibilityState === 'visible') {
+        try {
+          const result = await getRedirectResult(auth);
+          if (result) {
+            const user = result.user;
+            console.log("Пользователь вошёл после редиректа:", user);
+            localStorage.setItem("uid", user.uid);
+            updateUIForAuthenticatedUser(user);
+          }
+        } catch (error) {
+          console.error("Ошибка при проверке аутентификации:", error);
+        }
+      }
+    });
+  }
   // ===========================================================================
 
 
@@ -1334,6 +1355,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   // ====================== Конец сохранения JSON/PDF ==========================
 
+  // ================== БЛОК С ТАБАМИ ==================
   // Изначальная инициализация
   function setupButtons() {
     const isMobile = window.innerWidth < 576;
