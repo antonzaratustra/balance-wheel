@@ -575,21 +575,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // ======================== onAuthStateChanged ================================
-  onAuthStateChanged(auth, (user) => {
+  auth.onAuthStateChanged((user) => {
     if (user) {
-      console.log("Пользователь авторизован:", user.uid);
-      // Инициализируем слайдер истории (если есть >1 результат)
-      initializeHistorySlider();
+      console.log("Пользователь авторизован:", user);
+      updateLoginButtons();
+      updateSaveButtons();
+      updateUserInfo();
     } else {
       console.log("Пользователь не авторизован");
-      // Скрываем слайдер истории
-      const historySliderContainer = document.getElementById("historySliderContainer");
-      if (historySliderContainer) {
-        historySliderContainer.classList.add("d-none");
-      }
+      updateLoginButtons();
+      updateSaveButtons();
     }
-    // При любом изменении (логин/логаут) — обновляем кнопки и имя
-    updateUILanguage();
   });
   // ===========================================================================
 
