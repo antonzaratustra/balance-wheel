@@ -540,6 +540,10 @@ document.addEventListener("DOMContentLoaded", () => {
     updateSaveButtons();
     // Имя пользователя
     updateUserInfo();
+    // Сохраняем подсветку активного сектора при смене языка
+    if (activeWheelSector) {
+      highlightSector(activeWheelSector, true, true);
+    }
 
     // Локализация самой модалки логина
     const loginModalLabel = document.getElementById("loginModalLabel");
@@ -1353,6 +1357,12 @@ document.addEventListener("DOMContentLoaded", () => {
       faqContent.innerHTML = faqInstructions[currentLanguage];
       sphereTabContent.style.display = "none"; // Скрываем содержимое вкладок
       faqContent.style.display = "block"; // Показываем FAQ
+      
+      // Сбрасываем подсветку активного сектора и перерисовываем колесо
+      if (activeWheelSector) {
+        activeWheelSector = null;
+        drawWheel(); // Полная перерисовка колеса для удаления подсветки
+      }
 
       // Снимаем "active" у всех вкладок, прячем pane
       const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
