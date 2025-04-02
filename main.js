@@ -913,11 +913,9 @@ document.addEventListener("DOMContentLoaded", () => {
         // Подсвечиваем сектор при клике на вкладку
         const sector = wheelSectors.find(s => s.sphereId === sphereId);
         if (sector) {
-            highlightSector(sphereId, true);
-            // Убираем подсветку через небольшую задержку
-            setTimeout(() => {
-                highlightSector(sphereId, false);
-            }, 500);
+            // Устанавливаем новый активный сектор и подсвечиваем его
+            activeWheelSector = sphereId;
+            highlightSector(sphereId, true, true);
         }
     } else {
         console.error(`No active pane found for sphere: ${sphereId}`); // Логирование ошибки
@@ -948,39 +946,18 @@ document.addEventListener("DOMContentLoaded", () => {
             
             // Определяем состояния сектора
             const isCurrentActive = s.sphereId === activeWheelSector;
-            const isCurrentHighlighted = s.sphereId === sphereId && (isHighlighted || isActive);
-            const isHovered = s.sphereId === sphereId && isHighlighted;
             
             // Настраиваем стили в зависимости от состояния
             ctx.fillStyle = s.sphereObj.color || "#CCC";
+            ctx.globalAlpha = 0.95;
+            ctx.shadowBlur = 0;
             
-            if (isCurrentActive || isCurrentHighlighted) {
+            // Если это активный сектор или сектор, который нужно подсветить
+            if (isCurrentActive || (s.sphereId === sphereId && (isHighlighted || isActive))) {
                 ctx.shadowColor = s.sphereObj.color || "#CCC";
-                ctx.shadowBlur = 20;
+                ctx.shadowBlur = 30;
                 ctx.globalAlpha = 1.0;
-                
-                // Делаем активный сектор более насыщенным
-                if (isCurrentActive) {
-                    const color = s.sphereObj.color || "#CCC";
-                    ctx.fillStyle = color;
-                    ctx.shadowBlur = 25;
-                }
-                
-                // Если сектор и активный, и под курсором
-                if (isCurrentActive && isHovered) {
-                    ctx.shadowBlur = 30;
-                }
-            } else {
-                // Неактивные сектора
-                ctx.shadowBlur = 0;
-                ctx.globalAlpha = 0.95;
-                
-                // Если курсор над неактивным сектором
-                if (isHovered) {
-                    ctx.globalAlpha = 1.0;
-                    ctx.shadowBlur = 15;
-                    ctx.shadowColor = s.sphereObj.color || "#CCC";
-                }
+                ctx.fillStyle = s.sphereObj.color || "#CCC";
             }
             
             ctx.fill();
@@ -1021,7 +998,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (hoveredSector) {
         console.log(`Mouse over sector: ${hoveredSector.sphereId}`); // Логирование
         clearTimeout(highlightTimeout); // Очистка предыдущего таймера
-        highlightSector(hoveredSector.sphereId, true, hoveredSector.sphereId === activeWheelSector); // Добавляем эффект свечения
+        // Если сектор не активный, добавляем эффект свечения
+        if (hoveredSector.sphereId !== activeWheelSector) {
+            highlightSector(hoveredSector.sphereId, true, false);
+        }
     }
   });
 
@@ -1045,7 +1025,9 @@ document.addEventListener("DOMContentLoaded", () => {
             tabButton.click(); // Кликаем на вкладку
             showTabContent(hoveredSector.sphereId); // Обновляем контент
         }
-        highlightSector(hoveredSector.sphereId, false, true); // Устанавливаем сектор как активный
+        // Устанавливаем новый активный сектор и подсвечиваем его
+        activeWheelSector = hoveredSector.sphereId;
+        highlightSector(hoveredSector.sphereId, true, true);
     } else {
         console.log(`Clicked outside of sectors`); // Логирование
         if (activeWheelSector) {
@@ -1070,10 +1052,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // Функция для подсветки активного сектора
   function highlightActiveSector(sphereId) {
     console.log(`Highlighting active sector: ${sphereId}`); // Логирование
-    wheelSectors.forEach(sector => {
-        const isActive = sector.sphereId === sphereId;
-        highlightSector(sector.sphereId, isActive);
-    });
+    // Устанавливаем новый активный сектор
+    activeWheelSector = sphereId;
+    // Подсвечиваем активный сектор
+    highlightSector(sphereId, true, true);
   }
 
   // Слайдер истории
