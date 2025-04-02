@@ -26,6 +26,20 @@ async function handleRedirectResult() {
       const user = result.user;
       console.log("Пользователь вошёл после редиректа:", user);
       localStorage.setItem("uid", user.uid);
+      
+      // Закрываем модальное окно после успешной авторизации
+      const loginModalEl = document.getElementById("loginModal");
+      if (loginModalEl) {
+        const loginModal = bootstrap.Modal.getInstance(loginModalEl);
+        if (loginModal) {
+          loginModal.hide();
+          // Удаляем backdrop и очищаем стили
+          document.body.classList.remove('modal-open');
+          const backdrop = document.querySelector('.modal-backdrop');
+          if (backdrop) backdrop.remove();
+        }
+      }
+      
       return user;
     }
   } catch (error) {
@@ -87,11 +101,10 @@ export async function signInWithGoogle() {
 
 // Функция для инициализации аутентификации
 document.addEventListener("DOMContentLoaded", async () => {
-  // Проверяем, есть ли результат редиректа (для Safari)
+  // Проверяем, есть ли результат редиректа
   try {
     const result = await getRedirectResult(auth);
     if (result) {
-      // Пользователь вернулся после редиректа в Safari
       const user = result.user;
       console.log("Пользователь вошёл после редиректа:", user);
       
@@ -112,6 +125,18 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
         }
       }
+      
+      // Обновляем UI для отображения состояния авторизации
+      const loginButton = document.getElementById('loginButton');
+      if (loginButton) {
+        loginButton.innerHTML = '👤 Logout';
+      }
+      
+      // Показываем кнопки сохранения и загрузки результатов
+      const saveResultButton = document.getElementById('saveResult');
+      const loadResultsButton = document.getElementById('loadResults');
+      if (saveResultButton) saveResultButton.style.display = 'inline-block';
+      if (loadResultsButton) loadResultsButton.style.display = 'inline-block';
     }
   } catch (error) {
     console.error("Ошибка при обработке редиректа:", error);
