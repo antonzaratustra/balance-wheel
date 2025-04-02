@@ -27,6 +27,7 @@ const faqInstructions = {
 import { auth } from "./firebase-init.js";
 import { DejaVuSansTTF } from './fonts.js';
 import { spheres } from './js/spheres.js';
+import { initFloatingTooltip } from './js/floating-tooltip.js';
 
 // Импорт нужных методов из firebase/auth
 import {
@@ -104,7 +105,9 @@ document.addEventListener("DOMContentLoaded", () => {
    ***************************************************/
   let currentLanguage = "en"; 
   let darkMode = true;       
-  let wheelSectors = []; // Глобальный массив для хранения геометрии секторов колеса
+  // Делаем переменную доступной глобально для модуля floating-tooltip.js
+  window.wheelSectors = [];
+  let wheelSectors = window.wheelSectors; // Глобальный массив для хранения геометрии секторов колеса
 
   // Объект для текстов кнопок (используем и для десктопа, и для мобильной версии)
   const buttonTexts = {
@@ -1514,6 +1517,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Инициализация при загрузке
   init();
+  
+  // Инициализация плавающей подсказки
+  initFloatingTooltip();
+  
+  // Устанавливаем текущий язык для модуля подсказок
+  window.currentLanguage = currentLanguage;
 
   // Если на мобильном листаем вниз — скрываем вкладки, вверх — показываем
   let lastScrollTop = 0;
@@ -1590,7 +1599,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function getSectorUnderCursor(mouseX, mouseY) {
+  // Делаем функцию доступной глобально для модуля floating-tooltip.js
+window.getSectorUnderCursor = function(mouseX, mouseY) {
     const canvas = document.getElementById("balanceWheel");
     const canvasRect = canvas.getBoundingClientRect();
     const centerX = canvasRect.width / 2;
@@ -1628,7 +1638,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
     return null;
-  }
+}
 
   /**
    * 3D-поворот колеса — игнорируем его для tooltip,
@@ -1726,6 +1736,9 @@ document.addEventListener("DOMContentLoaded", () => {
       )
     `;
 
+    // Получаем размеры контейнера
+    const rect = wheelContainer.getBoundingClientRect();
+    
     // Adjust glow effect based on orientation
     const leftX = (rotateY + 1) * rect.width / 2;
     const topY = (rotateX + 1) * rect.height / 2;
