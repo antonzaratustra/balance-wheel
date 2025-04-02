@@ -1289,6 +1289,8 @@ body.dark-mode #historyDateDisplay {
   border-radius: 2px;
 }
 
+
+
 /* Стили для tooltip */
 #canvasTooltip {
   position: absolute;
@@ -1302,6 +1304,15 @@ body.dark-mode #historyDateDisplay {
   line-height: 1.2em;
   z-index: 99999;
 }
+
+@media (max-width: 768px) {
+  #canvasTooltip {
+    display: none !important;
+  }
+}
+
+
+
 
 
 
