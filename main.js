@@ -224,12 +224,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const userInfo = document.getElementById("userInfo"); 
   const userInfoMobile = document.getElementById("userInfo-mobile"); 
 
-  // // Универсальная функция входа через Google
-  // async function signInWithGoogle() {
-  //   const provider = new GoogleAuthProvider();
-  //   const result = await signInWithPopup(auth, provider);
-  //   return result.user;
-  // }
+  // Универсальная функция входа через Google
+  async function signInWithGoogle() {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    return result.user;
+  }
 
   // Обработчик нажатия «Войти через Google» (кнопка в модалке `loginModal`)
   if (googleSignInBtn) {

@@ -1,0 +1,36 @@
+<!-- Модальное окно для таймера -->
+<div class="modal fade" id="timerModal" tabindex="-1" aria-labelledby="timerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="timerModalLabel"><span id="timer-sphere-emoji"></span> <span id="timer-sphere-title"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">❌</button>
+      </div>
+      <div class="modal-body">
+        <!-- Вопрос и слайдер -->
+        <div id="timer-question-container">
+          <h6 id="timer-question-title"></h6>
+          <div class="slider-wrapper">
+            <div class="range-container">
+              <input type="range" class="form-range slider-control" id="timer-slider" min="0" max="10" value="5">
+            </div>
+            <div class="form-text slider-desc" id="timer-slider-desc"></div>
+          </div>
+        </div>
+        
+        <!-- Полоска таймера -->
+        <div class="timer-progress-container mt-4">
+          <div class="timer-progress-bar" id="timer-progress-bar"></div>
+        </div>
+        
+        <!-- Обратный отсчет -->
+        <div class="total-timer-container mt-3 text-center">
+          <div id="total-timer-display">10:00</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Контейнер для анимации взрыва эмодзи -->
+<div id="emoji-explosion" class="emoji-explosion"></div>
