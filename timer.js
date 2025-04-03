@@ -11,7 +11,6 @@ let currentSphereIndex = 0;
 let currentQuestionIndex = 0;
 let totalTimeLeft = 10 * 60; // 10 минут в секундах
 let questionTimeLeft = 15; // 15 секунд на вопрос
-let currentLanguage = 'en'; // Язык по умолчанию
 
 // Функция для получения текущего языка из main.js
 function getCurrentLanguage() {
@@ -19,7 +18,7 @@ function getCurrentLanguage() {
     if (window.currentLanguage) {
         return window.currentLanguage;
     }
-    return currentLanguage; // Возвращаем локальную переменную, если глобальная недоступна
+    return 'en'; // Возвращаем английский язык по умолчанию, если глобальная переменная недоступна
 }
 
 // Инициализация таймера
@@ -42,24 +41,25 @@ document.addEventListener("DOMContentLoaded", () => {
             // Инициализируем кнопку таймера в центре колеса
             initTimerButton();
             
-            // Получаем текущий язык из main.js
-            if (window.currentLanguage) {
-                currentLanguage = window.currentLanguage;
-            }
-            
             // Добавляем слушатель события изменения языка
             document.addEventListener('languageChanged', (e) => {
                 if (e.detail && e.detail.language) {
-                    currentLanguage = e.detail.language;
-                    
                     // Обновляем заголовок кнопки таймера
                     const timerButton = document.getElementById('timer-button');
                     if (timerButton) {
-                        timerButton.title = currentLanguage === 'ru' ? 'Запустить таймер' : 'Start timer';
+                        timerButton.title = e.detail.language === 'ru' ? 'Запустить таймер' : 'Start timer';
+                    }
+                    
+                    // Обновляем атрибут aria-label кнопки закрытия в модальном окне
+                    const timerModal = document.getElementById('timerModal');
+                    if (timerModal) {
+                        const closeButton = timerModal.querySelector('.btn-close');
+                        if (closeButton) {
+                            closeButton.setAttribute('aria-label', e.detail.language === 'ru' ? 'Закрыть' : 'Close');
+                        }
                     }
                     
                     // Обновляем контент в модальном окне при смене языка
-                    const timerModal = document.getElementById('timerModal');
                     if (timerModal && timerModal.classList.contains('show')) {
                         showCurrentQuestion();
                         // Обновляем описание слайдера с текущим значением
@@ -69,10 +69,13 @@ document.addEventListener("DOMContentLoaded", () => {
                             const currentSphere = spheres[currentSphereIndex];
                             const question = currentSphere.questions[currentQuestionIndex];
                             if (sliderDesc && question && question.descriptions[slider.value]) {
-                                sliderDesc.textContent = question.descriptions[slider.value][currentLanguage];
+                                sliderDesc.textContent = question.descriptions[slider.value][window.currentLanguage] || question.descriptions[slider.value]['en'];
                             }
                         }
                     }
+                    
+                    // Обновляем глобальную переменную языка
+                    window.currentLanguage = e.detail.language;
                 }
             });
         })
@@ -84,7 +87,7 @@ function initTimerButton() {
     const canvasWrapper = document.getElementById('balanceWheelContainer');
     
     // Получаем актуальный язык
-    currentLanguage = getCurrentLanguage();
+    const currentLanguage = getCurrentLanguage();
     
     // Создаем кнопку с эмодзи часов
     const timerButton = document.createElement('button');
@@ -104,26 +107,39 @@ function openTimerModal() {
     // Сбрасываем индексы и таймеры
     resetTimers();
     
-    // Получаем актуальный язык перед открытием модального окна
-    currentLanguage = getCurrentLanguage();
+    // Получаем актуальный язык
+    const language = window.currentLanguage || 'en';
     
-    // Получаем модальное окно
+    // Инициализируем модальное окно
     const timerModal = document.getElementById('timerModal');
-    const modal = new bootstrap.Modal(timerModal);
-    
-    // Показываем первый вопрос
-    showCurrentQuestion();
-    
-    // Запускаем таймеры
-    startTimers();
-    
-    // Открываем модальное окно
-    modal.show();
-    
-    // Добавляем обработчик закрытия модального окна
-    timerModal.addEventListener('hidden.bs.modal', () => {
-        resetTimers();
-    }, { once: true });
+    if (timerModal) {
+        // Обновляем заголовок кнопки таймера
+        const timerButton = document.getElementById('timer-button');
+        if (timerButton) {
+            timerButton.title = language === 'ru' ? 'Запустить таймер' : 'Start timer';
+        }
+        
+        // Обновляем атрибут aria-label кнопки закрытия
+        const closeButton = timerModal.querySelector('.btn-close');
+        if (closeButton) {
+            closeButton.setAttribute('aria-label', language === 'ru' ? 'Закрыть' : 'Close');
+        }
+        
+        // Показываем модальное окно
+        const modal = new bootstrap.Modal(timerModal);
+        modal.show();
+        
+        // Показываем первый вопрос
+        showCurrentQuestion();
+        
+        // Запускаем таймеры
+        startTimers();
+        
+        // Добавляем обработчик закрытия модального окна
+        timerModal.addEventListener('hidden.bs.modal', () => {
+            resetTimers();
+        }, { once: true });
+    }
 }
 
 // Функция для сброса таймеров
@@ -245,13 +261,16 @@ function showCurrentQuestion() {
     const sphere = spheres[currentSphereIndex];
     const question = sphere.questions[currentQuestionIndex];
     
+    // Получаем актуальный язык
+    const language = window.currentLanguage || 'en';
+    
     // Обновляем заголовок модального окна
     const sphereEmoji = document.getElementById('timer-sphere-emoji');
     const sphereTitle = document.getElementById('timer-sphere-title');
     
     if (sphereEmoji && sphereTitle) {
         sphereEmoji.textContent = sphere.emoji;
-        sphereTitle.textContent = sphere.title[currentLanguage];
+        sphereTitle.textContent = sphere.title[language] || sphere.title['en'];
     }
     
     // Обновляем вопрос и слайдер
@@ -260,7 +279,7 @@ function showCurrentQuestion() {
     const sliderDesc = document.getElementById('timer-slider-desc');
     
     if (questionTitle && slider && sliderDesc) {
-        questionTitle.textContent = question.title[currentLanguage];
+        questionTitle.textContent = question.title[language] || question.title['en'];
         
         // Устанавливаем цвет слайдера
         slider.style.setProperty('--slider-thumb-color', sphere.color);
@@ -270,7 +289,7 @@ function showCurrentQuestion() {
         if (mainSlider) {
             slider.value = mainSlider.value;
         } else {
-            slider.value = 5; // Значение по умолчанию
+            slider.value = 5;
         }
         
         // Обновляем описание слайдера
@@ -284,25 +303,28 @@ function showCurrentQuestion() {
             const mainSlider = document.getElementById(`slider_${sphere.id}_${question.id}`);
             if (mainSlider) {
                 mainSlider.value = this.value;
-                // Вызываем функцию обновления основного слайдера
                 updateSliderDisplay(sphere.id, question.id, this.value);
             }
         };
     }
+}
+
+// Функция для обновления описания слайдера
+function updateTimerSliderDescription(value) {
+    const sliderDesc = document.getElementById('timer-slider-desc');
+    const currentSphere = spheres[currentSphereIndex];
+    const question = currentSphere.questions[currentQuestionIndex];
+    const language = window.currentLanguage || 'en';
     
-    // Функция для обновления описания слайдера
-    function updateTimerSliderDescription(value) {
-        if (sliderDesc && question && question.descriptions[value]) {
-            // Используем текущий язык для отображения описания
-            sliderDesc.textContent = question.descriptions[value][currentLanguage];
-            
-            // Обновляем цвет текста в зависимости от значения слайдера
-            let val = parseInt(value, 10);
-            let fraction = val / 10;
-            let r = Math.round(255 * (1 - fraction));
-            let g = Math.round(255 * fraction);
-            sliderDesc.style.color = `rgb(${r}, ${g}, 0)`;
-        }
+    if (sliderDesc && question && question.descriptions[value]) {
+        sliderDesc.textContent = question.descriptions[value][language] || question.descriptions[value]['en'];
+        
+        // Обновляем цвет текста в зависимости от значения слайдера
+        let val = parseInt(value, 10);
+        let fraction = val / 10;
+        let r = Math.round(255 * (1 - fraction));
+        let g = Math.round(255 * fraction);
+        sliderDesc.style.color = `rgb(${r}, ${g}, 0)`;
     }
 }
 

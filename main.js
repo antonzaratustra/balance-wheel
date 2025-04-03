@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /***************************************************
    * 1. ПАРАМЕТРЫ ПО УМОЛЧАНИЮ: ТЁМНАЯ ТЕМА + АНГЛИЙСКИЙ
    ***************************************************/
-  let currentLanguage = "en"; 
+  window.currentLanguage = "en"; 
   let darkMode = true;       
   // Делаем переменную доступной глобально для модуля floating-tooltip.js
   window.wheelSectors = [];
@@ -566,6 +566,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Локализация самой модалки логина
     const loginModalLabel = document.getElementById("loginModalLabel");
     const modalBodyText = document.querySelector("#loginModal .modal-body p");
+    window.currentLanguage = currentLanguage; // Обновляем значение в window.currentLanguage
     if (currentLanguage === "ru") {
       if (loginModalLabel) loginModalLabel.innerText = "Вход";
       if (modalBodyText) modalBodyText.innerText = "Войдите с помощью:";
