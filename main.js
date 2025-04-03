@@ -909,16 +909,19 @@ document.addEventListener("DOMContentLoaded", () => {
     // Очищаем контейнер перед отрисовкой
     sectorsContainer.innerHTML = '';
 
-    spheres.forEach((sphere) => {
+    // Рисуем градации прозрачности
+    for (let i = 1; i <= 10; i++) {
+      const alpha = 1 - (i * 0.1);
+      spheres.forEach((sphere) => {
         let sum = 0, count = 0;
         sphere.questions.forEach((question) => {
-            const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
-            sum += parseInt(slider.value);
-            count++;
+          const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
+          sum += parseInt(slider.value);
+          count++;
         });
         const avg = sum / (count || 1);
         const fraction = avg / 10;
-        const sectorRadius = fraction * maxRadius;
+        const sectorRadius = fraction * maxRadius * (i / 10);
 
         const endAngle = startAngle + anglePerSphere;
         ctx.beginPath();
@@ -926,41 +929,108 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.arc(centerX, centerY, sectorRadius, startAngle, endAngle);
         ctx.closePath();
         ctx.fillStyle = sphere.color || "#CCC";
+        ctx.globalAlpha = alpha;
         ctx.fill();
-        ctx.strokeStyle = darkMode ? "#ccc" : "#666";
         ctx.stroke();
 
-        // Сохраняем геометрию сектора для tooltip
-        wheelSectors.push({
-            sphereId: sphere.id,
-            startAngle: startAngle,
-            endAngle: endAngle,
-            radius: sectorRadius,
-            sphereObj: sphere
-        });
-
-        // Создание элемента для сектора
-        const sectorElement = document.createElement('div');
-        sectorElement.id = "sector-" + sphere.id; // Убедитесь, что идентификатор соответствует
-        sectorElement.className = "sector"; // Добавьте нужные классы
-        sectorsContainer.appendChild(sectorElement); // Добавьте элемент в контейнер
-
-        // Подпись у края сектора
-        const midAngle = startAngle + anglePerSphere / 2;
-        const labelRadius = Math.min(width, height) / 2 - 80; // Исправляем на -80 для согласованности с highlightSector
-        const labelX = centerX + labelRadius * Math.cos(midAngle);
-        const labelY = centerY + labelRadius * Math.sin(midAngle);
-        
-        ctx.save();
-        ctx.font = "16px sans-serif";
-        ctx.fillStyle = darkMode ? "#fff" : "#000";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(`${sphere.emoji || ""} ${sphere.title[currentLanguage]}`, labelX, labelY);
-        ctx.restore();
-
         startAngle = endAngle;
+      });
+      startAngle = -Math.PI / 2; // Сбрасываем для следующей итерации
+    }
+
+    // Рисуем текущие заполненные сектора поверх градаций
+    spheres.forEach((sphere) => {
+      let sum = 0, count = 0;
+      sphere.questions.forEach((question) => {
+        const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
+        sum += parseInt(slider.value);
+        count++;
+      });
+      const avg = sum / (count || 1);
+      const fraction = avg / 10;
+      const sectorRadius = fraction * maxRadius;
+
+      const endAngle = startAngle + anglePerSphere;
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, sectorRadius, startAngle, endAngle);
+      ctx.closePath();
+      ctx.fillStyle = sphere.color || "#CCC";
+      ctx.globalAlpha = 1;
+      ctx.fill();
+      ctx.strokeStyle = darkMode ? "#ccc" : "#666";
+      ctx.stroke();
+
+      // Сохраняем геометрию сектора для tooltip
+      wheelSectors.push({
+          sphereId: sphere.id,
+          startAngle: startAngle,
+          endAngle: endAngle,
+          radius: sectorRadius,
+          sphereObj: sphere
+      });
+
+      // Создание элемента для сектора
+      const sectorElement = document.createElement('div');
+      sectorElement.id = "sector-" + sphere.id;
+      sectorElement.className = "sector";
+      sectorsContainer.appendChild(sectorElement);
+
+      // Подпись у края сектора
+      const midAngle = startAngle + anglePerSphere / 2;
+      const labelRadius = Math.min(width, height) / 2 - 80;
+      const labelX = centerX + labelRadius * Math.cos(midAngle);
+      const labelY = centerY + labelRadius * Math.sin(midAngle);
+      
+      ctx.save();
+      ctx.font = "16px sans-serif";
+      ctx.fillStyle = darkMode ? "#fff" : "#000";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(`${sphere.emoji || ""} ${sphere.title[currentLanguage]}`, labelX, labelY);
+      ctx.restore();
+
+      startAngle = endAngle;
     });
+
+    // Рисуем розу ветров поверх всех секторов
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.strokeStyle = darkMode ? "#fff" : "#000";
+  
+    // Основные линии розы ветров
+    for (let i = 1; i <= 10; i++) {
+      const radius = maxRadius * (i / 10);
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      ctx.stroke();
+    }
+
+    // Числа средних значений
+    spheres.forEach((sphere, index) => {
+      const midAngle = index * anglePerSphere + anglePerSphere / 2;
+      const radius = maxRadius * 0.8; // 80% радиуса
+      const x = centerX + radius * Math.cos(midAngle);
+      const y = centerY + radius * Math.sin(midAngle);
+
+      let sum = 0, count = 0;
+      sphere.questions.forEach((question) => {
+        const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
+        sum += parseInt(slider.value);
+        count++;
+      });
+      const avg = Math.round(sum / (count || 1));
+
+      ctx.save();
+      ctx.font = "14px sans-serif";
+      ctx.fillStyle = darkMode ? "#fff" : "#000";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(avg, x, y);
+      ctx.restore();
+    });
+
+    ctx.restore();
   }
 
   // Функция для отображения контента вкладки
