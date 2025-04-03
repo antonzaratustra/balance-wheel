@@ -49,7 +49,7 @@ export const tooltips = {
       "Составляю список способов увеличить доход",
       "Планирую 30 минут на финансовое планирование"
     ],
-    self_development: [
+    selfImprovement: [
       "Читаю 15 минут полезной литературы",
       "Записываю 3 цели для саморазвития",
       "Планирую 15 минут на медитацию",
@@ -61,7 +61,7 @@ export const tooltips = {
       "Создаю список целей для развития",
       "Планирую 15 минут на саморефлексию"
     ],
-    life_brightness: [
+    lifeBrightness: [
       "Записываю 3 позитивных момента дня",
       "Создаю список вещей, которые меня радуют",
       "Планирую 15 минут на хобби",
@@ -147,7 +147,7 @@ export const tooltips = {
       "Making a list of ways to increase income",
       "Planning 30 minutes for financial planning"
     ],
-    self_development: [
+    selfImprovement: [
       "Reading 15 minutes of useful literature",
       "Writing down 3 goals for self-development",
       "Planning 15 minutes for meditation",
@@ -159,7 +159,7 @@ export const tooltips = {
       "Making a list of development goals",
       "Planning 15 minutes for self-reflection"
     ],
-    life_brightness: [
+    lifeBrightness: [
       "Writing down 3 positive moments of the day",
       "Making a list of things that make me happy",
       "Planning 15 minutes for a hobby",
