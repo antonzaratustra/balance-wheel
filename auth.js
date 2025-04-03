@@ -12,6 +12,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.log("Пользователь вошёл после редиректа:", user);
       localStorage.setItem("uid", user.uid);
       updateUIForAuthenticatedUser(user);
+      
+      // Закрываем модальное окно после успешной авторизации
+      const loginModalEl = document.getElementById("loginModal");
+      if (loginModalEl) {
+        const loginModal = bootstrap.Modal.getInstance(loginModalEl);
+        if (loginModal) {
+          loginModal.hide();
+          document.body.classList.remove('modal-open');
+          const backdrop = document.querySelector('.modal-backdrop');
+          if (backdrop) backdrop.remove();
+        }
+      }
     }
 
     // Проверяем текущее состояние аутентификации
@@ -40,6 +52,23 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   } catch (error) {
     console.error("Ошибка при инициализации аутентификации:", error);
+    
+    // Очищаем UI при ошибке
+    const loginModalEl = document.getElementById("loginModal");
+    if (loginModalEl) {
+      const loginModal = bootstrap.Modal.getInstance(loginModalEl);
+      if (loginModal) {
+        loginModal.hide();
+        document.body.classList.remove('modal-open');
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) backdrop.remove();
+      }
+    }
+    
+    // Показываем ошибку пользователю
+    if (error.code !== "auth/cancelled-popup-request") {
+      alert("Ошибка входа: " + error.message);
+    }
   }
 });
 
@@ -51,6 +80,17 @@ export async function signInWithGoogle() {
     // Используем signInWithRedirect для мобильных устройств
     if (isMobileDevice()) {
       console.log("Начинаем редирект для мобильного устройства");
+      // Очищаем UI перед редиректом
+      const loginModalEl = document.getElementById("loginModal");
+      if (loginModalEl) {
+        const loginModal = bootstrap.Modal.getInstance(loginModalEl);
+        if (loginModal) {
+          loginModal.hide();
+          document.body.classList.remove('modal-open');
+          const backdrop = document.querySelector('.modal-backdrop');
+          if (backdrop) backdrop.remove();
+        }
+      }
       await signInWithRedirect(auth, provider);
       // Результат редиректа будет обработан в обработчике DOMContentLoaded
       return null;
