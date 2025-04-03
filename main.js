@@ -1387,7 +1387,7 @@ document.addEventListener("DOMContentLoaded", () => {
       updateTabStyles();
       drawWheel();
       if (activeWheelSector) {
-        highlightSector(activeWheelSector, false, true);
+        highlightSector(activeWheelSector, true, true);
       }
     });
 
@@ -1460,7 +1460,7 @@ document.addEventListener("DOMContentLoaded", () => {
         : (currentLanguage === "ru" ? "🌞 Светлая" : "🌞 Light");
       
       if (activeWheelSector) {
-        highlightSector(activeWheelSector, false, true);
+        highlightSector(activeWheelSector, true, true);
       }
 
       const savePdfBtn = document.getElementById("savePDF");
@@ -1488,6 +1488,11 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       updateTabStyles();
       drawWheel();
+      
+      // Восстанавливаем подсветку активного сектора после перерисовки колеса
+      if (activeWheelSector) {
+        highlightSector(activeWheelSector, true, true);
+      }
 
       // Если до переключения языка FAQ был открыт — оставим его открытым
       if (faqIsOpen) {
