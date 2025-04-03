@@ -1,6 +1,6 @@
 // main.js
 import { auth } from "./firebase-init.js";
-import { GoogleAuthProvider, signInWithPopup, getRedirectResult } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+import { GoogleAuthProvider, signInWithPopup, getRedirectResult, signInWithRedirect } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
 // Функция для инициализации аутентификации
 document.addEventListener("DOMContentLoaded", async () => {
@@ -48,26 +48,34 @@ export async function signInWithGoogle() {
   try {
     const provider = new GoogleAuthProvider();
     
-    // Используем signInWithPopup для всех устройств
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-    
-    console.log("Пользователь вошёл:", user);
-    localStorage.setItem("uid", user.uid);
-    
-    // Закрываем модальное окно после успешной авторизации
-    const loginModalEl = document.getElementById("loginModal");
-    if (loginModalEl) {
-      const loginModal = bootstrap.Modal.getInstance(loginModalEl);
-      if (loginModal) {
-        loginModal.hide();
-        document.body.classList.remove('modal-open');
-        const backdrop = document.querySelector('.modal-backdrop');
-        if (backdrop) backdrop.remove();
+    // Используем signInWithRedirect для мобильных устройств
+    if (isMobileDevice()) {
+      console.log("Начинаем редирект для мобильного устройства");
+      await signInWithRedirect(auth, provider);
+      // Результат редиректа будет обработан в обработчике DOMContentLoaded
+      return null;
+    } else {
+      // Для десктопа используем signInWithPopup
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      
+      console.log("Пользователь вошёл:", user);
+      localStorage.setItem("uid", user.uid);
+      
+      // Закрываем модальное окно после успешной авторизации
+      const loginModalEl = document.getElementById("loginModal");
+      if (loginModalEl) {
+        const loginModal = bootstrap.Modal.getInstance(loginModalEl);
+        if (loginModal) {
+          loginModal.hide();
+          document.body.classList.remove('modal-open');
+          const backdrop = document.querySelector('.modal-backdrop');
+          if (backdrop) backdrop.remove();
+        }
       }
+      
+      return user;
     }
-    
-    return user;
   } catch (error) {
     console.error("Ошибка авторизации:", error);
     if (error.code !== "auth/cancelled-popup-request") {
@@ -75,6 +83,11 @@ export async function signInWithGoogle() {
     }
     throw error;
   }
+}
+
+// Проверяем, является ли устройство мобильным
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
 // Функции для обновления UI
