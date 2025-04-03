@@ -936,7 +936,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Подпись у края сектора
         const midAngle = startAngle + anglePerSphere / 2;
-        const labelRadius = Math.min(width, height) / 2 - 60;
+        const labelRadius = Math.min(width, height) / 2 - 80; // Исправляем на -80 для согласованности с highlightSector
         const labelX = centerX + labelRadius * Math.cos(midAngle);
         const labelY = centerY + labelRadius * Math.sin(midAngle);
         
@@ -1030,7 +1030,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             // Отрисовываем подписи секторов
             const midAngle = s.startAngle + (s.endAngle - s.startAngle) / 2;
-            const labelRadius = Math.min(canvas.width, canvas.height) / 2 - 80; // Увеличиваем отступ
+            const labelRadius = Math.min(canvas.width, canvas.height) / 2 - 80; // Исправляем на -80 для согласованности с drawWheel
             const labelX = canvas.width / 2 + labelRadius * Math.cos(midAngle);
             const labelY = canvas.height / 2 + labelRadius * Math.sin(midAngle);
             
