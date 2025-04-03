@@ -584,6 +584,7 @@ document.addEventListener("DOMContentLoaded", () => {
       updateLoginButtons();
       updateSaveButtons();
       updateUserInfo();
+      initializeHistorySlider(); // Добавляем инициализацию слайдера истории
     } else {
       console.log("Пользователь не авторизован");
       updateLoginButtons();
@@ -1513,6 +1514,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateDateDisplay();
     drawWheel();
     setupButtons();
+    initializeHistorySlider(); // Добавляем инициализацию слайдера истории
   }
 
   // Инициализация при загрузке
