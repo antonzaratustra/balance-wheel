@@ -342,13 +342,10 @@ function showCurrentQuestion() {
                 // Используем window.updateSliderDisplay для доступа к функции из main.js
                 if (typeof window.updateSliderDisplay === 'function') {
                     window.updateSliderDisplay(sphere.id, question.id, this.value);
-                } else {
-                    // Если функция недоступна, вызываем локальную
-                    updateSliderDisplay(sphere.id, question.id, this.value);
-                    // И явно вызываем перерисовку колеса
-                    if (typeof window.drawWheel === 'function') {
-                        window.drawWheel();
-                    }
+                }
+                // Добавляем явный вызов перерисовки колеса
+                if (typeof window.drawWheel === 'function') {
+                    window.drawWheel();
                 }
             } else {
                 // Если основной слайдер не найден, явно вызываем перерисовку колеса
