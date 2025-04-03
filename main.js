@@ -46,6 +46,15 @@ import {
 } from "./firestore-utils.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Устанавливаем английский язык по умолчанию
+  window.currentLanguage = "en";
+  
+  // Локализация модалки логина
+  const loginModalLabel = document.getElementById("loginModalLabel");
+  const modalBodyText = document.querySelector("#loginModal .modal-body p");
+  if (loginModalLabel) loginModalLabel.innerText = "Login";
+  if (modalBodyText) modalBodyText.innerText = "Sign in with:";
+
   // Добавляем обработчик поворота устройства
   if (window.DeviceOrientationEvent) {
     window.addEventListener('deviceorientation', rotateCanvas);
@@ -103,7 +112,6 @@ document.addEventListener("DOMContentLoaded", () => {
   /***************************************************
    * 1. ПАРАМЕТРЫ ПО УМОЛЧАНИЮ: ТЁМНАЯ ТЕМА + АНГЛИЙСКИЙ
    ***************************************************/
-  window.currentLanguage = "en"; 
   let darkMode = true;       
   // Делаем переменную доступной глобально для модуля floating-tooltip.js
   window.wheelSectors = [];

@@ -57,6 +57,24 @@ document.addEventListener("DOMContentLoaded", () => {
                         if (closeButton) {
                             closeButton.setAttribute('aria-label', e.detail.language === 'ru' ? 'Закрыть' : 'Close');
                         }
+                        
+                        // Обновляем заголовок модального окна
+                        const modalTitle = timerModal.querySelector('.modal-title');
+                        if (modalTitle) {
+                            modalTitle.textContent = e.detail.language === 'ru' ? 'Таймер' : 'Timer';
+                        }
+                        
+                        // Обновляем текст прогресс-бара
+                        const progressBarLabel = timerModal.querySelector('.progress-bar-label');
+                        if (progressBarLabel) {
+                            progressBarLabel.textContent = e.detail.language === 'ru' ? 'Время на вопрос' : 'Time per question';
+                        }
+                        
+                        // Обновляем текст общего таймера
+                        const totalTimerLabel = timerModal.querySelector('.total-timer-label');
+                        if (totalTimerLabel) {
+                            totalTimerLabel.textContent = e.detail.language === 'ru' ? 'Оставшееся время' : 'Remaining time';
+                        }
                     }
                     
                     // Обновляем контент в модальном окне при смене языка
@@ -100,6 +118,24 @@ function initTimerButton() {
     
     // Добавляем обработчик клика для открытия модального окна
     timerButton.addEventListener('click', openTimerModal);
+    
+    // Инициализируем язык для модального окна
+    const timerModal = document.getElementById('timerModal');
+    if (timerModal) {
+        const modalTitle = timerModal.querySelector('.modal-title');
+        const progressBarLabel = timerModal.querySelector('.progress-bar-label');
+        const totalTimerLabel = timerModal.querySelector('.total-timer-label');
+        
+        if (modalTitle) {
+            modalTitle.textContent = 'Timer';
+        }
+        if (progressBarLabel) {
+            progressBarLabel.textContent = 'Time per question';
+        }
+        if (totalTimerLabel) {
+            totalTimerLabel.textContent = 'Remaining time';
+        }
+    }
 }
 
 // Функция для открытия модального окна с таймером
