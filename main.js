@@ -992,6 +992,20 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.fillText(`${sphere.emoji || ""} ${sphere.title[currentLanguage]}`, labelX, labelY);
       ctx.restore();
 
+      // Число среднего значения для текущего сектора
+      const midAngleNum = startAngle + anglePerSphere / 2;
+      const radiusNum = maxRadius * 0.6;
+      const xNum = centerX + radiusNum * Math.cos(midAngleNum);
+      const yNum = centerY + radiusNum * Math.sin(midAngleNum);
+
+      ctx.save();
+      ctx.font = "14px sans-serif";
+      ctx.fillStyle = darkMode ? "#fff" : "#000";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(Math.round(avg), xNum, yNum);
+      ctx.restore();
+
       startAngle = endAngle;
     });
 
@@ -1007,30 +1021,6 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
       ctx.stroke();
     }
-
-    // Числа средних значений (сдвинули ближе к центру)
-    spheres.forEach((sphere, index) => {
-      const midAngle = index * anglePerSphere + anglePerSphere / 2;
-      const radius = maxRadius * 0.6; // Теперь 60% радиуса вместо 80%
-      const x = centerX + radius * Math.cos(midAngle);
-      const y = centerY + radius * Math.sin(midAngle);
-
-      let sum = 0, count = 0;
-      sphere.questions.forEach((question) => {
-        const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
-        sum += parseInt(slider.value);
-        count++;
-      });
-      const avg = Math.round(sum / (count || 1));
-
-      ctx.save();
-      ctx.font = "14px sans-serif";
-      ctx.fillStyle = darkMode ? "#fff" : "#000";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(avg, x, y);
-      ctx.restore();
-    });
 
     ctx.restore();
   }
