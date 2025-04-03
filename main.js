@@ -49,6 +49,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Устанавливаем английский язык по умолчанию
   window.currentLanguage = "en";
   
+  showEmojiExplosion();
+
   // Локализация модалки логина
   const loginModalLabel = document.getElementById("loginModalLabel");
   const modalBodyText = document.querySelector("#loginModal .modal-body p");
@@ -1810,5 +1812,7 @@ window.getSectorUnderCursor = function(mouseX, mouseY) {
       )
     `;
   });
+
+  showEmojiExplosion();
 });
 // Конец DOMContentLoaded

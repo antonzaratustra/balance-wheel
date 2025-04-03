@@ -12,6 +12,9 @@ let currentQuestionIndex = 0;
 let totalTimeLeft = 10 * 60; // 10 минут в секундах
 let questionTimeLeft = 15; // 15 секунд на вопрос
 
+window.showEmojiExplosion = showEmojiExplosion;
+
+
 // Функция для получения текущего языка из main.js
 function getCurrentLanguage() {
     // Проверяем, доступна ли глобальная переменная currentLanguage из main.js
@@ -407,12 +410,15 @@ function showEmojiExplosion() {
     explosionContainer.innerHTML = '';
     explosionContainer.style.display = 'block';
     
-    // Эмодзи для анимации (используем эмодзи из всех сфер)
-    const emojis = spheres.map(sphere => sphere.emoji);
-    emojis.push('🎉', '✨', '🎊', '🌟', '⭐', '💫');
+    // Эмодзи для анимации
+    const emojis = [
+        '🎉', '✨', '🎊', '🌟', '⭐', '💫',
+        '🎈', '🎁', '🎈', '🎊', '✨', '💫',
+        '🌟', '⭐', '🎈', '🎁', '🎈', '🎊'
+    ];
     
     // Создаем частицы эмодзи
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 1000; i++) {
         const particle = document.createElement('div');
         particle.className = 'emoji-particle';
         particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
@@ -423,8 +429,15 @@ function showEmojiExplosion() {
         particle.style.setProperty('--x', `${x}px`);
         particle.style.setProperty('--y', `${y}px`);
         
+        // Случайный размер
+        const size = 30 + Math.random() * 20;
+        particle.style.fontSize = `${size}px`;
+        
         // Случайная задержка
-        particle.style.animationDelay = `${Math.random() * 0.5}s`;
+        particle.style.animationDelay = `${Math.random() * 0.2}s`;
+        
+        // Случайная продолжительность анимации
+        // particle.style.animationDuration = `${1 + Math.random() * 2.5}s`;
         
         explosionContainer.appendChild(particle);
     }
@@ -432,5 +445,5 @@ function showEmojiExplosion() {
     // Скрываем анимацию через 3 секунды
     setTimeout(() => {
         explosionContainer.style.display = 'none';
-    }, 3000);
+    }, 9000);
 }
