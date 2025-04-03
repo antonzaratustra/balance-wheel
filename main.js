@@ -1063,7 +1063,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Функция для подсветки активного сектора
   function highlightActiveSector(sphereId) {
-    console.log(`Highlighting active sector: ${sphereId}`);
+    console.log(`Highlighting active sector: ${sphereId}`); // Логирование
     // Устанавливаем новый активный сектор
     activeWheelSector = sphereId;
     // Подсвечиваем активный сектор
@@ -1416,24 +1416,23 @@ document.addEventListener("DOMContentLoaded", () => {
     // FAQ-кнопки (десктоп + мобильная)
     const faqBtnDesktop = document.getElementById("faqBtnDesktop");
     const faqBtnMobile = document.getElementById("faqBtnMobile");
+    const sphereTabs = document.getElementById("sphereTabs");
 
     // Функция, которая показывает FAQ и скрывает сферы
     function handleFaqClick() {
-      faqContent.classList.remove('faq-content2');
-      faqContent.classList.add('faq-content2');
-      
       if (!faqContent || !sphereTabContent) return;
-      faqContent.innerHTML = faqInstructions[currentLanguage];
-      sphereTabContent.style.display = "none"; // Скрываем содержимое вкладок
-      faqContent.style.display = "block"; // Показываем FAQ
+      
+      // Переключаем видимость контента
+      faqContent.style.display = "block";
+      sphereTabContent.style.display = "none";
       
       // Сбрасываем подсветку активного сектора и перерисовываем колесо
       if (activeWheelSector) {
         activeWheelSector = null;
-        drawWheel(); // Полная перерисовка колеса для удаления подсветки
+        drawWheel();
       }
 
-      // Снимаем "active" у всех вкладок, прячем pane
+      // Снимаем "active" у всех вкладок
       const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
       tabLinks.forEach(tab => {
         tab.classList.remove("active");
@@ -1447,6 +1446,45 @@ document.addEventListener("DOMContentLoaded", () => {
       if (window.innerWidth <= 576) {
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
+    }
+
+    // Обработчик для вкладок сфер
+    if (sphereTabs) {
+      sphereTabs.addEventListener('click', (e) => {
+        const target = e.target.closest('.nav-link');
+        if (!target) return;
+
+        // Переключаем видимость контента
+        if (faqContent) {
+          faqContent.style.display = "none";
+        }
+        if (sphereTabContent) {
+          sphereTabContent.style.display = "block";
+        }
+
+        // Снимаем "active" у всех вкладок
+        const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
+        tabLinks.forEach(tab => {
+          tab.classList.remove("active");
+          tab.style.boxShadow = 'none';
+          const targetPane = document.querySelector(tab.getAttribute("data-bs-target"));
+          if (targetPane) {
+            targetPane.classList.remove("show", "active");
+          }
+        });
+
+        // Добавляем "active" к текущей вкладке
+        target.classList.add("active");
+        target.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+        const targetPane = document.querySelector(target.getAttribute("data-bs-target"));
+        if (targetPane) {
+          targetPane.classList.add("show", "active");
+        }
+
+        if (window.innerWidth <= 576) {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      });
     }
 
     if (faqBtnDesktop) faqBtnDesktop.addEventListener("click", handleFaqClick);
