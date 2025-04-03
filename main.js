@@ -766,13 +766,12 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Подключаем обработчики на вкладки, чтобы при клике скрывать FAQ и показывать сферы
+    // Подключаем обработчики на вкладки
     const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
     tabLinks.forEach(tab => {
       tab.addEventListener('click', () => {
-        const sphereId = tab.id.split('-')[1]; // Получаем ID сферы
-        console.log(`Tab clicked: ${sphereId}`); // Логирование
-        showTabContent(sphereId); // Показываем контент соответствующей сферы
+        const sphereId = tab.id.split('-')[1];
+        highlightActiveSector(sphereId);
       });
 
       // Дополнительные «красивости»
@@ -1044,107 +1043,36 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log(`Highlighting sector: ${sphereId}, isHighlighted: ${isHighlighted}, isActive: ${isActive}`);
 
     if (sector) {
-        const canvas = document.getElementById("balanceWheel");
-        const ctx = canvas.getContext("2d");
-        
-        // Очищаем весь canvas перед отрисовкой
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Перерисовываем все сектора
-        wheelSectors.forEach(s => {
-            ctx.save();
-            ctx.beginPath();
-            ctx.moveTo(canvas.width / 2, canvas.height / 2);
-            ctx.arc(canvas.width / 2, canvas.height / 2, s.radius, s.startAngle, s.endAngle);
-            ctx.closePath();
-            
-            // Определяем состояния сектора
-            const isCurrentActive = s.sphereId === activeWheelSector;
-            
-            // Настраиваем стили в зависимости от состояния
-            ctx.fillStyle = s.sphereObj.color || "#CCC";
-            ctx.globalAlpha = 0.8;
-            ctx.shadowBlur = 0;
-            
-            // Если это активный сектор или сектор, который нужно подсветить
-            if (isCurrentActive || (s.sphereId === sphereId && (isHighlighted || isActive))) {
-                ctx.shadowColor = s.sphereObj.color || "#CCC";
-                ctx.shadowBlur = 15; // Уменьшаем размер тени
-                ctx.globalAlpha = 1.0;
-                // Используем более яркий оттенок цвета для активного сектора
-                const color = s.sphereObj.color || "#CCC";
-                ctx.fillStyle = color;
-            }
-            
-            ctx.fill();
-            
-            // Устанавливаем прозрачность и цвет для линий
-            ctx.strokeStyle = darkMode ? "rgba(255, 255, 255, 0.3)" : "rgba(0, 0, 0, 0.3)";
-            ctx.lineWidth = 1;
-            ctx.stroke();
-            
-            ctx.restore();
-            
-            // Отрисовываем подписи секторов
-            const midAngle = s.startAngle + (s.endAngle - s.startAngle) / 2;
-            const labelRadius = Math.min(canvas.width, canvas.height) / 2 - 80;
-            const labelX = canvas.width / 2 + labelRadius * Math.cos(midAngle);
-            const labelY = canvas.height / 2 + labelRadius * Math.sin(midAngle);
-            
-            ctx.save();
-            ctx.font = "16px sans-serif";
-            ctx.fillStyle = darkMode ? "#fff" : "#000";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(`${s.sphereObj.emoji || ""} ${s.sphereObj.title[currentLanguage]}`, labelX, labelY);
-            ctx.restore();
-        });
-        
-        // Рисуем розу ветров поверх всех секторов
-        ctx.save();
-        ctx.globalAlpha = 0.3;
-        ctx.strokeStyle = darkMode ? "rgba(255, 255, 255, 0.3)" : "rgba(0, 0, 0, 0.3)";
-        
-        // Основные линии розы ветров
-        for (let i = 1; i <= 10; i++) {
-            const radius = maxRadius * (i / 10);
-            ctx.beginPath();
-            ctx.arc(canvas.width / 2, canvas.height / 2, radius, 0, 2 * Math.PI);
-            ctx.stroke();
-        }
-
-        // Числа средних значений
-        spheres.forEach((sphere, index) => {
-            const midAngle = index * anglePerSphere + anglePerSphere / 2;
-            const radius = maxRadius * 0.6;
-            const x = canvas.width / 2 + radius * Math.cos(midAngle);
-            const y = canvas.height / 2 + radius * Math.sin(midAngle);
-
-            let sum = 0, count = 0;
-            sphere.questions.forEach((question) => {
-                const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
-                sum += parseInt(slider.value);
-                count++;
-            });
-            const avg = Math.round(sum / (count || 1));
-
-            ctx.save();
-            ctx.font = "14px sans-serif";
-            ctx.fillStyle = darkMode ? "#fff" : "#000";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(avg, x, y);
-            ctx.restore();
-        });
-
-        ctx.restore();
+        // Перерисовываем колесо
+        drawWheel();
         
         // Обновляем активный сектор
         if (isActive) {
             activeWheelSector = sphereId;
+            // Переключаем активную вкладку
+            const tab = document.getElementById(`tab-${sphereId}`);
+            if (tab) {
+                const tabEl = bootstrap.Tab.getOrCreateInstance(tab);
+                tabEl.show();
+            }
         }
     } else {
         console.error(`Sector not found for sphereId: ${sphereId}`);
+    }
+  }
+
+  // Функция для подсветки активного сектора
+  function highlightActiveSector(sphereId) {
+    console.log(`Highlighting active sector: ${sphereId}`);
+    // Устанавливаем новый активный сектор
+    activeWheelSector = sphereId;
+    // Подсвечиваем активный сектор
+    highlightSector(sphereId, true, true);
+    // Обновляем подсветку при движении слайдера истории
+    if (historySlider) {
+      historySlider.addEventListener('input', () => {
+        highlightSector(activeWheelSector, true, true);
+      });
     }
   }
 
