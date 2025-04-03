@@ -339,11 +339,22 @@ function showCurrentQuestion() {
             const mainSlider = document.getElementById(`slider_${sphere.id}_${question.id}`);
             if (mainSlider) {
                 mainSlider.value = this.value;
-                updateSliderDisplay(sphere.id, question.id, this.value);
-                // Перерисовка колеса происходит внутри updateSliderDisplay
+                // Используем window.updateSliderDisplay для доступа к функции из main.js
+                if (typeof window.updateSliderDisplay === 'function') {
+                    window.updateSliderDisplay(sphere.id, question.id, this.value);
+                } else {
+                    // Если функция недоступна, вызываем локальную
+                    updateSliderDisplay(sphere.id, question.id, this.value);
+                    // И явно вызываем перерисовку колеса
+                    if (typeof window.drawWheel === 'function') {
+                        window.drawWheel();
+                    }
+                }
             } else {
-                // Если основной слайдер не найден, ничего не делаем
-                // Функция updateSliderDisplay уже вызывает drawWheel
+                // Если основной слайдер не найден, явно вызываем перерисовку колеса
+                if (typeof window.drawWheel === 'function') {
+                    window.drawWheel();
+                }
             }
         };
     }
