@@ -1072,57 +1072,8 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log(`Highlighting sector: ${sphereId}, isHighlighted: ${isHighlighted}, isActive: ${isActive}`);
 
     if (sector) {
-        const canvas = document.getElementById("balanceWheel");
-        const ctx = canvas.getContext("2d");
-        
-        // Очищаем весь canvas перед отрисовкой
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Перерисовываем все сектора
-        wheelSectors.forEach(s => {
-            ctx.save();
-            ctx.beginPath();
-            ctx.moveTo(canvas.width / 2, canvas.height / 2);
-            ctx.arc(canvas.width / 2, canvas.height / 2, s.radius, s.startAngle, s.endAngle);
-            ctx.closePath();
-            
-            // Определяем состояния сектора
-            const isCurrentActive = s.sphereId === activeWheelSector;
-            
-            // Настраиваем стили в зависимости от состояния
-            ctx.fillStyle = s.sphereObj.color || "#CCC";
-            ctx.globalAlpha = 0.8;
-            ctx.shadowBlur = 0;
-            
-            // Если это активный сектор или сектор, который нужно подсветить
-            if (isCurrentActive || (s.sphereId === sphereId && (isHighlighted || isActive))) {
-                ctx.shadowColor = s.sphereObj.color || "#CCC";
-                ctx.shadowBlur = 15; // Уменьшаем размер тени
-                ctx.globalAlpha = 1.0;
-                // Используем более яркий оттенок цвета для активного сектора
-                const color = s.sphereObj.color || "#CCC";
-                ctx.fillStyle = color;
-            }
-            
-            ctx.fill();
-            ctx.strokeStyle = darkMode ? "#ccc" : "#666";
-            ctx.stroke();
-            ctx.restore();
-            
-            // Отрисовываем подписи секторов
-            const midAngle = s.startAngle + (s.endAngle - s.startAngle) / 2;
-            const labelRadius = Math.min(canvas.width, canvas.height) / 2 - 80; // Исправляем на -80 для согласованности с drawWheel
-            const labelX = canvas.width / 2 + labelRadius * Math.cos(midAngle);
-            const labelY = canvas.height / 2 + labelRadius * Math.sin(midAngle);
-            
-            ctx.save();
-            ctx.font = "16px sans-serif";
-            ctx.fillStyle = darkMode ? "#fff" : "#000";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(`${s.sphereObj.emoji || ""} ${s.sphereObj.title[currentLanguage]}`, labelX, labelY);
-            ctx.restore();
-        });
+        // Перерисовываем колесо с новыми параметрами
+        drawWheel();
         
         // Обновляем активный сектор
         if (isActive) {
@@ -1131,7 +1082,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
         console.error(`Sector not found for sphereId: ${sphereId}`);
     }
-}
+  }
 
   // Обработчик события для наведения на сектор
   const canvas = document.getElementById("balanceWheel");
