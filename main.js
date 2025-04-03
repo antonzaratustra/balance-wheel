@@ -267,10 +267,11 @@ document.addEventListener("DOMContentLoaded", () => {
     signOut(auth)
       .then(() => {
         console.log("Пользователь вышел");
+        // Скрываем слайдер истории
+        document.getElementById("historySliderContainer").classList.add("d-none");
       })
       .catch((err) => {
         console.error("Ошибка при выходе:", err);
-        // Можете показать окно ошибки, если хотите
       });
   }
 
