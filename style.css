@@ -1982,7 +1982,33 @@ body.dark-mode #historyDateDisplay {
   z-index: 99999;
 }
 
+/* === Анимация пульсации границы для FAQ === */
+@keyframes pulse-border {
+  0% { 
+    box-shadow: 0 0 0 0px rgba(255, 204, 128, 0.8);
+    border-radius: 20px;
+  }
+  50% { 
+    box-shadow: 0 0 0 20px rgba(255, 204, 128, 0.2);
+    border-radius: 20px;
+  }
+  100% { 
+    box-shadow: 0 0 0 0px rgba(255, 204, 128, 0);
+    border-radius: 20px;
+  }
+}
 
+#faqContent {
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+#faqContent.pulsing {
+  animation: pulse-border 1s ease-in-out;
+}
 
 @media (max-width: 576px) {
   #sphereTabContent {

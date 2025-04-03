@@ -1414,6 +1414,15 @@ document.addEventListener("DOMContentLoaded", () => {
     function handleFaqClick() {
       if (!faqContent || !sphereTabContent) return;
       
+      console.log('Добавляем класс pulsing');
+      faqContent.classList.add('pulsing');
+      
+      // Удаляем класс после анимации
+      setTimeout(() => {
+        console.log('Удаляем класс pulsing');
+        faqContent.classList.remove('pulsing');
+      }, 1000);
+      
       // Переключаем видимость контента
       faqContent.style.display = "block";
       sphereTabContent.style.display = "none";
