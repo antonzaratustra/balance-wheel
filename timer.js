@@ -340,6 +340,10 @@ function showCurrentQuestion() {
             if (mainSlider) {
                 mainSlider.value = this.value;
                 updateSliderDisplay(sphere.id, question.id, this.value);
+                // Перерисовка колеса происходит внутри updateSliderDisplay
+            } else {
+                // Если основной слайдер не найден, ничего не делаем
+                // Функция updateSliderDisplay уже вызывает drawWheel
             }
         };
     }
@@ -381,6 +385,9 @@ function closeTimerModal() {
     }
     
     resetTimers();
+    
+    // Перерисовываем колесо баланса при закрытии модального окна
+    window.drawWheel();
 }
 
 // Функция для отображения анимации взрыва эмодзи

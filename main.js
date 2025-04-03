@@ -883,7 +883,8 @@ document.addEventListener("DOMContentLoaded", () => {
       (currentLanguage === "ru" ? "Общее среднее: " : "Overall Average: ") + overall;
   }
 
-  function drawWheel() {
+  // Делаем функцию drawWheel доступной глобально
+  window.drawWheel = function() {
     const canvas = document.getElementById("balanceWheel");
     const ctx = canvas.getContext("2d");
     const width = canvas.width;
