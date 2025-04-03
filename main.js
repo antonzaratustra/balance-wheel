@@ -1016,7 +1016,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Если это активный сектор или сектор, который нужно подсветить
             if (isCurrentActive || (s.sphereId === sphereId && (isHighlighted || isActive))) {
                 ctx.shadowColor = s.sphereObj.color || "#CCC";
-                ctx.shadowBlur = 40;
+                ctx.shadowBlur = 15; // Уменьшаем размер тени
                 ctx.globalAlpha = 1.0;
                 // Используем более яркий оттенок цвета для активного сектора
                 const color = s.sphereObj.color || "#CCC";
@@ -1030,7 +1030,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             // Отрисовываем подписи секторов
             const midAngle = s.startAngle + (s.endAngle - s.startAngle) / 2;
-            const labelRadius = Math.min(canvas.width, canvas.height) / 2 - 60;
+            const labelRadius = Math.min(canvas.width, canvas.height) / 2 - 80; // Увеличиваем отступ
             const labelX = canvas.width / 2 + labelRadius * Math.cos(midAngle);
             const labelY = canvas.height / 2 + labelRadius * Math.sin(midAngle);
             
@@ -1050,7 +1050,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
         console.error(`Sector not found for sphereId: ${sphereId}`);
     }
-  }
+}
 
   // Обработчик события для наведения на сектор
   const canvas = document.getElementById("balanceWheel");
