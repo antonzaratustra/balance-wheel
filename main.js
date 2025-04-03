@@ -1011,12 +1011,15 @@ document.addEventListener("DOMContentLoaded", () => {
       startAngle = endAngle;
     });
 
-    // Рисуем розу ветров поверх всех секторов
+    // Улучшенная отрисовка розы ветров
     ctx.save();
-    ctx.globalAlpha = 0.3; // Сделали ещё более прозрачными
-    ctx.strokeStyle = darkMode ? "rgba(255, 255, 255, 0.3)" : "rgba(0, 0, 0, 0.3)";
-  
-    // Основные линии розы ветров
+    ctx.globalAlpha = 0.5; // Увеличили прозрачность
+    ctx.strokeStyle = darkMode 
+      ? "rgba(255, 255, 255, 0.6)" // Более яркий в темной теме
+      : "rgba(0, 0, 0, 0.6)";      // Более контрастный в светлой
+    ctx.lineWidth = 1.5; // Увеличили толщину линий
+
+    // Концентрические окружности
     for (let i = 1; i <= 10; i++) {
       const radius = maxRadius * (i / 10);
       ctx.beginPath();
@@ -1024,8 +1027,21 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.stroke();
     }
 
+    // Радиальные линии (16 направлений)
+    const numDirections = 16;
+    for (let i = 0; i < numDirections; i++) {
+      const angle = (i * Math.PI * 2) / numDirections;
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(
+        centerX + maxRadius * Math.cos(angle),
+        centerY + maxRadius * Math.sin(angle)
+      );
+      ctx.stroke();
+    }
+
     ctx.restore();
-  }
+};
 
   // Функция для подсветки сектора
   let activeWheelSector = null; // Глобальная переменная для хранения активного сектора
