@@ -3,24 +3,22 @@ const faqInstructions = {
   ru: `<strong>Добро пожаловать в Mentorist Life Balance Wheel!</strong><br><br>
   Инструмент для оценки баланса жизни по 8 сферам: 🎯 Призвание, 🤝 Отношения, 🏡 Окружение, 💰 Финансы, 📚 Саморазвитие, 🎉 Яркость жизни, 🌀 Духовность и ❤️ Здоровье.<br><br>
   <strong>1. Тема и язык:</strong> <span class="btn-like">🌐 RU</span> и <span class="btn-like">🌙 Тёмная</span> / <span class="btn-like">🌞 Светлая</span>.<br><br>
-  <strong>2. FAQ:</strong> <span class="btn-like">💡 FAQ</span> для инструкции; <span class="btn-like">❤️ Здоровье (5.0)</span> для возврата к сферам.<br><br>
-  <strong>3. Переключение:</strong> Вкладки вверху и клик по секторам колеса для смены сфер.<br><br>
-  <strong>4. Оценка:</strong> 5 вопросов в каждой сфере. Слайдеры от 0 до 10. Эмодзи часов <span class="btn-like">⏱️</span> для сфокусированного прохождения за 10 минут.<br><br>
-  <strong>5. Визуализация:</strong> Колесо показывает ваши оценки.<br><br>
-  <strong>6. Среднее:</strong> Автоматическое среднее для каждой сферы и общее.<br><br>
-  <strong>7. Сохранение:</strong> <span class="btn-like">👤 Войти</span> для сохранения. Кнопки: <span class="btn-like">💾</span> (сохранить в облако), <span class="btn-like">☁️</span> (загрузить из облака), <span class="btn-like">🔽 PDF</span> (скачать).<br><br>
-  <strong>8. История:</strong> Слайдер под колесом для просмотра сохранённых результатов.`,
-    
-  en: `<strong>Welcome to Mentorist Life Balance Wheel!</strong><br><br>
+  <strong>2. Навигация:</strong> <span class="btn-like">💡 FAQ</span> для инструкции, <span class="btn-like">❤️ Здоровье (5.0)</span> для возврата к сферам, вкладки вверху и клик по секторам колеса для смены сфер.<br><br>
+  <strong>3. Оценка:</strong> В каждой сфере представлено 5 утверждений, оценивайте их на слайдерах от 0 до 10. Эмодзи часов <span class="btn-like">⏱️</span> активирует сфокусированный режим, где вы проходите все утверждения всех сфер за 10 минут.<br><br>
+  <strong>4. Подсказки:</strong> Летающий кружочек рядом с курсором показывает простое действие, которое вы можете сделать в текущей сфере прямо сейчас.<br><br>
+  <strong>5. Визуализация:</strong> Колесо показывает ваши оценки и автоматическое среднее для каждой сферы и общее.<br><br>
+  <strong>6. Сохранение:</strong> <span class="btn-like">👤 Войти</span> для сохранения. Кнопки: <span class="btn-like">💾</span> (сохранить в облако), <span class="btn-like">☁️</span> (загрузить из облака), <span class="btn-like">🔽 PDF</span> (скачать).<br><br>
+  <strong>7. История:</strong> Слайдер под колесом для просмотра сохранённых результатов.`,
+
+en: `<strong>Welcome to Mentorist Life Balance Wheel!</strong><br><br>
   Tool for assessing life balance across 8 areas: 🎯 Calling, 🤝 Relationships, 🏡 Environment, 💰 Finance, 📚 Self-Improvement, 🎉 Life Brightness, 🌀 Spirituality, and ❤️ Health.<br><br>
   <strong>1. Theme and Language:</strong> <span class="btn-like">🌐 EN</span> and <span class="btn-like">🌙 Dark</span> / <span class="btn-like">🌞 Light</span>.<br><br>
-  <strong>2. FAQ:</strong> <span class="btn-like">💡 FAQ</span> for instructions; <span class="btn-like">❤️ Health (5.0)</span> to return to spheres.<br><br>
-  <strong>3. Switching:</strong> Top tabs and clicking wheel sectors to switch between areas.<br><br>
-  <strong>4. Assessment:</strong> 5 questions per area. Sliders from 0 to 10. Clock emoji <span class="btn-like">⏱️</span> for focused 10-minute session.<br><br>
-  <strong>5. Visualization:</strong> Wheel displays your ratings.<br><br>
-  <strong>6. Average:</strong> Automatic average for each area and overall.<br><br>
-  <strong>7. Saving:</strong> <span class="btn-like">👤 Login</span> to save. Buttons: <span class="btn-like">💾</span> (save to cloud), <span class="btn-like">☁️</span> (load from cloud), <span class="btn-like">🔽 PDF</span> (download).<br><br>
-  <strong>8. History:</strong> Slider below wheel to view saved results.`
+  <strong>2. Navigation:</strong> <span class="btn-like">💡 FAQ</span> for instructions, <span class="btn-like">❤️ Health (5.0)</span> to return to spheres, top tabs and clicking wheel sectors to switch between areas.<br><br>
+  <strong>3. Assessment:</strong> Each area features 5 statements to evaluate using sliders from 0 to 10. Clock emoji <span class="btn-like">⏱️</span> activates focused mode where you assess all statements in all areas within 10 minutes.<br><br>
+  <strong>4. Tips:</strong> The floating circle near your cursor shows a simple action you can take in the current area right now.<br><br>
+  <strong>5. Visualization:</strong> Wheel displays your ratings and automatic averages for each area and overall.<br><br>
+  <strong>6. Saving:</strong> <span class="btn-like">👤 Login</span> to save. Buttons: <span class="btn-like">💾</span> (save to cloud), <span class="btn-like">☁️</span> (load from cloud), <span class="btn-like">🔽 PDF</span> (download).<br><br>
+  <strong>7. History:</strong> Slider below wheel to view saved results.`
 };
 
 // Импорт auth из firebase-init.js
