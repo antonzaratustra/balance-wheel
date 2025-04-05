@@ -1,14 +1,17 @@
 // Function to highlight elements in FAQ with overlay and tooltip
 export function highlightElement(element, tooltipText, needsScroll = false, topOffset = null) {
+  // Проверяем, находится ли элемент в FAQ
+  const isInFaq = document.getElementById('faqContent')?.contains(element) || false;
+  
   // Проверяем, является ли элемент кнопкой Health или Timer
-  const isHealthButton = element.textContent && element.textContent.includes('❤️ Health');
+  const isHealthButton = element.textContent && (element.textContent.includes('❤️ Health') || element.textContent.includes('❤️ Здоровье'));
   const isTimerButton = element.textContent && element.textContent.includes('⏱️');
   
   // Находим соответствующие элементы для подсветки
-  if (isHealthButton) {
+  if (isHealthButton || (isInFaq && element.innerHTML && (element.innerHTML.includes('❤️ Health') || element.innerHTML.includes('❤️ Здоровье')))) {
     const sphereTabs = document.getElementById('sphereTabs');
     if (sphereTabs) element = sphereTabs;
-  } else if (isTimerButton) {
+  } else if (isTimerButton || (isInFaq && element.innerHTML && element.innerHTML.includes('⏱️'))) {
     const timerButton = document.querySelector('.timer-button');
     if (timerButton) element = timerButton;
   }

@@ -59,9 +59,9 @@ const faqInstructions = {
   },
   ru: `<strong>Добро пожаловать в Mentorist Life Balance Wheel!</strong><br><br>
   Инструмент для оценки баланса жизни по 8 сферам: 🎯 Призвание, 🤝 Отношения, 🏡 Окружение, 💰 Финансы, 📚 Саморазвитие, 🎉 Яркость жизни, 🌀 Духовность и ❤️ Здоровье.<br><br>
-  <strong>1. Тема и язык:</strong> <span class="btn-like">🌐 RU</span> и <span class="btn-like">🌙 Тёмная</span> / <span class="btn-like">🌞 Светлая</span>.<br><br>
-  <strong>2. Навигация:</strong> <span class="btn-like">💡 FAQ</span> для инструкции, <span class="btn-like">❤️ Здоровье (5.0)</span> для возврата к сферам, вкладки вверху и клик по секторам колеса для смены сфер.<br><br>
-  <strong>3. Оценка:</strong> В каждой сфере представлено 5 утверждений, оценивайте их на слайдерах от 0 до 10. Эмодзи часов <span class="btn-like">⏱️</span> активирует сфокусированный режим, где вы проходите все утверждения всех сфер за 10 минут.<br><br>
+  <strong>1. Тема и язык:</strong> <span class="btn-like lang-toggle">🌐 RU</span> и <span class="btn-like theme-toggle">🌙 Тёмная</span> / <span class="btn-like theme-toggle">🌞 Светлая</span>.<br><br>
+  <strong>2. Навигация:</strong> <span class="btn-like faq-button">💡 FAQ</span> для инструкции, <span class="btn-like faq-health-button">❤️ Здоровье (5.0)</span> для возврата к сферам, вкладки вверху и клик по секторам колеса для смены сфер.<br><br>
+  <strong>3. Оценка:</strong> В каждой сфере представлено 5 утверждений, оценивайте их на слайдерах от 0 до 10. Эмодзи часов <span class="btn-like faq-timer-button">⏱️</span> активирует сфокусированный режим, где вы проходите все утверждения всех сфер за 10 минут.<br><br>
   <strong>4. Подсказки:</strong> Летающий кружочек рядом с курсором показывает простое действие, которое вы можете сделать в текущей сфере прямо сейчас.<br><br>
   <strong>5. Визуализация:</strong> Колесо показывает ваши оценки и автоматическое среднее для каждой сферы и общее.<br><br>
   <strong>6. Сохранение:</strong> <span class="btn-like">👤 Войти</span> для сохранения. Кнопки: <span class="btn-like">💾</span> (сохранить в облако), <span class="btn-like">☁️</span> (загрузить из облака), <span class="btn-like">🔽 PDF</span> (скачать).<br><br>
@@ -69,9 +69,9 @@ const faqInstructions = {
 
 en: `<strong>Welcome to Mentorist Life Balance Wheel!</strong><br><br>
   Tool for assessing life balance across 8 areas: 🎯 Calling, 🤝 Relationships, 🏡 Environment, 💰 Finance, 📚 Self-Improvement, 🎉 Life Brightness, 🌀 Spirituality, and ❤️ Health.<br><br>
-  <strong>1. Theme and Language:</strong> <span class="btn-like">🌐 EN</span> and <span class="btn-like">🌙 Dark</span> / <span class="btn-like">🌞 Light</span>.<br><br>
-  <strong>2. Navigation:</strong> <span class="btn-like">💡 FAQ</span> for instructions, <span class="btn-like">❤️ Health (5.0)</span> to return to spheres, top tabs and clicking wheel sectors to switch between areas.<br><br>
-  <strong>3. Assessment:</strong> Each area features 5 statements to evaluate using sliders from 0 to 10. Clock emoji <span class="btn-like">⏱️</span> activates focused mode where you assess all statements in all areas within 10 minutes.<br><br>
+  <strong>1. Theme and Language:</strong> <span class="btn-like lang-toggle">🌐 EN</span> and <span class="btn-like theme-toggle">🌙 Dark</span> / <span class="btn-like theme-toggle">🌞 Light</span>.<br><br>
+  <strong>2. Navigation:</strong> <span class="btn-like faq-button">💡 FAQ</span> for instructions, <span class="btn-like faq-health-button">❤️ Health (5.0)</span> to return to spheres, top tabs and clicking wheel sectors to switch between areas.<br><br>
+  <strong>3. Assessment:</strong> Each area features 5 statements to evaluate using sliders from 0 to 10. Clock emoji <span class="btn-like faq-timer-button">⏱️</span> activates focused mode where you assess all statements in all areas within 10 minutes.<br><br>
   <strong>4. Tips:</strong> The floating circle near your cursor shows a simple action you can take in the current area right now.<br><br>
   <strong>5. Visualization:</strong> Wheel displays your ratings and automatic averages for each area and overall.<br><br>
   <strong>6. Saving:</strong> <span class="btn-like">👤 Login</span> to save. Buttons: <span class="btn-like">💾</span> (save to cloud), <span class="btn-like">☁️</span> (load from cloud), <span class="btn-like">🔽 PDF</span> (download).<br><br>
@@ -157,7 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (targetId) {
       const { targetElement, needsScroll } = faqInstructions.getTargetElement(targetId);
       if (targetElement) {
-        highlightElement(targetElement, tooltipText, needsScroll, targetId === 'timerBtn' ? '50%' : null);
+        // Передаем элемент напрямую в highlightElement, так как логика определения
+        // целевого элемента уже реализована в highlight-element.js
+        highlightElement(targetElement, tooltipText, needsScroll);
       }
     }
   });
@@ -1606,63 +1608,110 @@ document.addEventListener("DOMContentLoaded", () => {
   
   console.log('Highlighting element:', element);
   
-  // Сохраняем текущий z-index элемента
-  const originalZIndex = element.style.zIndex;
-  
-  // Временно повышаем z-index элемента, чтобы он был поверх затемнения
-  element.style.zIndex = '1060';
-  
-  // Добавляем класс пульсации
+  // Очищаем существующие оверлеи и тултипы
+  const cleanup = () => {
+    const existingOverlays = document.querySelectorAll('[id^="faqOverlay"]');
+    const existingTooltips = document.querySelectorAll('[id^="faqTooltip"]');
+    
+    existingOverlays.forEach(overlay => overlay.remove());
+    existingTooltips.forEach(tooltip => tooltip.remove());
+
+    document.querySelectorAll('.pulsing').forEach(el => {
+      el.classList.remove('pulsing');
+      el.style.position = '';
+      el.style.zIndex = '';
+    });
+  };
+
+  // Очищаем существующие элементы
+  cleanup();
+
+  // Сохраняем оригинальные стили
+  const originalStyles = {
+    position: window.getComputedStyle(element).position,
+    zIndex: window.getComputedStyle(element).zIndex || 'auto'
+  };
+
+  // Создаем оверлей
+  const overlay = document.createElement('div');
+  overlay.id = 'faqOverlay-' + Date.now();
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+  overlay.style.zIndex = '1000';
+  document.body.appendChild(overlay);
+
+  // Устанавливаем стили элемента
+  element.style.position = originalStyles.position === 'static' ? 'relative' : originalStyles.position;
+  element.style.zIndex = '1001';
   element.classList.add('pulsing');
-  
-  // Если задан радиус границы, применяем его
+
   if (borderRadius) {
     element.style.borderRadius = borderRadius;
   }
-  
-  // Создаем затемнение для всего контента
-  const overlay = document.createElement('div');
-  overlay.id = 'faqOverlay';
-  document.body.appendChild(overlay);
-  
-  // Если нужен тултип, создаем его
-  let tooltip = null;
+
+  // Создаем тултип
   if (tooltipText) {
-    tooltip = document.createElement('div');
-    tooltip.id = 'faqTooltip';
+    const tooltip = document.createElement('div');
+    tooltip.id = 'faqTooltip-' + Date.now();
     tooltip.textContent = tooltipText;
-    
-    // Выбираем случайный цвет из цветов сфер
+
     const randomColor = sphereColors[Math.floor(Math.random() * sphereColors.length)];
-    tooltip.style.backgroundColor = randomColor;
-    tooltip.style.color = document.body.classList.contains('dark-mode') ? '#fff' : '#333';
+    tooltip.style.cssText = `
+      background-color: ${randomColor};
+      color: ${document.body.classList.contains('dark-mode') ? '#fff' : '#333'};
+      padding: 8px 12px;
+      border-radius: 4px;
+      position: absolute;
+      z-index: 1002;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      pointer-events: none;
+      white-space: nowrap;
+    `;
+
+    document.body.appendChild(tooltip);
+
+    // Позиционируем тултип
+    const elementRect = element.getBoundingClientRect();
+    const tooltipRect = tooltip.getBoundingClientRect();
     
-    // Добавляем тултип к элементу
-    element.appendChild(tooltip);
+    tooltip.style.top = `${elementRect.bottom + window.scrollY + 10}px`;
+    tooltip.style.left = `${elementRect.left + (elementRect.width - tooltipRect.width) / 2}px`;
   }
-  
-  // Если нужно прокрутить до элемента (для мобильных устройств)
+
+  // Прокручиваем к элементу
   if (scrollToElement && window.innerWidth <= 576) {
     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
-  
-  // Удаляем затемнение, тултип и класс после анимации
+
+  // Очищаем через timeout
   setTimeout(() => {
-    element.classList.remove('pulsing');
-    if (borderRadius) {
-      element.style.borderRadius = '';
-    }
-    if (overlay && overlay.parentNode) {
-      overlay.parentNode.removeChild(overlay);
-    }
-    if (tooltip && tooltip.parentNode) {
-      tooltip.parentNode.removeChild(tooltip);
-    }
-    
-    // Восстанавливаем оригинальный z-index
-    element.style.zIndex = originalZIndex;
-  }, 1000);
+    cleanup();
+    element.style.position = originalStyles.position;
+    element.style.zIndex = originalStyles.zIndex;
+  }, 2000);
 }
+
+    // Обработчик для элементов FAQ
+    document.addEventListener('click', (e) => {
+      if (!e.target.classList.contains('btn-like')) return;
+      
+      const tooltipText = currentLanguage === 'ru' ? 'я здесь' : 'I am here';
+      let targetElement = null;
+      
+      if (e.target.classList.contains('faq-health-button')) {
+        targetElement = document.getElementById('sphereTabs');
+      } else if (e.target.classList.contains('faq-timer-button')) {
+        targetElement = document.querySelector('.timer-button');
+      }
+      
+      if (targetElement) {
+        highlightElement(targetElement, tooltipText, true);
+      }
+    });
 
     // Функция, которая показывает FAQ и скрывает сферы
     function handleFaqClick() {
@@ -1680,17 +1729,6 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log('Toggling content visibility');
       faqContent.style.display = "block";
       sphereTabContent.style.display = "none";
-      
-      // Добавляем обработчики для элементов FAQ
-      const faqElements = faqContent.querySelectorAll('.btn-like');
-      console.log('Found FAQ elements:', faqElements.length);
-      faqElements.forEach((element, index) => {
-        console.log(`Adding click handler to FAQ element ${index}`);
-        element.addEventListener('click', () => {
-          console.log(`FAQ element ${index} clicked`);
-          highlightElement(element, null, true, '4px');
-        });
-      });
       
       // Сбрасываем подсветку активного сектора и перерисовываем колесо
       if (activeWheelSector) {
