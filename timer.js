@@ -101,6 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Функция для добавления кнопки таймера в центр колеса
 function initTimerButton() {
+    // const canvasWrapper = document.getElementById('canvas-wrapper');
     const canvasWrapper = document.getElementById('balanceWheelContainer');
     
     // Получаем актуальный язык

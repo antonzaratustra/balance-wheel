@@ -12,7 +12,7 @@ export function highlightElement(element, tooltipText, needsScroll = false, topO
     const sphereTabs = document.getElementById('sphereTabs');
     if (sphereTabs) element = sphereTabs;
   } else if (isTimerButton || (isInFaq && element.innerHTML && element.innerHTML.includes('⏱️'))) {
-    const timerButton = document.querySelector('.timer-button');
+    const timerButton = document.getElementById('timer-button');
     if (timerButton) element = timerButton;
   }
   // Clean up any existing overlays and tooltips

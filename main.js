@@ -1705,7 +1705,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.target.classList.contains('faq-health-button')) {
         targetElement = document.getElementById('sphereTabs');
       } else if (e.target.classList.contains('faq-timer-button')) {
-        targetElement = document.querySelector('.timer-button');
+        targetElement = document.getElementById('timer-button');
       }
       
       if (targetElement) {
