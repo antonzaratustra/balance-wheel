@@ -5,10 +5,18 @@ import { GoogleAuthProvider, signInWithPopup, getRedirectResult, signInWithRedir
 // Функция для инициализации аутентификации
 document.addEventListener("DOMContentLoaded", async () => {
   try {
+    // Проверяем, является ли устройство мобильным
+    const isMobile = isMobileDevice();
+    console.log("Тип устройства:", isMobile ? "Мобильное" : "Десктоп");
+    
     // Проверяем результат редиректа
     console.log("Проверка результата редиректа при загрузке страницы");
-    const result = await getRedirectResult(auth);
-    if (result) {
+    const result = await getRedirectResult(auth).catch(error => {
+      console.error("Ошибка при получении результата редиректа:", error);
+      return null;
+    });
+    
+    if (result && result.user) {
       const user = result.user;
       console.log("Пользователь вошёл после редиректа:", user);
       localStorage.setItem("uid", user.uid);
@@ -82,6 +90,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 export async function signInWithGoogle() {
   try {
     const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({
+      prompt: 'select_account'
+    });
     
     // Используем signInWithRedirect для мобильных устройств
     if (isMobileDevice()) {
@@ -97,9 +108,19 @@ export async function signInWithGoogle() {
           if (backdrop) backdrop.remove();
         }
       }
-      await signInWithRedirect(auth, provider);
-      // Результат редиректа будет обработан в обработчике DOMContentLoaded
-      return null;
+      
+      try {
+        // Сохраняем состояние перед редиректом
+        localStorage.setItem("auth_redirect_pending", "true");
+        await signInWithRedirect(auth, provider);
+        // Результат редиректа будет обработан в обработчике DOMContentLoaded
+        return null;
+      } catch (redirectError) {
+        console.error("Ошибка при редиректе:", redirectError);
+        localStorage.removeItem("auth_redirect_pending");
+        alert("Ошибка при авторизации: " + redirectError.message);
+        return null;
+      }
     } else {
       // Для десктопа используем signInWithPopup
       const result = await signInWithPopup(auth, provider);
@@ -145,6 +166,8 @@ function isMobileDevice() {
 // Функции для обновления UI
 function updateUIForAuthenticatedUser(user) {
   localStorage.setItem("uid", user.uid);
+  // Очищаем флаг ожидания редиректа, если он был установлен
+  localStorage.removeItem("auth_redirect_pending");
   
   // Обновляем кнопку логина
   const loginButton = document.getElementById('loginButton');
@@ -157,6 +180,12 @@ function updateUIForAuthenticatedUser(user) {
   const loadResultsButton = document.getElementById('loadResults');
   if (saveResultButton) saveResultButton.style.display = 'inline-block';
   if (loadResultsButton) loadResultsButton.style.display = 'inline-block';
+  
+  // Проверяем, был ли редирект с мобильного устройства
+  if (isMobileDevice() && document.referrer.includes('accounts.google.com')) {
+    console.log("Обнаружен редирект с Google на мобильном устройстве");
+    // Дополнительные действия для мобильных устройств после редиректа, если необходимо
+  }
 }
 
 function updateUIForUnauthenticatedUser() {
