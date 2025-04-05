@@ -1059,12 +1059,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Число среднего значения для текущего сектора
       const midAngleNum = startAngle + anglePerSphere / 2;
-      const radiusNum = maxRadius * 0.6;
+      const radiusNum = maxRadius * 0.5;
       const xNum = centerX + radiusNum * Math.cos(midAngleNum);
       const yNum = centerY + radiusNum * Math.sin(midAngleNum);
 
       ctx.save();
-      ctx.font = "14px sans-serif";
+      ctx.font = "16px sans-serif";
       ctx.fillStyle = darkMode ? "#fff" : "#000";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
