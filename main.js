@@ -612,6 +612,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener('visibilitychange', async () => {
       if (document.visibilityState === 'visible') {
         try {
+          console.log("Проверка результата редиректа после возвращения на страницу");
           const result = await getRedirectResult(auth);
           if (result) {
             const user = result.user;
@@ -621,6 +622,29 @@ document.addEventListener("DOMContentLoaded", () => {
             updateLoginButtons();
             updateSaveButtons();
             updateUserInfo();
+            
+            // Закрываем модальное окно после успешной авторизации
+            const loginModalEl = document.getElementById("loginModal");
+            if (loginModalEl) {
+              const loginModal = bootstrap.Modal.getInstance(loginModalEl);
+              if (loginModal) {
+                loginModal.hide();
+                document.body.classList.remove('modal-open');
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) backdrop.remove();
+              }
+            }
+          } else {
+            console.log("Результат редиректа отсутствует или пользователь не авторизован");
+            // Проверяем текущего пользователя
+            const currentUser = auth.currentUser;
+            if (currentUser) {
+              console.log("Текущий пользователь:", currentUser);
+              localStorage.setItem("uid", currentUser.uid);
+              updateLoginButtons();
+              updateSaveButtons();
+              updateUserInfo();
+            }
           }
         } catch (error) {
           console.error("Ошибка при проверке аутентификации:", error);

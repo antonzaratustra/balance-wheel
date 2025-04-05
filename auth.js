@@ -6,6 +6,7 @@ import { GoogleAuthProvider, signInWithPopup, getRedirectResult, signInWithRedir
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     // Проверяем результат редиректа
+    console.log("Проверка результата редиректа при загрузке страницы");
     const result = await getRedirectResult(auth);
     if (result) {
       const user = result.user;
@@ -24,6 +25,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           if (backdrop) backdrop.remove();
         }
       }
+    } else {
+      console.log("Результат редиректа отсутствует при загрузке страницы");
     }
 
     // Проверяем текущее состояние аутентификации
