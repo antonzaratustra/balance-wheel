@@ -1,5 +1,17 @@
 // Function to highlight elements in FAQ with overlay and tooltip
 export function highlightElement(element, tooltipText, needsScroll = false, topOffset = null) {
+  // Проверяем, является ли элемент кнопкой Health или Timer
+  const isHealthButton = element.textContent && element.textContent.includes('❤️ Health');
+  const isTimerButton = element.textContent && element.textContent.includes('⏱️');
+  
+  // Находим соответствующие элементы для подсветки
+  if (isHealthButton) {
+    const sphereTabs = document.getElementById('sphereTabs');
+    if (sphereTabs) element = sphereTabs;
+  } else if (isTimerButton) {
+    const timerButton = document.querySelector('.timer-button');
+    if (timerButton) element = timerButton;
+  }
   // Clean up any existing overlays and tooltips
   const cleanup = () => {
     // Remove all existing overlays and tooltips (including those with timestamp IDs)
@@ -82,9 +94,14 @@ export function highlightElement(element, tooltipText, needsScroll = false, topO
 
     // Get random color from spheres palette
     const sphereColors = [
-      '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4',
-      '#FFEEAD', '#D4A5A5', '#9B59B6', '#3498DB',
-      '#E74C3C', '#2ECC71'
+      '#f6b95a', // желтый (calling)
+      '#fbd462', // более яркий желтый (finance)
+      '#d25342', // красный (health)
+      '#f05f50', // более яркий красный (relationships)
+      '#27a2df', // более яркий синий (growth)
+      '#2289bc', // синий (recreation)
+      '#45c4a1', // более яркий зеленый (environment)
+      '#3fa49a'  // зеленый (contribution)
     ];
     const randomColor = sphereColors[Math.floor(Math.random() * sphereColors.length)];
     
@@ -108,6 +125,19 @@ export function highlightElement(element, tooltipText, needsScroll = false, topO
     const tooltipRect = tooltip.getBoundingClientRect();
     
     // Устанавливаем позицию тултипа под элементом
+    if (window.innerWidth <= 576 && needsScroll) {
+      // На мобильных устройствах добавляем слушатель события прокрутки
+      const updateTooltipPosition = () => {
+        const updatedRect = element.getBoundingClientRect();
+        tooltip.style.top = `${updatedRect.bottom + window.scrollY + 10}px`;
+        tooltip.style.left = `${updatedRect.left + (updatedRect.width - tooltipRect.width) / 2}px`;
+      };
+      
+      window.addEventListener('scroll', updateTooltipPosition);
+      setTimeout(() => {
+        window.removeEventListener('scroll', updateTooltipPosition);
+      }, 2000);
+    }
     tooltip.style.top = `${elementRect.bottom + window.scrollY + 10}px`;
     tooltip.style.left = `${elementRect.left + (elementRect.width - tooltipRect.width) / 2}px`;
     tooltip.style.transform = 'none';
