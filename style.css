@@ -1184,9 +1184,12 @@ body.dark-mode #historyDateDisplay {
 
 /* Анимации для элементов после загрузки */
 #faqContent {
-  transition: transform 0.3s ease-out;
+  border-radius: 20px;
+  transition: all 0.2s ease;
   position: relative;
-  left: 0;
+  z-index: 1000;
+  overflow: hidden;
+  background-color: inherit;
 }
 
 /* Медленные анимации для десктопа */
@@ -1863,9 +1866,12 @@ body.dark-mode #historyDateDisplay {
 
 /* Анимации для элементов после загрузки */
 #faqContent {
-  transition: transform 0.3s ease-out;
+  border-radius: 20px;
+  transition: all 0.2s ease;
   position: relative;
-  left: 0;
+  z-index: 1000;
+  overflow: hidden;
+  background-color: inherit;
 }
 
 /* Медленные анимации для десктопа */
@@ -2034,8 +2040,9 @@ body.dark-mode #historyDateDisplay {
   border-radius: 20px;
   transition: all 0.2s ease;
   position: relative;
-  z-index: 1;
+  z-index: 1000;
   overflow: hidden;
+  background-color: inherit;
 }
 
 #faqContent.pulsing {
