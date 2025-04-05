@@ -1187,7 +1187,7 @@ body.dark-mode #historyDateDisplay {
   border-radius: 20px;
   transition: all 0.2s ease;
   position: relative;
-  z-index: 1100;
+  z-index: 1000;
   overflow: hidden;
 }
 
@@ -1878,7 +1878,7 @@ body.dark-mode #historyDateDisplay {
   border-radius: 20px;
   transition: all 0.2s ease;
   position: relative;
-  z-index: 1100;
+  z-index: 1000;
   overflow: hidden;
 }
 
@@ -2058,7 +2058,7 @@ body.dark-mode #faqContent {
   border-radius: 20px;
   transition: all 0.2s ease;
   position: relative;
-  z-index: 1100;
+  z-index: 1000;
   overflow: hidden;
 }
 

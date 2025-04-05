@@ -1500,51 +1500,84 @@ document.addEventListener("DOMContentLoaded", () => {
     const faqBtnMobile = document.getElementById("faqBtnMobile");
     const sphereTabs = document.getElementById("sphereTabs");
 
-    // Функция, которая показывает FAQ и скрывает сферы
-    function handleFaqClick() {
-      if (!faqContent || !sphereTabContent) return;
+    // Массив цветов сфер для случайного выбора цвета тултипа
+    const sphereColors = [
+      '#f6b95a', // желтый (calling)
+      '#fbd462', // более яркий желтый (finance)
+      '#d25342', // красный (health)
+      '#f05f50', // более яркий красный (relationships)
+      '#27a2df', // более яркий синий (growth)
+      '#2289bc', // синий (recreation)
+      '#45c4a1', // более яркий зеленый (environment)
+      '#3fa49a'  // зеленый (contribution)
+    ];
+
+    // Общая функция для подсветки элемента с затемнением фона
+    function highlightElement(element, tooltipText = null, scrollToElement = false, borderRadius = null) {
+      if (!element) return;
       
-      console.log('Добавляем класс pulsing');
-      faqContent.classList.add('pulsing');
+      // Сохраняем текущий z-index элемента
+      const originalZIndex = element.style.zIndex;
+      
+      // Временно повышаем z-index элемента, чтобы он был поверх затемнения
+      element.style.zIndex = '1060';
+      
+      // Добавляем класс пульсации
+      element.classList.add('pulsing');
+      
+      // Если задан радиус границы, применяем его
+      if (borderRadius) {
+        element.style.borderRadius = borderRadius;
+      }
       
       // Создаем затемнение для всего контента
       const overlay = document.createElement('div');
       overlay.id = 'faqOverlay';
       document.body.appendChild(overlay);
       
-      // Создаем тултип
-      const tooltip = document.createElement('div');
-      tooltip.id = 'faqTooltip';
-      tooltip.textContent = currentLanguage === 'ru' ? 'я здесь' : 'I am here';
+      // Если нужен тултип, создаем его
+      let tooltip = null;
+      if (tooltipText) {
+        tooltip = document.createElement('div');
+        tooltip.id = 'faqTooltip';
+        tooltip.textContent = tooltipText;
+        
+        // Выбираем случайный цвет из цветов сфер
+        const randomColor = sphereColors[Math.floor(Math.random() * sphereColors.length)];
+        tooltip.style.backgroundColor = randomColor;
+        tooltip.style.color = document.body.classList.contains('dark-mode') ? '#fff' : '#333';
+        
+        // Добавляем тултип к элементу
+        element.appendChild(tooltip);
+      }
       
-      // Выбираем случайный цвет из цветов сфер
-      const sphereColors = [
-        '#f6b95a', // желтый (calling)
-        '#fbd462', // более яркий желтый (finance)
-        '#d25342', // красный (health)
-        '#f05f50', // более яркий красный (relationships)
-        '#27a2df', // более яркий синий (growth)
-        '#2289bc', // синий (recreation)
-        '#45c4a1', // более яркий зеленый (environment)
-        '#3fa49a'  // зеленый (contribution)
-      ];
-      
-      const randomColor = sphereColors[Math.floor(Math.random() * sphereColors.length)];
-      tooltip.style.backgroundColor = randomColor;
-      tooltip.style.color = document.body.classList.contains('dark-mode') ? '#fff' : '#333';
-      
-      // Добавляем тултип к FAQ
-      faqContent.appendChild(tooltip);
+      // Если нужно прокрутить до элемента (для мобильных устройств)
+      if (scrollToElement && window.innerWidth <= 576) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       
       // Удаляем затемнение, тултип и класс после анимации
       setTimeout(() => {
-        console.log('Удаляем класс pulsing');
-        faqContent.classList.remove('pulsing');
+        element.classList.remove('pulsing');
+        if (borderRadius) {
+          element.style.borderRadius = '';
+        }
         document.body.removeChild(overlay);
         if (tooltip && tooltip.parentNode) {
           tooltip.parentNode.removeChild(tooltip);
         }
+        
+        // Восстанавливаем оригинальный z-index
+        element.style.zIndex = originalZIndex;
       }, 1000);
+    }
+
+    // Функция, которая показывает FAQ и скрывает сферы
+    function handleFaqClick() {
+      if (!faqContent || !sphereTabContent) return;
+      
+      // Подсвечиваем FAQ с тултипом
+      highlightElement(faqContent, currentLanguage === 'ru' ? 'я здесь' : 'I am here', false, '10px');
       
       // Переключаем видимость контента
       faqContent.style.display = "block";
