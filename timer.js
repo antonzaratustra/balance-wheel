@@ -61,11 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             closeButton.setAttribute('aria-label', e.detail.language === 'ru' ? 'Закрыть' : 'Close');
                         }
                         
-                        // Обновляем заголовок модального окна
-                        const modalTitle = timerModal.querySelector('.modal-title');
-                        if (modalTitle) {
-                            modalTitle.textContent = e.detail.language === 'ru' ? 'Таймер' : 'Timer';
-                        }
+                        // Не обновляем заголовок модального окна, так как там должно отображаться название сферы
                         
                         // Обновляем текст прогресс-бара
                         const progressBarLabel = timerModal.querySelector('.progress-bar-label');
@@ -129,9 +125,7 @@ function initTimerButton() {
         const progressBarLabel = timerModal.querySelector('.progress-bar-label');
         const totalTimerLabel = timerModal.querySelector('.total-timer-label');
         
-        if (modalTitle) {
-            modalTitle.textContent = 'Timer';
-        }
+        // Не устанавливаем заголовок модального окна при инициализации, так как он будет установлен в showCurrentQuestion()
         if (progressBarLabel) {
             progressBarLabel.textContent = 'Time per question';
         }
@@ -168,7 +162,7 @@ function openTimerModal() {
         const modal = new bootstrap.Modal(timerModal);
         modal.show();
         
-        // Показываем первый вопрос
+        // Показываем первый вопрос и устанавливаем заголовок с названием сферы
         showCurrentQuestion();
         
         // Запускаем таймеры
