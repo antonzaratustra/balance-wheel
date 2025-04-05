@@ -46,9 +46,45 @@ import {
   deleteSavedResult
 } from "./firestore-utils.js";
 
+// Функции для работы с localStorage
+function saveSettingsToLocalStorage(language, isDarkMode) {
+  try {
+    localStorage.setItem('balanceWheel_language', language);
+    localStorage.setItem('balanceWheel_darkMode', isDarkMode ? 'true' : 'false');
+    console.log('Настройки сохранены в localStorage:', { language, isDarkMode });
+  } catch (error) {
+    console.error('Ошибка при сохранении настроек в localStorage:', error);
+  }
+}
+
+function loadSettingsFromLocalStorage() {
+  try {
+    const savedLanguage = localStorage.getItem('balanceWheel_language');
+    const savedDarkMode = localStorage.getItem('balanceWheel_darkMode');
+    
+    return {
+      language: savedLanguage || 'en',
+      darkMode: savedDarkMode === null ? true : savedDarkMode === 'true'
+    };
+  } catch (error) {
+    console.error('Ошибка при загрузке настроек из localStorage:', error);
+    return { language: 'en', darkMode: true };
+  }
+}
+
+// Глобальная переменная для темного режима
+let darkMode = true;
+
 document.addEventListener("DOMContentLoaded", () => {
-  // Устанавливаем английский язык по умолчанию
-  window.currentLanguage = "en";
+  // Загружаем сохраненные настройки из localStorage
+  const savedSettings = loadSettingsFromLocalStorage();
+  
+  // Устанавливаем язык из сохраненных настроек или по умолчанию английский
+  window.currentLanguage = savedSettings.language;
+  
+  // Устанавливаем тему из сохраненных настроек
+  darkMode = savedSettings.darkMode;
+  document.body.classList.toggle("dark-mode", darkMode);
   
   showEmojiExplosion();
 
@@ -115,7 +151,6 @@ document.addEventListener("DOMContentLoaded", () => {
   /***************************************************
    * 1. ПАРАМЕТРЫ ПО УМОЛЧАНИЮ: ТЁМНАЯ ТЕМА + АНГЛИЙСКИЙ
    ***************************************************/
-  let darkMode = true;       
   // Делаем переменную доступной глобально для модуля floating-tooltip.js
   window.wheelSectors = [];
   let wheelSectors = window.wheelSectors; // Глобальный массив для хранения геометрии секторов колеса
@@ -1422,6 +1457,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const langBtn = isMobile ? document.getElementById("langToggle") : document.getElementById("langToggleDesktop");
     const faqContent = document.getElementById("faqContent");
     const sphereTabContent = document.getElementById("sphereTabContent");
+    
+    // Устанавливаем текст кнопок в соответствии с текущими настройками
+    if (themeBtn) {
+      themeBtn.innerText = darkMode
+        ? (currentLanguage === "ru" ? "🌙 Тёмная" : "🌙 Dark")
+        : (currentLanguage === "ru" ? "🌞 Светлая" : "🌞 Light");
+    }
+    
+    if (langBtn) {
+      langBtn.innerText = (currentLanguage === "ru") ? "🌐 RU" : "🌐 EN";
+    }
 
     // **По умолчанию показываем FAQ**, а сферы скрываем
     if (faqContent) {
@@ -1446,6 +1492,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (activeWheelSector) {
         highlightSector(activeWheelSector, true, true);
       }
+      
+      // Сохраняем настройки темы в localStorage
+      saveSettingsToLocalStorage(currentLanguage, darkMode);
     });
 
     // FAQ-кнопки (десктоп + мобильная)
@@ -1559,6 +1608,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }));
 
       langBtn.innerText = (currentLanguage === "ru") ? "🌐 RU" : "🌐 EN";
+      
+      // Сохраняем настройки языка в localStorage
+      saveSettingsToLocalStorage(currentLanguage, darkMode);
       themeBtn.innerText = darkMode
         ? (currentLanguage === "ru" ? "🌙 Тёмная" : "🌙 Dark")
         : (currentLanguage === "ru" ? "🌞 Светлая" : "🌞 Light");
