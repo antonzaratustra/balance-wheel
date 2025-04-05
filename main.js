@@ -1,5 +1,62 @@
 // Глобальный объект с инструкциями FAQ
 const faqInstructions = {
+  // Функция для определения целевого элемента в зависимости от targetId
+  getTargetElement(targetId) {
+    let targetElement;
+    let needsScroll = false;
+
+    switch(targetId) {
+      case 'langToggle':
+        targetElement = window.innerWidth > 576 ? 
+          document.getElementById('langToggleDesktop') : 
+          document.getElementById('langToggle');
+        break;
+      case 'themeToggle':
+        targetElement = window.innerWidth > 576 ? 
+          document.getElementById('themeToggleDesktop') : 
+          document.getElementById('themeToggle');
+        break;
+      case 'faqBtn':
+        targetElement = window.innerWidth > 576 ? 
+          document.getElementById('faqBtnDesktop') : 
+          document.getElementById('faqBtnMobile');
+        break;
+      case 'healthTab':
+        targetElement = document.querySelector('#sphereTabs .nav-link[data-bs-target="#healthTab"]');
+        needsScroll = true;
+        break;
+      case 'timerBtn':
+        targetElement = document.querySelector('.timer-button');
+        break;
+      case 'loginBtn':
+        targetElement = window.innerWidth > 576 ? 
+          document.getElementById('loginBtn') : 
+          document.getElementById('mobile-login-btn');
+        needsScroll = true;
+        break;
+      case 'saveToCloudBtn':
+        targetElement = window.innerWidth > 576 ? 
+          document.getElementById('saveToCloudBtn') : 
+          document.getElementById('btn-save');
+        needsScroll = true;
+        break;
+      case 'showResultsBtn':
+        targetElement = window.innerWidth > 576 ? 
+          document.getElementById('showResultsBtn') : 
+          document.getElementById('mobile-view-btn');
+        needsScroll = true;
+        break;
+      case 'savePDF':
+        targetElement = window.innerWidth > 576 ? 
+          document.getElementById('savePDF') : 
+          document.getElementById('savePDFMobile');
+        needsScroll = true;
+        break;
+      default:
+        targetElement = document.getElementById(targetId);
+    }
+    return { targetElement, needsScroll };
+  },
   ru: `<strong>Добро пожаловать в Mentorist Life Balance Wheel!</strong><br><br>
   Инструмент для оценки баланса жизни по 8 сферам: 🎯 Призвание, 🤝 Отношения, 🏡 Окружение, 💰 Финансы, 📚 Саморазвитие, 🎉 Яркость жизни, 🌀 Духовность и ❤️ Здоровье.<br><br>
   <strong>1. Тема и язык:</strong> <span class="btn-like">🌐 RU</span> и <span class="btn-like">🌙 Тёмная</span> / <span class="btn-like">🌞 Светлая</span>.<br><br>
@@ -26,6 +83,7 @@ import { auth } from "./firebase-init.js";
 import { DejaVuSansTTF } from './fonts.js';
 import { spheres } from './js/spheres.js';
 import { initFloatingTooltip } from './js/floating-tooltip.js';
+import { highlightElement } from './js/highlight-element.js';
 
 // Импорт нужных методов из firebase/auth
 import {
@@ -76,6 +134,33 @@ let darkMode = true;
 document.addEventListener("DOMContentLoaded", () => {
   // Загружаем сохраненные настройки из localStorage
   const savedSettings = loadSettingsFromLocalStorage();
+
+  // Добавляем обработчики для кликабельных элементов в FAQ
+  document.addEventListener('click', (e) => {
+    if (!e.target.classList.contains('btn-like')) return;
+    
+    const btnText = e.target.textContent.trim();
+    const tooltipText = currentLanguage === 'ru' ? 'я здесь' : 'I am here';
+    let targetId;
+
+    // Определяем targetId на основе текста кнопки
+    if (btnText.includes('🌐')) targetId = 'langToggle';
+    else if (btnText.includes('🌙') || btnText.includes('🌞')) targetId = 'themeToggle';
+    else if (btnText.includes('💡')) targetId = 'faqBtn';
+    else if (btnText.includes('❤️')) targetId = 'healthTab';
+    else if (btnText.includes('⏱️')) targetId = 'timerBtn';
+    else if (btnText.includes('👤')) targetId = 'loginBtn';
+    else if (btnText.includes('💾')) targetId = 'saveToCloudBtn';
+    else if (btnText.includes('☁️')) targetId = 'showResultsBtn';
+    else if (btnText.includes('🔽')) targetId = 'savePDF';
+
+    if (targetId) {
+      const { targetElement, needsScroll } = faqInstructions.getTargetElement(targetId);
+      if (targetElement) {
+        highlightElement(targetElement, tooltipText, needsScroll, targetId === 'timerBtn' ? '50%' : null);
+      }
+    }
+  });
   
   // Устанавливаем язык из сохраненных настроек или по умолчанию английский
   window.currentLanguage = savedSettings.language;
@@ -1514,83 +1599,109 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Общая функция для подсветки элемента с затемнением фона
     function highlightElement(element, tooltipText = null, scrollToElement = false, borderRadius = null) {
-      if (!element) return;
-      
-      // Сохраняем текущий z-index элемента
-      const originalZIndex = element.style.zIndex;
-      
-      // Временно повышаем z-index элемента, чтобы он был поверх затемнения
-      element.style.zIndex = '1060';
-      
-      // Добавляем класс пульсации
-      element.classList.add('pulsing');
-      
-      // Если задан радиус границы, применяем его
-      if (borderRadius) {
-        element.style.borderRadius = borderRadius;
-      }
-      
-      // Создаем затемнение для всего контента
-      const overlay = document.createElement('div');
-      overlay.id = 'faqOverlay';
-      document.body.appendChild(overlay);
-      
-      // Если нужен тултип, создаем его
-      let tooltip = null;
-      if (tooltipText) {
-        tooltip = document.createElement('div');
-        tooltip.id = 'faqTooltip';
-        tooltip.textContent = tooltipText;
-        
-        // Выбираем случайный цвет из цветов сфер
-        const randomColor = sphereColors[Math.floor(Math.random() * sphereColors.length)];
-        tooltip.style.backgroundColor = randomColor;
-        tooltip.style.color = document.body.classList.contains('dark-mode') ? '#fff' : '#333';
-        
-        // Добавляем тултип к элементу
-        element.appendChild(tooltip);
-      }
-      
-      // Если нужно прокрутить до элемента (для мобильных устройств)
-      if (scrollToElement && window.innerWidth <= 576) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-      
-      // Удаляем затемнение, тултип и класс после анимации
-      setTimeout(() => {
-        element.classList.remove('pulsing');
-        if (borderRadius) {
-          element.style.borderRadius = '';
-        }
-        document.body.removeChild(overlay);
-        if (tooltip && tooltip.parentNode) {
-          tooltip.parentNode.removeChild(tooltip);
-        }
-        
-        // Восстанавливаем оригинальный z-index
-        element.style.zIndex = originalZIndex;
-      }, 1000);
+  if (!element) {
+    console.error('Element not found for highlighting');
+    return;
+  }
+  
+  console.log('Highlighting element:', element);
+  
+  // Сохраняем текущий z-index элемента
+  const originalZIndex = element.style.zIndex;
+  
+  // Временно повышаем z-index элемента, чтобы он был поверх затемнения
+  element.style.zIndex = '1060';
+  
+  // Добавляем класс пульсации
+  element.classList.add('pulsing');
+  
+  // Если задан радиус границы, применяем его
+  if (borderRadius) {
+    element.style.borderRadius = borderRadius;
+  }
+  
+  // Создаем затемнение для всего контента
+  const overlay = document.createElement('div');
+  overlay.id = 'faqOverlay';
+  document.body.appendChild(overlay);
+  
+  // Если нужен тултип, создаем его
+  let tooltip = null;
+  if (tooltipText) {
+    tooltip = document.createElement('div');
+    tooltip.id = 'faqTooltip';
+    tooltip.textContent = tooltipText;
+    
+    // Выбираем случайный цвет из цветов сфер
+    const randomColor = sphereColors[Math.floor(Math.random() * sphereColors.length)];
+    tooltip.style.backgroundColor = randomColor;
+    tooltip.style.color = document.body.classList.contains('dark-mode') ? '#fff' : '#333';
+    
+    // Добавляем тултип к элементу
+    element.appendChild(tooltip);
+  }
+  
+  // Если нужно прокрутить до элемента (для мобильных устройств)
+  if (scrollToElement && window.innerWidth <= 576) {
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  
+  // Удаляем затемнение, тултип и класс после анимации
+  setTimeout(() => {
+    element.classList.remove('pulsing');
+    if (borderRadius) {
+      element.style.borderRadius = '';
     }
+    if (overlay && overlay.parentNode) {
+      overlay.parentNode.removeChild(overlay);
+    }
+    if (tooltip && tooltip.parentNode) {
+      tooltip.parentNode.removeChild(tooltip);
+    }
+    
+    // Восстанавливаем оригинальный z-index
+    element.style.zIndex = originalZIndex;
+  }, 1000);
+}
 
     // Функция, которая показывает FAQ и скрывает сферы
     function handleFaqClick() {
-      if (!faqContent || !sphereTabContent) return;
+      console.log('FAQ click handler started');
+      if (!faqContent || !sphereTabContent) {
+        console.error('Required elements not found:', { faqContent: !!faqContent, sphereTabContent: !!sphereTabContent });
+        return;
+      }
       
+      console.log('Highlighting FAQ content with tooltip');
       // Подсвечиваем FAQ с тултипом
       highlightElement(faqContent, currentLanguage === 'ru' ? 'я здесь' : 'I am here', false, '10px');
       
       // Переключаем видимость контента
+      console.log('Toggling content visibility');
       faqContent.style.display = "block";
       sphereTabContent.style.display = "none";
       
+      // Добавляем обработчики для элементов FAQ
+      const faqElements = faqContent.querySelectorAll('.btn-like');
+      console.log('Found FAQ elements:', faqElements.length);
+      faqElements.forEach((element, index) => {
+        console.log(`Adding click handler to FAQ element ${index}`);
+        element.addEventListener('click', () => {
+          console.log(`FAQ element ${index} clicked`);
+          highlightElement(element, null, true, '4px');
+        });
+      });
+      
       // Сбрасываем подсветку активного сектора и перерисовываем колесо
       if (activeWheelSector) {
+        console.log('Resetting active wheel sector');
         activeWheelSector = null;
         drawWheel();
       }
 
       // Снимаем "active" у всех вкладок
       const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
+      console.log('Removing active state from tabs');
       tabLinks.forEach(tab => {
         tab.classList.remove("active");
         tab.style.boxShadow = 'none';
@@ -1601,6 +1712,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       if (window.innerWidth <= 576) {
+        console.log('Mobile view detected, scrolling to top');
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
     }
