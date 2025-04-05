@@ -32,7 +32,8 @@ import { initFloatingTooltip } from './js/floating-tooltip.js';
 // Импорт нужных методов из firebase/auth
 import {
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
+  getRedirectResult
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
 // Импорт функции авторизации через Google
@@ -616,7 +617,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const user = result.user;
             console.log("Пользователь вошёл после редиректа:", user);
             localStorage.setItem("uid", user.uid);
-            updateUIForAuthenticatedUser(user);
+            // Обновляем UI после успешной авторизации
+            updateLoginButtons();
+            updateSaveButtons();
+            updateUserInfo();
           }
         } catch (error) {
           console.error("Ошибка при проверке аутентификации:", error);

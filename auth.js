@@ -66,7 +66,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     
     // Показываем ошибку пользователю
-    if (error.code !== "auth/cancelled-popup-request") {
+    // Игнорируем ошибки, связанные с отменой попапа и COOP (Cross-Origin-Opener-Policy)
+    if (error.code !== "auth/cancelled-popup-request" && 
+        !error.message.includes("Cross-Origin-Opener-Policy") && 
+        !error.message.includes("popup")) {
       alert("Ошибка входа: " + error.message);
     }
   }
@@ -118,10 +121,16 @@ export async function signInWithGoogle() {
     }
   } catch (error) {
     console.error("Ошибка авторизации:", error);
-    if (error.code !== "auth/cancelled-popup-request") {
+    // Игнорируем ошибки, связанные с отменой попапа и COOP (Cross-Origin-Opener-Policy)
+    if (error.code !== "auth/cancelled-popup-request" && 
+        !error.message.includes("Cross-Origin-Opener-Policy") && 
+        !error.message.includes("popup")) {
       alert("Ошибка входа: " + error.message);
     }
-    throw error;
+    // Не выбрасываем ошибку для мобильных устройств, чтобы процесс аутентификации мог продолжиться
+    if (!isMobileDevice()) {
+      throw error;
+    }
   }
 }
 
