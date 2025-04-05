@@ -1507,10 +1507,43 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log('Добавляем класс pulsing');
       faqContent.classList.add('pulsing');
       
-      // Удаляем класс после анимации
+      // Создаем затемнение для всего контента
+      const overlay = document.createElement('div');
+      overlay.id = 'faqOverlay';
+      document.body.appendChild(overlay);
+      
+      // Создаем тултип
+      const tooltip = document.createElement('div');
+      tooltip.id = 'faqTooltip';
+      tooltip.textContent = currentLanguage === 'ru' ? 'я здесь' : 'I am here';
+      
+      // Выбираем случайный цвет из цветов сфер
+      const sphereColors = [
+        '#f6b95a', // желтый (calling)
+        '#fbd462', // более яркий желтый (finance)
+        '#d25342', // красный (health)
+        '#f05f50', // более яркий красный (relationships)
+        '#27a2df', // более яркий синий (growth)
+        '#2289bc', // синий (recreation)
+        '#45c4a1', // более яркий зеленый (environment)
+        '#3fa49a'  // зеленый (contribution)
+      ];
+      
+      const randomColor = sphereColors[Math.floor(Math.random() * sphereColors.length)];
+      tooltip.style.backgroundColor = randomColor;
+      tooltip.style.color = document.body.classList.contains('dark-mode') ? '#fff' : '#333';
+      
+      // Добавляем тултип к FAQ
+      faqContent.appendChild(tooltip);
+      
+      // Удаляем затемнение, тултип и класс после анимации
       setTimeout(() => {
         console.log('Удаляем класс pulsing');
         faqContent.classList.remove('pulsing');
+        document.body.removeChild(overlay);
+        if (tooltip && tooltip.parentNode) {
+          tooltip.parentNode.removeChild(tooltip);
+        }
       }, 1000);
       
       // Переключаем видимость контента
