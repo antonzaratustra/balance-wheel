@@ -444,6 +444,7 @@ input[type=range]::-moz-range-thumb:active {
   display: block;
   padding: 0 15px;
   margin-bottom: 0.5rem;
+  font-weight: 600;
 }
 
 /* 
@@ -764,6 +765,7 @@ input[type=range]::-moz-range-thumb:active {
   /* padding: 0 15px; */
   min-height: 2.5em; /* или другой подходящий размер для двух строк */
   line-height: 1.2em; /* регулирует межстрочный интервал */
+  font-weight: 600;
 
 }
 
