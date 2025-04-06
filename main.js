@@ -1725,6 +1725,9 @@ document.addEventListener("DOMContentLoaded", () => {
       // Подсвечиваем FAQ с тултипом
       highlightElement(faqContent, currentLanguage === 'ru' ? 'я здесь' : 'I am here', false, '10px');
       
+      // Добавляем класс для подсветки
+      faqContent.classList.add('faq-content-highlight');
+      
       // Переключаем видимость контента
       console.log('Toggling content visibility');
       faqContent.style.display = "block";
@@ -1740,19 +1743,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Снимаем "active" у всех вкладок
       const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
       console.log('Removing active state from tabs');
-      tabLinks.forEach(tab => {
-        tab.classList.remove("active");
-        tab.style.boxShadow = 'none';
-        const targetPane = document.querySelector(tab.getAttribute("data-bs-target"));
-        if (targetPane) {
-          targetPane.classList.remove("show", "active");
-        }
-      });
-
-      if (window.innerWidth <= 576) {
-        console.log('Mobile view detected, scrolling to top');
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
+      tabLinks.forEach(tab => tab.classList.remove("active"));
     }
 
     // Обработчик для вкладок сфер
@@ -1771,22 +1762,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Снимаем "active" у всех вкладок
         const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
-        tabLinks.forEach(tab => {
-          tab.classList.remove("active");
-          tab.style.boxShadow = 'none';
-          const targetPane = document.querySelector(tab.getAttribute("data-bs-target"));
-          if (targetPane) {
-            targetPane.classList.remove("show", "active");
-          }
-        });
-
-        // Добавляем "active" к текущей вкладке
+        tabLinks.forEach(tab => tab.classList.remove("active"));
         target.classList.add("active");
-        target.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-        const targetPane = document.querySelector(target.getAttribute("data-bs-target"));
-        if (targetPane) {
-          targetPane.classList.add("show", "active");
-        }
 
         if (window.innerWidth <= 576) {
           window.scrollTo({ top: 0, behavior: "smooth" });
