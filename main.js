@@ -1721,17 +1721,12 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       
-      console.log('Highlighting FAQ content with tooltip');
-      // Подсвечиваем FAQ с тултипом
-      highlightElement(faqContent, currentLanguage === 'ru' ? 'я здесь' : 'I am here', false, '10px');
-      
-      // Добавляем класс для подсветки
-      faqContent.classList.add('faq-content-highlight');
-      
-      // Переключаем видимость контента
       console.log('Toggling content visibility');
       faqContent.style.display = "block";
       sphereTabContent.style.display = "none";
+      
+      console.log('Highlighting FAQ content with tooltip');
+      highlightElement(faqContent, currentLanguage === 'ru' ? 'я здесь' : 'I am here', false, '10px');
       
       // Сбрасываем подсветку активного сектора и перерисовываем колесо
       if (activeWheelSector) {
@@ -1742,7 +1737,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Снимаем "active" у всех вкладок
       const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
-      console.log('Removing active state from tabs');
       tabLinks.forEach(tab => tab.classList.remove("active"));
     }
 
