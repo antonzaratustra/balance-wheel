@@ -89,6 +89,19 @@ export function highlightElement(element, tooltipText, needsScroll = false, topO
   element.style.position = originalStyles.position === 'static' ? 'relative' : originalStyles.position;
   element.style.zIndex = '1001';
 
+  // Special handling for timer button on mobile
+  if (isTimerButton && window.innerWidth <= 576) {
+    // Get the canvas wrapper position
+    const canvasWrapper = document.getElementById('canvas-wrapper');
+    if (canvasWrapper) {
+      const canvasRect = canvasWrapper.getBoundingClientRect();
+      // Center the timer button horizontally and vertically within the canvas area
+      element.style.position = 'absolute';
+      element.style.left = `${canvasRect.left + (canvasRect.width - element.offsetWidth) / 2}px`;
+      element.style.top = `${canvasRect.top + (canvasRect.height - element.offsetHeight) / 2}px`;
+    }
+  }
+
   // Create tooltip if text is provided
   if (tooltipText) {
     const tooltip = document.createElement('div');
