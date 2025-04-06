@@ -1387,12 +1387,12 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // Если сектор под курсором или активный, делаем его ярче
         if (isHighlighted || isActive) {
-            // Добавляем свечение
-            ctx.shadowBlur = isActive ? 20 : 15;
+            // Добавляем более яркое свечение
+            ctx.shadowBlur = isActive ? 30 : 20;
             ctx.shadowColor = sector.sphereObj.color;
             
-            // Делаем сектор ярче
-            ctx.globalAlpha = isActive ? 0.7 : 0.5;
+            // Делаем сектор ярче и насыщеннее
+            ctx.globalAlpha = isActive ? 0.9 : 0.6;
             ctx.fillStyle = sector.sphereObj.color;
             ctx.beginPath();
             ctx.moveTo(canvas.width/2, canvas.height/2);
@@ -1400,10 +1400,10 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.closePath();
             ctx.fill();
             
-            // Добавляем выразительную обводку
+            // Добавляем более толстую и яркую обводку
             ctx.strokeStyle = darkMode ? "#ffffff" : "#000000";
-            ctx.lineWidth = isActive ? 3 : 2;
-            ctx.globalAlpha = isActive ? 0.8 : 0.6;
+            ctx.lineWidth = isActive ? 4 : 3;
+            ctx.globalAlpha = isActive ? 0.9 : 0.7;
             ctx.stroke();
 
             // Восстанавливаем настройки для отрисовки текста и делений
@@ -1412,7 +1412,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             // Увеличиваем контрастность текста и делений
             ctx.globalAlpha = 1.0;
-            ctx.lineWidth = isActive ? 2 : 1.5;
+            ctx.lineWidth = isActive ? 3 : 2;
             
             // Перерисовываем деления и текст для этого сектора
             drawSectorDivisions(sector);
