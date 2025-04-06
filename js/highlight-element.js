@@ -86,9 +86,15 @@ export function highlightElement(element, tooltipText, needsScroll = false, topO
 
   overlay.addEventListener('click', cleanup);
 
-  // Set element's position and z-index
-  element.style.position = originalStyles.position === 'static' ? 'relative' : originalStyles.position;
-  element.style.zIndex = '1001';
+  // Special handling for timer button - do not modify its position or z-index
+  if (isTimerButton) {
+    // Add pulsing effect without changing position or z-index
+    element.classList.add('pulsing');
+  } else {
+    // Set element's position and z-index for other elements
+    element.style.position = originalStyles.position === 'static' ? 'relative' : originalStyles.position;
+    element.style.zIndex = '1001';
+  }
 
   // Create tooltip if text is provided
   if (tooltipText) {
@@ -148,7 +154,9 @@ export function highlightElement(element, tooltipText, needsScroll = false, topO
   }
 
   // Add pulsing effect to the element
-  element.classList.add('pulsing');
+  if (!isTimerButton) {
+    element.classList.add('pulsing');
+  }
 
   // Scroll into view if needed
   if (needsScroll) {
@@ -161,8 +169,10 @@ export function highlightElement(element, tooltipText, needsScroll = false, topO
   const restoreAndCleanup = () => {
     cleanup();
     element.classList.remove('pulsing');
-    element.style.position = originalStyles.position;
-    element.style.zIndex = originalStyles.zIndex;
+    if (!isTimerButton) {
+      element.style.position = originalStyles.position;
+      element.style.zIndex = originalStyles.zIndex;
+    }
   };
 
   setTimeout(restoreAndCleanup, 2000);
