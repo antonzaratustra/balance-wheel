@@ -1934,8 +1934,31 @@ document.addEventListener("DOMContentLoaded", () => {
       ${questionsHtml}
     `;
     tooltip.innerHTML = tooltipHtml;
-    tooltip.style.left = (e.pageX + 15) + 'px';
-    tooltip.style.top  = (e.pageY + 15) + 'px';
+    // Получаем размеры тултипа
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const tooltipHeight = tooltipRect.height;
+    const tooltipWidth = tooltipRect.width;
+
+    // Проверяем доступное пространство
+    const bottomSpace = window.innerHeight - e.clientY;
+    const rightSpace = window.innerWidth - e.clientX;
+
+    // Позиционируем тултип
+    let tooltipLeft = e.pageX + 15;
+    let tooltipTop = e.pageY + 15;
+
+    // Если тултип выходит за правую границу
+    if (rightSpace < tooltipWidth + 15) {
+      tooltipLeft = e.pageX - tooltipWidth - 15;
+    }
+
+    // Если тултип выходит за нижнюю границу
+    if (bottomSpace < tooltipHeight + 15) {
+      tooltipTop = e.pageY - tooltipHeight - 15;
+    }
+
+    tooltip.style.left = tooltipLeft + 'px';
+    tooltip.style.top = tooltipTop + 'px';
     tooltip.style.display = 'block';
   }
 

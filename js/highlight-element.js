@@ -119,37 +119,48 @@ export function highlightElement(element, tooltipText, needsScroll = false, topO
     tooltip.style.color = '#fff';
     tooltip.style.padding = '8px 12px';
     tooltip.style.borderRadius = '4px';
-    tooltip.style.position = 'absolute';
-    tooltip.style.left = '50%';
-    tooltip.style.transform = 'translateX(-50%)';
+    tooltip.style.position = 'fixed';
     tooltip.style.zIndex = '1002';
     tooltip.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
     tooltip.style.pointerEvents = 'none';
-    tooltip.style.whiteSpace = 'nowrap';
+    tooltip.style.whiteSpace = 'normal';
+    tooltip.style.maxWidth = '300px';
+    tooltip.style.wordWrap = 'break-word';
     
     // Add tooltip to body
     document.body.appendChild(tooltip);
 
     // Позиционируем тултип относительно элемента
     const elementRect = element.getBoundingClientRect();
-    const tooltipRect = tooltip.getBoundingClientRect();
     
-    // Устанавливаем позицию тултипа под элементом
-    if (window.innerWidth <= 576 && needsScroll) {
-      // На мобильных устройствах добавляем слушатель события прокрутки
-      const updateTooltipPosition = () => {
-        const updatedRect = element.getBoundingClientRect();
-        tooltip.style.top = `${updatedRect.bottom + window.scrollY + 10}px`;
-        tooltip.style.left = `${updatedRect.left + (updatedRect.width - tooltipRect.width) / 2}px`;
-      };
-      
-      window.addEventListener('scroll', updateTooltipPosition);
-      setTimeout(() => {
-        window.removeEventListener('scroll', updateTooltipPosition);
-      }, 2000);
+    // Получаем размеры тултипа до позиционирования
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const tooltipHeight = tooltipRect.height;
+    const tooltipWidth = tooltipRect.width;
+    
+    // Проверяем доступное пространство
+    const bottomSpace = window.innerHeight - elementRect.bottom;
+    const topSpace = elementRect.top;
+    
+    // Определяем позицию тултипа
+    const tooltipShouldBeAbove = bottomSpace < tooltipHeight + 10 && topSpace > tooltipHeight + 10;
+    
+    // Вычисляем горизонтальную позицию тултипа
+    let tooltipLeft = Math.min(
+      Math.max(10, elementRect.left + (elementRect.width - tooltipWidth) / 2),
+      window.innerWidth - tooltipWidth - 10
+    );
+    
+    // Вычисляем вертикальную позицию тултипа
+    let tooltipTop;
+    if (tooltipShouldBeAbove) {
+      tooltipTop = Math.max(10, elementRect.top - tooltipHeight - 10);
+    } else {
+      tooltipTop = Math.min(window.innerHeight - tooltipHeight - 10, elementRect.bottom + 10);
     }
-    tooltip.style.top = `${elementRect.bottom + window.scrollY + 10}px`;
-    tooltip.style.left = `${elementRect.left + (elementRect.width - tooltipRect.width) / 2}px`;
+    
+    tooltip.style.top = `${tooltipTop}px`;
+    tooltip.style.left = `${tooltipLeft}px`;
     tooltip.style.transform = 'none';
   }
 
