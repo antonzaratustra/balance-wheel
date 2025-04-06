@@ -37,7 +37,7 @@ const faqInstructions = {
       case 'saveToCloudBtn':
         targetElement = window.innerWidth > 576 ? 
           document.getElementById('saveToCloudBtn') : 
-          document.getElementById('btn-save');
+          document.getElementById('mobile-save-btn');
         needsScroll = true;
         break;
       case 'showResultsBtn':
