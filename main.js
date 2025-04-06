@@ -781,8 +781,8 @@ document.addEventListener("DOMContentLoaded", () => {
    */
   function renderTabs() {
     const savedValues = {};
-    spheres.forEach(sphere => {
-      sphere.questions.forEach(question => {
+    spheres.forEach((sphere) => {
+      sphere.questions.forEach((question) => {
         const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
         if (slider) {
           savedValues[sphere.id] = savedValues[sphere.id] || {};
@@ -1453,6 +1453,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
         drawWheel(); // Перерисовываем колесо в исходное состояние
     }
+    drawWheel(false); // Добавляем вызов drawWheel()
   });
 
   // Обработчик события для клика на сектор
@@ -2116,8 +2117,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const sliderEl = document.getElementById(sliderId);
       if (!sliderEl) return;
       const val = sliderEl.value;
-      const desc = question.descriptions[val] 
-        ? question.descriptions[val][currentLanguage] 
+      const desc = question.descriptions[val]
+        ? question.descriptions[val][currentLanguage]
         : '';
       questionsHtml += `<div style="margin-bottom:2px;">
         <strong>${question.title[currentLanguage]}:</strong> ${desc}
@@ -2280,6 +2281,10 @@ window.getSectorUnderCursor = function(mouseX, mouseY) {
     const tooltip = document.getElementById('canvasTooltip');
     if (tooltip) {
       tooltip.style.display = 'none';
+    }
+    drawWheel(false); // Добавляем вызов drawWheel()
+    if (activeWheelSector) {
+        highlightSector(activeWheelSector, false, true); // Оставляем подсветку только на активном секторе
     }
   });
 
