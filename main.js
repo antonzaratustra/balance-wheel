@@ -873,8 +873,10 @@ document.addEventListener("DOMContentLoaded", () => {
           updateSliderDisplay(sphere.id, question.id, slider.value);
           updateSphereAverage(sphere.id);
           drawWheel();
-          // Подсвечиваем активный сектор при движении слайдера
-          highlightSector(sphere.id, true, true);
+          // Подсвечиваем активный сектор при движении слайдера только если это текущий активный сектор
+          if (activeWheelSector === sphere.id) {
+            highlightSector(sphere.id, true, true);
+          }
         });
 
         const desc = document.createElement("div");
@@ -1033,7 +1035,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Делаем функцию drawWheel доступной глобально
-  window.drawWheel = function() {
+  window.drawWheel = function(skipHighlight = false) {
     const canvas = document.getElementById("balanceWheel");
     const ctx = canvas.getContext("2d");
     const width = canvas.width;
@@ -1047,6 +1049,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const maxRadius = Math.min(width, height) / 2 - 30;
     const anglePerSphere = (2 * Math.PI) / spheres.length;
     let startAngle = -Math.PI / 2;
+    
+
+    
+    // Сохраняем текущий активный и наведенный секторы
+    const currentActive = activeWheelSector;
+    const currentHovered = hoveredSector;
 
     // Убедитесь, что контейнер для секторов существует
     const sectorsContainer = document.getElementById('sectorsContainer');
@@ -1159,13 +1167,56 @@ document.addEventListener("DOMContentLoaded", () => {
       startAngle = endAngle;
     });
 
-    // Улучшенная отрисовка розы ветров
+    // Вызываем функции для отрисовки сетки и подписей
+    drawGrid();
+    drawLabels();
+  }
+
+  // Функция для отрисовки сетки (розы ветров)
+  // Функция для отрисовки делений на секторах
+  function drawSectorDivisions(sector) {
+    const canvas = document.getElementById("balanceWheel");
+    const ctx = canvas.getContext("2d");
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const maxRadius = Math.min(canvas.width, canvas.height) / 2 - 30;
+
     ctx.save();
-    ctx.globalAlpha = 0.5; // Увеличили прозрачность
+    ctx.strokeStyle = darkMode ? "rgba(255, 255, 255, 0.4)" : "rgba(0, 0, 0, 0.4)";
+    ctx.lineWidth = 1;
+
+    // Рисуем деления от 0 до 10
+    for (let i = 1; i <= 10; i++) {
+      const radius = (maxRadius * i) / 10;
+      const startX = centerX + radius * Math.cos(sector.startAngle);
+      const startY = centerY + radius * Math.sin(sector.startAngle);
+      const endX = centerX + radius * Math.cos(sector.endAngle);
+      const endY = centerY + radius * Math.sin(sector.endAngle);
+
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.arc(centerX, centerY, radius, sector.startAngle, sector.endAngle);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  function drawGrid() {
+    const canvas = document.getElementById("balanceWheel");
+    const ctx = canvas.getContext("2d");
+    const width = canvas.width;
+    const height = canvas.height;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const maxRadius = Math.min(width, height) / 2 - 30;
+
+    ctx.save();
+    ctx.globalAlpha = 0.5;
     ctx.strokeStyle = darkMode 
-      ? "rgba(255, 255, 255, 0.6)" // Более яркий в темной теме
-      : "rgba(0, 0, 0, 0.6)";      // Более контрастный в светлой
-    ctx.lineWidth = 1.5; // Увеличили толщину линий
+      ? "rgba(255, 255, 255, 0.6)"
+      : "rgba(0, 0, 0, 0.6)";
+    ctx.lineWidth = 1.5;
 
     // Концентрические окружности
     for (let i = 1; i <= 10; i++) {
@@ -1175,7 +1226,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.stroke();
     }
 
-    // Радиальные линии (16 направлений)
+    // Радиальные линии
     const numDirections = 16;
     for (let i = 0; i < numDirections; i++) {
       const angle = (i * Math.PI * 2) / numDirections;
@@ -1189,27 +1240,180 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     ctx.restore();
-};
+  }
+
+  // Функция для отрисовки подписей и значений
+  function drawLabels() {
+    const canvas = document.getElementById("balanceWheel");
+    const ctx = canvas.getContext("2d");
+    const width = canvas.width;
+    const height = canvas.height;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const maxRadius = Math.min(width, height) / 2 - 30;
+    const anglePerSphere = (2 * Math.PI) / spheres.length;
+    let startAngle = -Math.PI / 2;
+
+    spheres.forEach((sphere) => {
+      // Подпись у края сектора
+      const midAngle = startAngle + anglePerSphere / 2;
+      const labelRadius = maxRadius - 50;
+      const labelX = centerX + labelRadius * Math.cos(midAngle);
+      const labelY = centerY + labelRadius * Math.sin(midAngle);
+      
+      ctx.save();
+      ctx.font = "16px sans-serif";
+      ctx.fillStyle = darkMode ? "#fff" : "#000";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(`${sphere.emoji || ""} ${sphere.title[currentLanguage]}`, labelX, labelY);
+      ctx.restore();
+
+      // Число среднего значения
+      let sum = 0, count = 0;
+      sphere.questions.forEach((question) => {
+        const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
+        sum += parseInt(slider.value);
+        count++;
+      });
+      const avg = sum / (count || 1);
+
+      const radiusNum = maxRadius * 0.5;
+      const xNum = centerX + radiusNum * Math.cos(midAngle);
+      const yNum = centerY + radiusNum * Math.sin(midAngle);
+
+      ctx.save();
+      ctx.font = "16px sans-serif";
+      ctx.fillStyle = darkMode ? "#fff" : "#000";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(Math.round(avg), xNum, yNum);
+      ctx.restore();
+
+      startAngle += anglePerSphere;
+    });
+  }
+
+  // Функция для отрисовки подписей конкретного сектора
+  function drawSectorLabels(sector) {
+    const canvas = document.getElementById("balanceWheel");
+    const ctx = canvas.getContext("2d");
+    const width = canvas.width;
+    const height = canvas.height;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const maxRadius = Math.min(width, height) / 2 - 30;
+
+    // Подпись у края сектора
+    const midAngle = (sector.startAngle + sector.endAngle) / 2;
+    const labelRadius = maxRadius - 50;
+    const labelX = centerX + labelRadius * Math.cos(midAngle);
+    const labelY = centerY + labelRadius * Math.sin(midAngle);
+    
+    ctx.save();
+    ctx.font = "16px sans-serif";
+    ctx.fillStyle = darkMode ? "#fff" : "#000";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(`${sector.sphereObj.emoji || ""} ${sector.sphereObj.title[currentLanguage]}`, labelX, labelY);
+
+    // Число среднего значения
+    let sum = 0, count = 0;
+    sector.sphereObj.questions.forEach((question) => {
+      const slider = document.getElementById(`slider_${sector.sphereObj.id}_${question.id}`);
+      sum += parseInt(slider.value);
+      count++;
+    });
+    const avg = sum / (count || 1);
+
+    const radiusNum = maxRadius * 0.5;
+    const xNum = centerX + radiusNum * Math.cos(midAngle);
+    const yNum = centerY + radiusNum * Math.sin(midAngle);
+
+    ctx.font = "16px sans-serif";
+    ctx.fillStyle = darkMode ? "#fff" : "#000";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(Math.round(avg), xNum, yNum);
+    ctx.restore();
+  };
+
   // Функция для подсветки сектора
   let activeWheelSector = null; // Глобальная переменная для хранения активного сектора
+  let hoveredSector = null; // Глобальная переменная для хранения сектора под курсором
 
   function highlightSector(sphereId, isHighlighted, isActive = false) {
     const sector = wheelSectors.find(sector => sector.sphereId === sphereId);
     console.log(`Highlighting sector: ${sphereId}, isHighlighted: ${isHighlighted}, isActive: ${isActive}`);
 
     if (sector) {
-        // Перерисовываем колесо
-        drawWheel();
+        // Очищаем все подсветки, если это не активный сектор
+        if (!isActive) {
+            drawWheel();
+        }
+
+        const canvas = document.getElementById("balanceWheel");
+        const ctx = canvas.getContext("2d");
+        
+        // Сохраняем текущие настройки контекста
+        ctx.save();
+        
+        // Если сектор под курсором или активный, делаем его ярче
+        if (isHighlighted || isActive) {
+            // Добавляем свечение
+            ctx.shadowBlur = isActive ? 20 : 15;
+            ctx.shadowColor = sector.sphereObj.color;
+            
+            // Делаем сектор ярче
+            ctx.globalAlpha = isActive ? 0.7 : 0.5;
+            ctx.fillStyle = sector.sphereObj.color;
+            ctx.beginPath();
+            ctx.moveTo(canvas.width/2, canvas.height/2);
+            ctx.arc(canvas.width/2, canvas.height/2, sector.radius, sector.startAngle, sector.endAngle);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Добавляем выразительную обводку
+            ctx.strokeStyle = darkMode ? "#ffffff" : "#000000";
+            ctx.lineWidth = isActive ? 3 : 2;
+            ctx.globalAlpha = isActive ? 0.8 : 0.6;
+            ctx.stroke();
+
+            // Восстанавливаем настройки для отрисовки текста и делений
+            ctx.restore();
+            ctx.save();
+            
+            // Увеличиваем контрастность текста и делений
+            ctx.globalAlpha = 1.0;
+            ctx.lineWidth = isActive ? 2 : 1.5;
+            
+            // Перерисовываем деления и текст для этого сектора
+            drawSectorDivisions(sector);
+            drawSectorLabels(sector);
+        }
+        
+        // Восстанавливаем настройки контекста
+        ctx.restore();
         
         // Обновляем активный сектор
         if (isActive) {
+            // Снимаем предыдущую активацию
+            if (activeWheelSector && activeWheelSector !== sphereId) {
+                const prevSector = wheelSectors.find(s => s.sphereId === activeWheelSector);
+                if (prevSector) {
+                    drawWheel();
+                }
+            }
             activeWheelSector = sphereId;
+            hoveredSector = null;
             // Переключаем активную вкладку
             const tab = document.getElementById(`tab-${sphereId}`);
             if (tab) {
                 const tabEl = bootstrap.Tab.getOrCreateInstance(tab);
                 tabEl.show();
             }
+        } else if (isHighlighted) {
+            hoveredSector = sphereId;
         }
     } else {
         console.error(`Sector not found for sphereId: ${sphereId}`);
@@ -1218,17 +1422,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Функция для подсветки активного сектора
   function highlightActiveSector(sphereId) {
-    console.log(`Highlighting active sector: ${sphereId}`); // Логирование
+    console.log(`Highlighting active sector: ${sphereId}`);
     // Устанавливаем новый активный сектор
     activeWheelSector = sphereId;
     // Подсвечиваем активный сектор
     highlightSector(sphereId, true, true);
-    // Обновляем подсветку при движении слайдера истории
-    if (historySlider) {
-      historySlider.addEventListener('input', () => {
-        highlightSector(activeWheelSector, true, true);
-      });
-    }
   }
 
   // Обработчик события для наведения на сектор
@@ -1282,17 +1480,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Функция для подсветки активного сектора
   function highlightActiveSector(sphereId) {
-    console.log(`Highlighting active sector: ${sphereId}`); // Логирование
+    console.log(`Highlighting active sector: ${sphereId}`);
     // Устанавливаем новый активный сектор
     activeWheelSector = sphereId;
     // Подсвечиваем активный сектор
     highlightSector(sphereId, true, true);
-    // Обновляем подсветку при движении слайдера истории
-    if (historySlider) {
-      historySlider.addEventListener('input', () => {
-        highlightSector(activeWheelSector, true, true);
-      });
-    }
   }
 
   // Слайдер истории
