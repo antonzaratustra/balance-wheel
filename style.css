@@ -1658,3 +1658,17 @@ body.dark-mode .btn-like:hover {
     box-shadow: 0 0 0 rgba(255, 255, 0, 0);
   }
 }
+
+/* Стили для плавного появления элементов на мобильном */
+@media (max-width: 575.98px) {
+  .powered-by, #userInfo-mobile {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    pointer-events: none;
+  }
+  
+  .powered-by.visible, #userInfo-mobile.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}

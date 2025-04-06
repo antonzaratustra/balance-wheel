@@ -222,6 +222,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let isMobile = window.innerWidth < 576;
   window.addEventListener("resize", () => {
     isMobile = window.innerWidth < 576;
+    updateMobileElementsVisibility();
   });
 
   function fillCanvasBackground(canvas, color) {
@@ -1753,9 +1754,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // ================== БЛОК С ТАБАМИ ==================
   // Изначальная инициализация
   function setupButtons() {
-    const isMobile = window.innerWidth < 576;
-    const themeBtn = isMobile ? document.getElementById("themeToggle") : document.getElementById("themeToggleDesktop");
-    const langBtn = isMobile ? document.getElementById("langToggle") : document.getElementById("langToggleDesktop");
+    const themeBtn = document.getElementById("themeToggleDesktop");
+    const langBtn = document.getElementById("langToggleDesktop");
     const faqContent = document.getElementById("faqContent");
     const sphereTabContent = document.getElementById("sphereTabContent");
     
@@ -2099,7 +2099,6 @@ document.addEventListener("DOMContentLoaded", () => {
   window.currentLanguage = currentLanguage;
 
   // Если на мобильном листаем вниз — скрываем вкладки, вверх — показываем
-  let lastScrollTop = 0;
   window.addEventListener("scroll", function() {
     if (window.innerWidth >= 576) return;
     let st = window.pageYOffset || document.documentElement.scrollTop;
@@ -2356,5 +2355,47 @@ window.getSectorUnderCursor = function(mouseX, mouseY) {
   });
 
   showEmojiExplosion();
+
+  // Добавляем обработчик прокрутки для мобильных элементов
+  window.addEventListener("resize", () => {
+    updateMobileElementsVisibility();
+  });
+
+  // Функция для обновления видимости мобильных элементов
+  function updateMobileElementsVisibility() {
+    const poweredBy = document.querySelector('.powered-by');
+    const userInfoMobile = document.getElementById('userInfo-mobile'); // Исправляем переменную
+    
+    if (poweredBy) {
+      poweredBy.classList.remove('visible');
+    }
+    if (userInfoMobile) {
+      userInfoMobile.classList.remove('visible');
+    }
+  }
+
+  // Обработчик прокрутки для мобильных элементов
+  function handleMobileScroll() {
+    const scrolled = window.scrollY;
+    const viewportHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    const isAtBottom = scrolled + viewportHeight >= documentHeight;
+
+    const poweredBy = document.querySelector('.powered-by');
+    const userInfoMobile = document.getElementById('userInfo-mobile'); // Исправляем переменную
+
+    if (poweredBy && userInfoMobile) {
+      if (isAtBottom) {
+        poweredBy.classList.add('visible');
+        userInfoMobile.classList.add('visible');
+      } else {
+        poweredBy.classList.remove('visible');
+        userInfoMobile.classList.remove('visible');
+      }
+    }
+  }
+
+  // Добавляем обработчик прокрутки
+  window.addEventListener('scroll', handleMobileScroll, { passive: true });
 });
 // Конец DOMContentLoaded
