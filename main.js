@@ -1167,7 +1167,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Подпись у края сектора
       const midAngle = startAngle + anglePerSphere / 2;
-      const labelRadius = Math.min(width, height) / 2 - 80;
+      const labelRadius = maxRadius - 70; // Уменьшаем значение на 30%
       const labelX = centerX + labelRadius * Math.cos(midAngle);
       const labelY = centerY + labelRadius * Math.sin(midAngle);
       
@@ -1286,7 +1286,7 @@ document.addEventListener("DOMContentLoaded", () => {
     spheres.forEach((sphere) => {
       // Подпись у края сектора
       const midAngle = startAngle + anglePerSphere / 2;
-      const labelRadius = maxRadius - 50;
+      const labelRadius = maxRadius - 70; // Уменьшаем значение на 30%
       const labelX = centerX + labelRadius * Math.cos(midAngle);
       const labelY = centerY + labelRadius * Math.sin(midAngle);
       
@@ -1335,7 +1335,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Подпись у края сектора
     const midAngle = (sector.startAngle + sector.endAngle) / 2;
-    const labelRadius = maxRadius - 50;
+    const labelRadius = maxRadius - 70; // Уменьшаем значение на 30%
     const labelX = centerX + labelRadius * Math.cos(midAngle);
     const labelY = centerY + labelRadius * Math.sin(midAngle);
     
@@ -1975,8 +1975,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // Снимаем "active" у всех вкладок
-        const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
-        tabLinks.forEach(tab => tab.classList.remove("active"));
+        const allTabs = document.querySelectorAll("#sphereTabs .nav-link");
+        allTabs.forEach(t => t.classList.remove("active"));
         target.classList.add("active");
 
         // Обновляем активный сектор на колесе
@@ -1998,8 +1998,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Сохраняем значения ползунков
       const savedValues = {};
-      spheres.forEach(sphere => {
-        sphere.questions.forEach(question => {
+      spheres.forEach((sphere) => {
+        sphere.questions.forEach((question) => {
           const slider = document.getElementById(`slider_${sphere.id}_${question.id}`);
           if (slider) {
             savedValues[sphere.id] = savedValues[sphere.id] || {};
