@@ -101,7 +101,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Функция для добавления кнопки таймера в центр колеса
 function initTimerButton() {
-    // const canvasWrapper = document.getElementById('canvas-wrapper');
     const canvasWrapper = document.getElementById('balanceWheelContainer');
     
     // Получаем актуальный язык
@@ -112,6 +111,12 @@ function initTimerButton() {
     timerButton.id = 'timer-button';
     timerButton.innerHTML = '⏱️';
     timerButton.title = currentLanguage === 'ru' ? 'Запустить таймер' : 'Start timer';
+    
+    // Добавляем фиксированное позиционирование
+    timerButton.style.position = 'absolute';
+    timerButton.style.left = '50%';
+    timerButton.style.top = '50%';
+    timerButton.style.transform = 'translate(-50%, -50%)';
     
     // Добавляем кнопку в контейнер колеса
     canvasWrapper.appendChild(timerButton);
