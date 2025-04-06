@@ -921,9 +921,38 @@ document.addEventListener("DOMContentLoaded", () => {
     // Подключаем обработчики на вкладки
     const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
     tabLinks.forEach(tab => {
-      tab.addEventListener('click', () => {
+      tab.addEventListener('click', (e) => {
+        e.preventDefault();
         const sphereId = tab.id.split('-')[1];
-        highlightActiveSector(sphereId);
+        
+        // Скрываем FAQ и показываем контент сфер
+        const faqContent = document.getElementById("faqContent");
+        const sphereTabContent = document.getElementById("sphereTabContent");
+        if (faqContent) {
+          faqContent.style.display = "none";
+        }
+        if (sphereTabContent) {
+          sphereTabContent.style.display = "block";
+        }
+
+        // Снимаем "active" у всех вкладок
+        const allTabs = document.querySelectorAll("#sphereTabs .nav-link");
+        allTabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+
+        // Показываем соответствующий контент сферы
+        const allPanes = document.querySelectorAll(".tab-pane");
+        allPanes.forEach(pane => pane.classList.remove("show", "active"));
+        document.getElementById("pane-" + sphereId).classList.add("show", "active");
+
+        // Подсвечиваем активный сектор на колесе
+        activeWheelSector = sphereId;
+        highlightSector(sphereId, false, true);
+
+        // Скрываем подсветку предыдущего активного сектора
+        if (window.innerWidth <= 576) {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
       });
 
       // Дополнительные «красивости»
@@ -1347,10 +1376,8 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log(`Highlighting sector: ${sphereId}, isHighlighted: ${isHighlighted}, isActive: ${isActive}`);
 
     if (sector) {
-        // Очищаем все подсветки, если это не активный сектор
-        if (!isActive) {
-            drawWheel();
-        }
+        // Всегда перерисовываем колесо перед подсветкой
+        drawWheel();
 
         const canvas = document.getElementById("balanceWheel");
         const ctx = canvas.getContext("2d");
@@ -1397,13 +1424,6 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // Обновляем активный сектор
         if (isActive) {
-            // Снимаем предыдущую активацию
-            if (activeWheelSector && activeWheelSector !== sphereId) {
-                const prevSector = wheelSectors.find(s => s.sphereId === activeWheelSector);
-                if (prevSector) {
-                    drawWheel();
-                }
-            }
             activeWheelSector = sphereId;
             hoveredSector = null;
             // Переключаем активную вкладку
@@ -1454,6 +1474,9 @@ document.addEventListener("DOMContentLoaded", () => {
         drawWheel(); // Перерисовываем колесо в исходное состояние
     }
     drawWheel(false); // Добавляем вызов drawWheel()
+    if (activeWheelSector) {
+        highlightSector(activeWheelSector, false, true); // Оставляем подсветку только на активном секторе
+    }
   });
 
   // Обработчик события для клика на сектор
@@ -1939,6 +1962,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const target = e.target.closest('.nav-link');
         if (!target) return;
 
+        // Получаем ID сферы из атрибута data-sphere-id
+        const sphereId = target.dataset.sphereId;
+        if (!sphereId) return;
+
         // Переключаем видимость контента
         if (faqContent) {
           faqContent.style.display = "none";
@@ -1951,6 +1978,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const tabLinks = document.querySelectorAll("#sphereTabs .nav-link");
         tabLinks.forEach(tab => tab.classList.remove("active"));
         target.classList.add("active");
+
+        // Обновляем активный сектор на колесе
+        activeWheelSector = sphereId;
+        highlightSector(sphereId, false, true);
 
         if (window.innerWidth <= 576) {
           window.scrollTo({ top: 0, behavior: "smooth" });
