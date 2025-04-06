@@ -142,6 +142,10 @@ body.dark-mode input[type=range]::-moz-range-track {
   transition: box-shadow 0.3s ease; /* Плавный переход */
 }
 
+.sector {
+  cursor: pointer;
+}
+
 #balanceWheel {
   background-color: transparent;
   display: block;

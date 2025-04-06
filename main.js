@@ -1900,6 +1900,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function showSphereTooltip(e) {
     const canvas = document.getElementById("balanceWheel");
     const tooltip = document.getElementById("canvasTooltip");
+    canvas.style.cursor = 'pointer';
     // Координаты мыши внутри канваса с учетом позиции wheelContainer
     const wheelRect = wheelContainer.getBoundingClientRect();
     const canvasRect = canvas.getBoundingClientRect();
@@ -1910,6 +1911,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const hoveredSector = getSectorUnderCursor(xInCanvas, yInCanvas);
     if (!hoveredSector) {
       tooltip.style.display = 'none';
+      canvas.style.cursor = 'default';
       return;
     }
     const sphere = hoveredSector.sphereObj;

@@ -91,6 +91,7 @@ function addFloatingTooltipStyles() {
 // Обработчик движения мыши
 function handleMouseMove(e) {
   const canvas = e.target;
+  canvas.style.cursor = 'default';
   const canvasRect = canvas.getBoundingClientRect();
   
   // Получаем координаты курсора относительно центра канваса
@@ -131,9 +132,11 @@ function handleMouseMove(e) {
     floatingTooltip.style.left = (canvasRect.left + tooltipX - floatingTooltip.offsetWidth / 2) + 'px';
     floatingTooltip.style.top = (canvasRect.top + tooltipY - floatingTooltip.offsetHeight / 2) + 'px';
     floatingTooltip.style.display = 'flex';
+    canvas.style.cursor = 'pointer';
   } else {
     // Если курсор не над сектором, скрываем подсказку
     floatingTooltip.style.display = 'none';
+    canvas.style.cursor = 'default';
   }
 }
 
